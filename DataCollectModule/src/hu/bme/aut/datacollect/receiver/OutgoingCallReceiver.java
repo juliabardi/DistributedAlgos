@@ -22,7 +22,7 @@ public class OutgoingCallReceiver extends BroadcastReceiver{
 		}
 		
 		//get phone number
-		String phoneNumber = extras.getString(Intent.EXTRA_PHONE_NUMBER);
+		//String phoneNumber = extras.getString(Intent.EXTRA_PHONE_NUMBER);
 		
 		//get dao
 		DataCollectDao dao = DataCollectDao.getInstance(context);
@@ -33,7 +33,7 @@ public class OutgoingCallReceiver extends BroadcastReceiver{
 		if (location != null) {
 			lac = location.getLac();
 		}
-		dao.insertCall(Calendar.getInstance().getTimeInMillis(), "out", lac, phoneNumber);
+		dao.insertCall(Calendar.getInstance().getTimeInMillis(), "out", lac);
 	}
 
 }

@@ -33,16 +33,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity android:name="hu.bme.aut.datacollect.activity.DetailsActivity" />
 
         <receiver android:name="hu.bme.aut.datacollect.receiver.IncomingCallReceiver" >
-            <intent-filter>
-                <action android:name="android.intent.action.PHONE_STATE" />
-            </intent-filter>
+<!--             <intent-filter> -->
+<!--                 <action android:name="android.intent.action.PHONE_STATE" /> -->
+<!--             </intent-filter> -->
         </receiver>
         <receiver android:name="hu.bme.aut.datacollect.receiver.OutgoingCallReceiver" >
-            <intent-filter>
-                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-            </intent-filter>
+<!--             <intent-filter> -->
+<!--                 <action android:name="android.intent.action.NEW_OUTGOING_CALL" /> -->
+<!--             </intent-filter> -->
         </receiver>
     </application>
 

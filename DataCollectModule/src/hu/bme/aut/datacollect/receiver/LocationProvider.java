@@ -22,8 +22,6 @@ public class LocationProvider implements LocationListener{
 		
 		//request location updates
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-		//locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60000, 100, this);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60000, 100, this);
 	}
 	
 	public static GsmCellLocation getGsmCellLocation(Context context){
@@ -61,6 +59,11 @@ public class LocationProvider implements LocationListener{
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void registerListener(){
+		//locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60000, 100, this);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60000, 100, this);
 	}
 	
 	public void unregisterListener(){

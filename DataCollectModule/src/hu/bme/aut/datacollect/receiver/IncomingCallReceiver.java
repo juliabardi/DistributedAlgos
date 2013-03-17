@@ -25,7 +25,7 @@ public class IncomingCallReceiver extends BroadcastReceiver{
 		String callState = extras.getString(TelephonyManager.EXTRA_STATE);
 		if (TelephonyManager.EXTRA_STATE_RINGING.equals(callState)){
 			//get incoming number
-			String incomingNumber = extras.getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
+			//String incomingNumber = extras.getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
 			
 			//get reference for dao
 			DataCollectDao dao = DataCollectDao.getInstance(context);
@@ -36,7 +36,7 @@ public class IncomingCallReceiver extends BroadcastReceiver{
 			if (location != null) {
 				lac = location.getLac();
 			}
-			dao.insertCall(Calendar.getInstance().getTimeInMillis(), "in", lac, incomingNumber);
+			dao.insertCall(Calendar.getInstance().getTimeInMillis(), "in", lac);
 		}
 	}
 

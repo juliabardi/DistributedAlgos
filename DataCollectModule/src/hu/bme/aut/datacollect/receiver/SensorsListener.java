@@ -1,8 +1,9 @@
 package hu.bme.aut.datacollect.receiver;
 
+import hu.bme.aut.datacollect.db.DataCollectDao;
+
 import java.util.Calendar;
 
-import hu.bme.aut.datacollect.db.DataCollectDao;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -11,10 +12,14 @@ import android.hardware.SensorManager;
 
 public class SensorsListener implements SensorEventListener {
 	
+	public enum Sensors { ACCELEROMETER, LIGHT, TEMPERATURE };
+	
 	private final SensorManager sensorManager;
 	private final Sensor accelerometerSensor;
 	private final Sensor lightSensor;
 	private final Sensor ambientTempSensor;
+	
+	private final float NOISE = 2.0F;
 	
 	private final Context mContext;
 	
@@ -38,14 +43,6 @@ public class SensorsListener implements SensorEventListener {
 		//warning: api level 14
 		ambientTempSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
 		
-		//register listener for sensors
-		if (accelerometerSensor != null){
-			sensorManager.registerListener(this, accelerometerSensor, 100); }
-		if (lightSensor != null){
-			sensorManager.registerListener(this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL); }
-		if (ambientTempSensor != null){
-			sensorManager.registerListener(this, ambientTempSensor, SensorManager.SENSOR_DELAY_NORMAL); }
-		
 	}
 
 	@Override
@@ -66,8 +63,8 @@ public class SensorsListener implements SensorEventListener {
 			
 			Acceleration acc = new Acceleration(accX, accY, accZ);
 			
-			//if differs from previous, save
-			if (currentAcc == null || !currentAcc.equals(acc)){
+			//if differs from previous, save (some noise is ok)
+			if (currentAcc == null || !currentAcc.equalsWithNoise(acc)){
 				//calculate eredo see dia if necessary			
 				//save into db
 				dao.insertAcceleration(Calendar.getInstance().getTimeInMillis(), accX, accY, accZ);
@@ -91,9 +88,38 @@ public class SensorsListener implements SensorEventListener {
 		}
 
 	}
+
+	public void registerListener(Sensors name) {
+		// register listener for sensors
+		if (name.equals(Sensors.ACCELEROMETER) && accelerometerSensor != null) {
+			sensorManager.registerListener(this, accelerometerSensor,
+					SensorManager.SENSOR_DELAY_NORMAL);
+		} else if (name.equals(Sensors.LIGHT) && lightSensor != null) {
+			sensorManager.registerListener(this, lightSensor,
+					SensorManager.SENSOR_DELAY_NORMAL);
+		} else if (name.equals(Sensors.TEMPERATURE)
+				&& ambientTempSensor != null) {
+			sensorManager.registerListener(this, ambientTempSensor,
+					SensorManager.SENSOR_DELAY_NORMAL);
+		}
+	}
 	
 	public void unregisterListener(){
 		sensorManager.unregisterListener(this);
+	}
+	
+	public void unregisterListener(Sensors name) {
+		switch (name) {
+		case ACCELEROMETER:
+			sensorManager.unregisterListener(this, accelerometerSensor);
+			break;
+		case LIGHT:
+			sensorManager.unregisterListener(this, lightSensor);
+			break;
+		case TEMPERATURE:
+			sensorManager.unregisterListener(this, ambientTempSensor);
+			break;
+		}
 	}
 	
 	private class Acceleration {
@@ -117,6 +143,15 @@ public class SensorsListener implements SensorEventListener {
 			result = prime * result + Float.floatToIntBits(accY);
 			result = prime * result + Float.floatToIntBits(accZ);
 			return result;
+		}
+		
+		public boolean equalsWithNoise(Acceleration acc){
+			if (Math.abs(accX - acc.accX) < NOISE
+					&& Math.abs(accY- acc.accY) < NOISE
+					&& Math.abs(accZ - acc.accZ) < NOISE) {
+				return true;
+			}
+			return false;
 		}
 
 		@Override
