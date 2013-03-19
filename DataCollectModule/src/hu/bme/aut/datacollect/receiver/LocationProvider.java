@@ -1,8 +1,10 @@
 package hu.bme.aut.datacollect.receiver;
 
+import hu.bme.aut.datacollect.db.LocationDao;
+import hu.bme.aut.datacollect.entity.LocationData;
+
 import java.util.Calendar;
 
-import hu.bme.aut.datacollect.db.DataCollectDao;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
@@ -13,12 +15,13 @@ import android.telephony.gsm.GsmCellLocation;
 
 public class LocationProvider implements LocationListener{
 	
-	private Context mContext = null;
 	private final LocationManager locationManager;
 	
-	public LocationProvider(Context context){
-		
-		mContext = context;
+	private LocationDao locationDao = null;
+	
+	public LocationProvider(Context context, LocationDao locationDao){
+			
+		this.locationDao = locationDao;
 		
 		//request location updates
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -38,9 +41,9 @@ public class LocationProvider implements LocationListener{
 	@Override
 	public void onLocationChanged(Location location) {
 		// insert new location
-		DataCollectDao dao = DataCollectDao.getInstance(mContext);
-		dao.insertFineLocation(Calendar.getInstance().getTimeInMillis(), 
-				location.getLatitude(), location.getLongitude(), location.getAltitude());
+		locationDao.create(new LocationData(Calendar.getInstance()
+				.getTimeInMillis(), location.getLatitude(), location
+				.getLongitude(), location.getAltitude()));
 	}
 
 	@Override

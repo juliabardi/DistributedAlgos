@@ -1,6 +1,7 @@
 package hu.bme.aut.datacollect.receiver;
 
-import hu.bme.aut.datacollect.db.DataCollectDao;
+import hu.bme.aut.datacollect.db.CallDao;
+import hu.bme.aut.datacollect.entity.CallData;
 
 import java.util.Calendar;
 
@@ -11,6 +12,12 @@ import android.os.Bundle;
 import android.telephony.gsm.GsmCellLocation;
 
 public class OutgoingCallReceiver extends BroadcastReceiver{
+	
+	private CallDao callDao = null;
+	
+	public OutgoingCallReceiver(CallDao callDao){
+		this.callDao = callDao;
+	}
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -21,19 +28,13 @@ public class OutgoingCallReceiver extends BroadcastReceiver{
 			return;
 		}
 		
-		//get phone number
-		//String phoneNumber = extras.getString(Intent.EXTRA_PHONE_NUMBER);
-		
-		//get dao
-		DataCollectDao dao = DataCollectDao.getInstance(context);
-		
 		//get location
 		GsmCellLocation location = LocationProvider.getGsmCellLocation(context);
 		int lac = 0;
 		if (location != null) {
 			lac = location.getLac();
 		}
-		dao.insertCall(Calendar.getInstance().getTimeInMillis(), "out", lac);
+		callDao.create(new CallData(Calendar.getInstance().getTimeInMillis(), "out", lac));
 	}
 
 }

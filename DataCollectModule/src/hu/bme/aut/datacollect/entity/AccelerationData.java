@@ -1,25 +1,46 @@
 package hu.bme.aut.datacollect.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import hu.bme.aut.datacollect.db.AccelerationDao;
 
-import android.database.Cursor;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
-public class Acceleration {
+//private static final String CREATE_TABLE_ACCELERATIONS = "create table if not exists accelerations ( " +
+//	"id integer primary key autoincrement, " +
+//	"timestamp not null, " +
+//	"accX not null, " +
+//	"accY not null, " +
+//	"accZ not null)";
 
+@DatabaseTable(tableName="accelerations", daoClass=AccelerationDao.class)
+public class AccelerationData {
+
+	@DatabaseField(generatedId=true)
 	private int id;
+	@DatabaseField(canBeNull=false)
 	private long timestamp;
+	@DatabaseField(canBeNull=false)
 	private float accX;
+	@DatabaseField(canBeNull=false)
 	private float accY;
+	@DatabaseField(canBeNull=false)
 	private float accZ;
 	
+	private final float NOISE = 2.0F;
+	
+	public AccelerationData(){}
+	
+	public AccelerationData(long timestamp, float accX, float accY,
+			float accZ) {
+		super();
+		this.timestamp = timestamp;
+		this.accX = accX;
+		this.accY = accY;
+		this.accZ = accZ;
+	}
 
 	public int getId() {
 		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public long getTimestamp() {
@@ -54,25 +75,19 @@ public class Acceleration {
 		this.accZ = accZ;
 	}
 
-	public static List<Acceleration> makeAcceleration(Cursor cursor){
-		
-		List<Acceleration> resultset = new ArrayList<Acceleration>();
-		while (cursor.moveToNext()){
-			Acceleration acc = new Acceleration();
-			acc.id = cursor.getInt(0);
-			acc.timestamp = cursor.getLong(1);
-			acc.accX = cursor.getFloat(2);
-			acc.accY = cursor.getFloat(3);
-			acc.accZ = cursor.getFloat(4);
-			resultset.add(acc);
-		}		
-		return resultset;
-	}
-
 	@Override
 	public String toString() {
 		return String
-				.format("Acceleration [id=%s, timestamp=%s, accX=%s, accY=%s, accZ=%s]",
+				.format("AccelerationData [id=%s, timestamp=%s, accX=%s, accY=%s, accZ=%s]",
 						id, timestamp, accX, accY, accZ);
+	}
+	
+	public boolean equalsWithNoise(AccelerationData acc){
+		if (Math.abs(accX - acc.accX) < NOISE
+				&& Math.abs(accY- acc.accY) < NOISE
+				&& Math.abs(accZ - acc.accZ) < NOISE) {
+			return true;
+		}
+		return false;
 	}
 }

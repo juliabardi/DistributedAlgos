@@ -2,12 +2,15 @@ package hu.bme.aut.datacollect.db;
 
 import hu.bme.aut.datacollect.entity.AccelerationData;
 
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.RuntimeExceptionDao;
+import java.sql.SQLException;
 
-public class AccelerationDao extends RuntimeExceptionDao<AccelerationData, Integer>{
+import com.j256.ormlite.support.ConnectionSource;
 
-	public AccelerationDao(Dao<AccelerationData, Integer> dao) {
-		super(dao);
+public class AccelerationDao extends DaoBase<AccelerationData, Integer>{
+
+	public AccelerationDao(ConnectionSource connectionSource,
+			Class<AccelerationData> dataClass) throws SQLException {
+		super(connectionSource, dataClass);
 	}
+	
 }

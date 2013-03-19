@@ -2,13 +2,16 @@ package hu.bme.aut.datacollect.db;
 
 import hu.bme.aut.datacollect.entity.LocationData;
 
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.RuntimeExceptionDao;
+import java.sql.SQLException;
 
-public class LocationDao extends RuntimeExceptionDao<LocationData, Integer>{
+import com.j256.ormlite.support.ConnectionSource;
 
-	public LocationDao(Dao<LocationData, Integer> dao) {
-		super(dao);
+public class LocationDao extends DaoBase<LocationData, Integer>{
+
+	public LocationDao(ConnectionSource connectionSource,
+			Class<LocationData> dataClass) throws SQLException {
+		super(connectionSource, dataClass);
 	}
+
 
 }

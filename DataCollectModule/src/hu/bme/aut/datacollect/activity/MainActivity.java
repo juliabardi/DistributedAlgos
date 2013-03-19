@@ -1,12 +1,12 @@
 package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.datacollect.R;
+import hu.bme.aut.datacollect.db.DatabaseHelper;
 import hu.bme.aut.datacollect.receiver.IncomingCallReceiver;
 import hu.bme.aut.datacollect.receiver.LocationProvider;
 import hu.bme.aut.datacollect.receiver.OutgoingCallReceiver;
 import hu.bme.aut.datacollect.receiver.SensorsListener;
 import hu.bme.aut.datacollect.receiver.SensorsListener.Sensors;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -14,12 +14,17 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.ToggleButton;
 
-public class MainActivity extends Activity {
+import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
+
+public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 	
 	private LocationProvider locProvider;
 	private SensorsListener sensorsListener;
 	private IncomingCallReceiver incomingReceiver;
 	private OutgoingCallReceiver outgoingReceiver;
+	
+	boolean regIncoming = false;
+	boolean regOutgoing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,13 +32,16 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
                 
         //instantiate class, it will register for loc updates
-        locProvider = new LocationProvider(this);
+        locProvider = new LocationProvider(this, getHelper().getLocationDao());
         
         //instantiate to register
-        sensorsListener = new SensorsListener(this);
+		sensorsListener = new SensorsListener(this, getHelper()
+				.getAccelerationDao(), getHelper().getLightDao(), getHelper()
+				.getTemperatureDao());
+ 
+        incomingReceiver = new IncomingCallReceiver(getHelper().getCallDao());
+        outgoingReceiver = new OutgoingCallReceiver(getHelper().getCallDao());
         
-        incomingReceiver = new IncomingCallReceiver();
-        outgoingReceiver = new OutgoingCallReceiver();
     }
 
 
@@ -60,10 +68,7 @@ public class MainActivity extends Activity {
 
 	@Override
 	protected void onPause() {
-		
-//		locProvider.unregisterListener();
-//		sensorsListener.unregisterListener();
-		
+				
 		super.onPause();
 	}
     
@@ -114,24 +119,36 @@ public class MainActivity extends Activity {
 	
 	public void registerReceiverIncoming(){
 		
-		IntentFilter intentFilter = new IntentFilter("android.intent.action.PHONE_STATE");
-		this.registerReceiver(incomingReceiver, intentFilter);
+		if (!regIncoming){
+			IntentFilter intentFilter = new IntentFilter("android.intent.action.PHONE_STATE");
+			this.registerReceiver(incomingReceiver, intentFilter);
+			regIncoming = true;
+		}
 	}
 	
 	public void unregisterReceiverIncoming(){
 		
-		this.unregisterReceiver(incomingReceiver);
+		if (regIncoming){
+			this.unregisterReceiver(incomingReceiver);
+			regIncoming = false;
+		}
 	}
 	
 	public void registerReceiverOutgoing(){
 		
-		IntentFilter intentFilter = new IntentFilter(Intent.ACTION_NEW_OUTGOING_CALL);
-		this.registerReceiver(outgoingReceiver, intentFilter);
+		if (!regOutgoing){
+			IntentFilter intentFilter = new IntentFilter(Intent.ACTION_NEW_OUTGOING_CALL);
+			this.registerReceiver(outgoingReceiver, intentFilter);
+			regOutgoing = true;
+		}
 	}
 	
 	public void unregisterReceiverOutgoing(){
 		
-		this.unregisterReceiver(outgoingReceiver);
+		if (regOutgoing){
+			this.unregisterReceiver(outgoingReceiver);
+			regOutgoing = false;
+		}
 	}
     
 	public void onTvClicked(View v){

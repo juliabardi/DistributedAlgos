@@ -1,24 +1,22 @@
 package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.datacollect.R;
-import hu.bme.aut.datacollect.db.DataCollectDao;
-import hu.bme.aut.datacollect.entity.Acceleration;
+import hu.bme.aut.datacollect.db.DatabaseHelper;
+import hu.bme.aut.datacollect.entity.AccelerationData;
 
 import java.util.List;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-public class DetailsActivity extends Activity {
+import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 
-	private final DataCollectDao dao = DataCollectDao.getInstance(this);
+public class DetailsActivity extends OrmLiteBaseActivity<DatabaseHelper>  {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.detail_view);
 		this.loadTableData();
@@ -28,8 +26,8 @@ public class DetailsActivity extends Activity {
 		
 		TableLayout table = (TableLayout)findViewById(R.id.table);
 		
-		List<Acceleration> list = dao.getAllAccelerations();
-		for (Acceleration acc : list) {
+		List<AccelerationData> list = getHelper().getAccelerationDao().queryForAll();
+		for (AccelerationData acc : list) {
 			TableRow row = new TableRow(this);
 			TextView tv = new TextView(this);
 			tv.setText(String.format(

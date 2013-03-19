@@ -2,13 +2,15 @@ package hu.bme.aut.datacollect.db;
 
 import hu.bme.aut.datacollect.entity.LightData;
 
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.RuntimeExceptionDao;
+import java.sql.SQLException;
 
-public class LightDao extends RuntimeExceptionDao<LightData, Integer> {
+import com.j256.ormlite.support.ConnectionSource;
 
-	public LightDao(Dao<LightData, Integer> dao) {
-		super(dao);
+public class LightDao extends DaoBase<LightData, Integer> {
+
+	public LightDao(ConnectionSource connectionSource,
+			Class<LightData> dataClass) throws SQLException {
+		super(connectionSource, dataClass);
 	}
 
 }

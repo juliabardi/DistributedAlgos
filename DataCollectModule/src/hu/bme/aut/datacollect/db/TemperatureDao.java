@@ -2,12 +2,15 @@ package hu.bme.aut.datacollect.db;
 
 import hu.bme.aut.datacollect.entity.TemperatureData;
 
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.RuntimeExceptionDao;
+import java.sql.SQLException;
 
-public class TemperatureDao extends RuntimeExceptionDao<TemperatureData, Integer>{
+import com.j256.ormlite.support.ConnectionSource;
 
-	public TemperatureDao(Dao<TemperatureData, Integer> dao) {
-		super(dao);
+public class TemperatureDao extends DaoBase<TemperatureData, Integer>{
+
+	public TemperatureDao(ConnectionSource connectionSource,
+			Class<TemperatureData> dataClass) throws SQLException {
+		super(connectionSource, dataClass);
 	}
+
 }

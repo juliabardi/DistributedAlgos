@@ -2,13 +2,15 @@ package hu.bme.aut.datacollect.db;
 
 import hu.bme.aut.datacollect.entity.CallData;
 
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.RuntimeExceptionDao;
+import java.sql.SQLException;
 
-public class CallDao extends RuntimeExceptionDao<CallData, Integer>{
+import com.j256.ormlite.support.ConnectionSource;
 
-	public CallDao(Dao<CallData, Integer> dao) {
-		super(dao);
+public class CallDao extends DaoBase<CallData, Integer>{
+
+	public CallDao(ConnectionSource connectionSource,
+			Class<CallData> dataClass) throws SQLException {
+		super(connectionSource, dataClass);
 	}
 
 }

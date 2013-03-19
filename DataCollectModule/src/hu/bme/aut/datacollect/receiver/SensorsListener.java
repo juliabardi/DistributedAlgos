@@ -1,6 +1,11 @@
 package hu.bme.aut.datacollect.receiver;
 
-import hu.bme.aut.datacollect.db.DataCollectDao;
+import hu.bme.aut.datacollect.db.AccelerationDao;
+import hu.bme.aut.datacollect.db.LightDao;
+import hu.bme.aut.datacollect.db.TemperatureDao;
+import hu.bme.aut.datacollect.entity.AccelerationData;
+import hu.bme.aut.datacollect.entity.LightData;
+import hu.bme.aut.datacollect.entity.TemperatureData;
 
 import java.util.Calendar;
 
@@ -19,20 +24,19 @@ public class SensorsListener implements SensorEventListener {
 	private final Sensor lightSensor;
 	private final Sensor ambientTempSensor;
 	
-	private final float NOISE = 2.0F;
+	private AccelerationDao accelerationDao = null;
+	private LightDao lightDao = null;
+	private TemperatureDao temperatureDao = null;
 	
-	private final Context mContext;
+	private AccelerationData currentAcc = null;
 	
-	private DataCollectDao dao;
-	
-	private Acceleration currentAcc = null;
-	
-	public SensorsListener(Context context){
-		
-		mContext = context;
-		
-		//setup dao
-		dao = DataCollectDao.getInstance(mContext);
+	public SensorsListener(Context context, AccelerationDao aDao,
+			LightDao lDao, TemperatureDao tDao) {
+
+		//setup daos
+		this.accelerationDao = aDao;
+		this.lightDao = lDao;
+		this.temperatureDao = tDao;
 		
 		//get sensor manager
 		sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
@@ -61,13 +65,13 @@ public class SensorsListener implements SensorEventListener {
 			float accY = event.values[1];
 			float accZ = event.values[2];
 			
-			Acceleration acc = new Acceleration(accX, accY, accZ);
+			AccelerationData acc = new AccelerationData(0, accX, accY, accZ);
 			
 			//if differs from previous, save (some noise is ok)
-			if (currentAcc == null || !currentAcc.equalsWithNoise(acc)){
-				//calculate eredo see dia if necessary			
-				//save into db
-				dao.insertAcceleration(Calendar.getInstance().getTimeInMillis(), accX, accY, accZ);
+			if (currentAcc == null || !currentAcc.equalsWithNoise(acc)){	
+				// save into db
+				accelerationDao.create(new AccelerationData(Calendar
+						.getInstance().getTimeInMillis(), accX, accY, accZ));
 				currentAcc = acc;
 			}
 
@@ -77,14 +81,15 @@ public class SensorsListener implements SensorEventListener {
 			//illuminance in lx
 			float lux = event.values[0];			
 			//save into db
-			dao.insertLight(Calendar.getInstance().getTimeInMillis(), lux);
+			lightDao.create(new LightData(Calendar.getInstance().getTimeInMillis(), lux));
 		}
 		else if (event.sensor.equals(ambientTempSensor)){
 			
 			//ambient air temperature in C degrees.
 			float temperature = event.values[0];			
 			//save into db
-			dao.insertAmbientTemperature(Calendar.getInstance().getTimeInMillis(), temperature);
+			temperatureDao.create(new TemperatureData(Calendar.getInstance()
+					.getTimeInMillis(), temperature));
 		}
 
 	}
@@ -122,62 +127,4 @@ public class SensorsListener implements SensorEventListener {
 		}
 	}
 	
-	private class Acceleration {
-		
-		float accX;
-		float accY;
-		float accZ;
-		
-		public Acceleration(float accX, float accY, float accZ) {
-			this.accX = accX;
-			this.accY = accY;
-			this.accZ = accZ;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + Float.floatToIntBits(accX);
-			result = prime * result + Float.floatToIntBits(accY);
-			result = prime * result + Float.floatToIntBits(accZ);
-			return result;
-		}
-		
-		public boolean equalsWithNoise(Acceleration acc){
-			if (Math.abs(accX - acc.accX) < NOISE
-					&& Math.abs(accY- acc.accY) < NOISE
-					&& Math.abs(accZ - acc.accZ) < NOISE) {
-				return true;
-			}
-			return false;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Acceleration other = (Acceleration) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (Float.floatToIntBits(accX) != Float.floatToIntBits(other.accX))
-				return false;
-			if (Float.floatToIntBits(accY) != Float.floatToIntBits(other.accY))
-				return false;
-			if (Float.floatToIntBits(accZ) != Float.floatToIntBits(other.accZ))
-				return false;
-			return true;
-		}
-
-		private SensorsListener getOuterType() {
-			return SensorsListener.this;
-		}
-		
-	}
-
 }
