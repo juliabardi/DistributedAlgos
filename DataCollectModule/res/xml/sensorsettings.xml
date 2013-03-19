@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    <PreferenceCategory android:title="Gyorsulásmérő" >
+    <PreferenceCategory android:title="Szenzorok monitorozása" >
         <SwitchPreference
-		  android:title="Gyorsulás monitorozása"
+		  android:title="Gyorsulásmérő"
 		  android:key="acceleration"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
-    </PreferenceCategory>
-    <PreferenceCategory android:title="Fénymérő" >
         <SwitchPreference
-		  android:title="Fényerő monitorozása"
+		  android:title="Fényszenzor"
 		  android:key="light"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
-    </PreferenceCategory>
-        <PreferenceCategory android:title="Hőmérő" >
         <SwitchPreference
-		  android:title="Hőmérséklet monitorozása"
+		  android:title="Hőmérő"
 		  android:key="temperature"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>

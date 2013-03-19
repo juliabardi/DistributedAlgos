@@ -19,7 +19,6 @@
             android:layout_height="wrap_content"
             android:text="@string/sensors"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-
     </TableRow>
 
     <TableRow
@@ -39,8 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onClick"
-            android:text="View"/>
-
+            android:text="View" />
     </TableRow>
 
     <TableRow
@@ -59,9 +57,8 @@
             android:id="@+id/buttonLight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onClick" 
-            android:text="View"/>
-
+            android:onClick="onClick"
+            android:text="View" />
     </TableRow>
 
     <TableRow
@@ -80,9 +77,8 @@
             android:id="@+id/buttonTemperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onClick" 
-            android:text="View"/>
-
+            android:onClick="onClick"
+            android:text="View" />
     </TableRow>
 
     <TableRow
@@ -102,8 +98,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onClick"
-            android:text="View"/>
-
+            android:text="View" />
     </TableRow>
 
     <TableRow
@@ -123,8 +118,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onClick"
-            android:text="View"/>
+            android:text="View" />
+    </TableRow>
 
+    <TableRow
+        android:id="@+id/tableRow7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/buttonStop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="stopClicked"
+            android:text="Mérés leállítása" />
     </TableRow>
 
 </TableLayout>

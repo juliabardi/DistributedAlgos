@@ -40,6 +40,8 @@
             android:name="hu.bme.aut.datacollect.activity.ActivityFragmentSettings"
             android:label="@string/app_name" >
         </activity>
+        
+        <service android:name="hu.bme.aut.datacollect.activity.DataCollectService"></service>
 
         <receiver android:name="hu.bme.aut.datacollect.receiver.IncomingCallReceiver" >
         </receiver>
