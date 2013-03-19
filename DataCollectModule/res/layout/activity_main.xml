@@ -32,15 +32,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/acceleration"
-            android:textAppearance="?android:attr/textAppearanceSmall" 
-            android:onClick="onTvClicked"
-            android:clickable="true"/>
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <ToggleButton
-            android:id="@+id/toggleButtonAcceleration"
+        <Button
+            android:id="@+id/buttonAcceleration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onToggleClicked"/>
+            android:onClick="onClick"
+            android:text="View"/>
 
     </TableRow>
 
@@ -56,11 +55,12 @@
             android:text="@string/light"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <ToggleButton
-            android:id="@+id/toggleButtonLight"
+        <Button
+            android:id="@+id/buttonLight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onToggleClicked" />
+            android:onClick="onClick" 
+            android:text="View"/>
 
     </TableRow>
 
@@ -76,11 +76,12 @@
             android:text="@string/temperature"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <ToggleButton
-            android:id="@+id/toggleButtonTemperature"
+        <Button
+            android:id="@+id/buttonTemperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onToggleClicked" />
+            android:onClick="onClick" 
+            android:text="View"/>
 
     </TableRow>
 
@@ -96,11 +97,12 @@
             android:text="@string/fine_location"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <ToggleButton
-            android:id="@+id/toggleButtonFineLocation"
+        <Button
+            android:id="@+id/buttonFineLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onToggleClicked"/>
+            android:onClick="onClick"
+            android:text="View"/>
 
     </TableRow>
 
@@ -116,11 +118,12 @@
             android:text="@string/calls"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <ToggleButton
-            android:id="@+id/toggleButtonCalls"
+        <Button
+            android:id="@+id/buttonCalls"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onToggleClicked"/>
+            android:onClick="onClick"
+            android:text="View"/>
 
     </TableRow>
 

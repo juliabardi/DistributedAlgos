@@ -1,0 +1,19 @@
+<preference-headers
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    <header android:fragment="hu.bme.aut.datacollect.activity.ActivityFragmentSettings$FragmentSettingsSensors"
+            android:icon="@drawable/ic_launcher"
+            android:title="Szenzorok"
+            android:summary="Szenzor monitorozás beállítása">
+    </header>
+    <header android:fragment="hu.bme.aut.datacollect.activity.ActivityFragmentSettings$FragmentSettingsLoc"
+            android:icon="@drawable/ic_launcher"
+            android:title="Helymeghatározás"
+            android:summary="Hely monitorozása">
+    </header>
+
+    <header android:fragment="hu.bme.aut.datacollect.activity.ActivityFragmentSettings$FragmentSettingsCalls"
+        	android:icon="@drawable/ic_launcher"
+            android:title="Hívások"
+            android:summary="Hívás monitorozás">
+    </header>
+</preference-headers>
