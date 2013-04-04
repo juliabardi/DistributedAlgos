@@ -69,6 +69,7 @@ public class SensorsListener implements SensorEventListener {
 			
 			//if differs from previous, save (some noise is ok)
 			if (currentAcc == null || !currentAcc.equalsWithNoise(acc)){	
+//			if (currentAcc == null || !currentAcc.equals(acc)){	
 				// save into db
 				accelerationDao.create(new AccelerationData(Calendar
 						.getInstance().getTimeInMillis(), accX, accY, accZ));
