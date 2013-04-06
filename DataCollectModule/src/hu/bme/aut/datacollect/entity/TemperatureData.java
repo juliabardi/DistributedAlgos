@@ -1,11 +1,11 @@
 package hu.bme.aut.datacollect.entity;
 
-import hu.bme.aut.datacollect.db.TemperatureDao;
+import hu.bme.aut.datacollect.db.DaoBase;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName="temperatures", daoClass=TemperatureDao.class)
+@DatabaseTable(tableName="temperatures", daoClass=DaoBase.class)
 public class TemperatureData {
 
 	@DatabaseField(generatedId=true)

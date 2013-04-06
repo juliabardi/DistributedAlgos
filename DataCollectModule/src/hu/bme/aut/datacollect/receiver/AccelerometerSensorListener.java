@@ -1,6 +1,6 @@
 package hu.bme.aut.datacollect.receiver;
 
-import hu.bme.aut.datacollect.db.AccelerationDao;
+import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.AccelerationData;
 
 import java.util.Calendar;
@@ -13,11 +13,11 @@ import android.hardware.SensorManager;
 public class AccelerometerSensorListener extends SensorsListener {
 
 	private final Sensor accelerometerSensor;
-	private AccelerationDao accelerationDao = null;
+	private DaoBase<AccelerationData> accelerationDao = null;
 
 	private AccelerationData currentAcc = null;
 
-	public AccelerometerSensorListener(Context context, AccelerationDao aDao) {
+	public AccelerometerSensorListener(Context context, DaoBase<AccelerationData> aDao) {
 		super(context);
 		this.accelerationDao = aDao;
 

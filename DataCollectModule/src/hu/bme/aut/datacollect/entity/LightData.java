@@ -1,11 +1,11 @@
 package hu.bme.aut.datacollect.entity;
 
-import hu.bme.aut.datacollect.db.LightDao;
+import hu.bme.aut.datacollect.db.DaoBase;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName="lights", daoClass=LightDao.class)
+@DatabaseTable(tableName="lights", daoClass=DaoBase.class)
 public class LightData {
 	
 	@DatabaseField(generatedId=true)

@@ -1,6 +1,6 @@
 package hu.bme.aut.datacollect.receiver;
 
-import hu.bme.aut.datacollect.db.LocationDao;
+import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.LocationData;
 
 import java.util.Calendar;
@@ -20,10 +20,10 @@ import android.telephony.gsm.GsmCellLocation;
 public class LocationProvider implements LocationListener, IListener{
 	
 	private final LocationManager locationManager;	
-	private LocationDao locationDao = null;
+	private DaoBase<LocationData> locationDao = null;
 	private Context mContext;
 	
-	public LocationProvider(Context context, LocationDao locationDao){
+	public LocationProvider(Context context, DaoBase<LocationData> locationDao){
 			
 		this.mContext = context;
 		this.locationDao = locationDao;

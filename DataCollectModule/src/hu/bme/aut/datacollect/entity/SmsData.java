@@ -1,11 +1,11 @@
 package hu.bme.aut.datacollect.entity;
 
-import hu.bme.aut.datacollect.db.SmsDao;
+import hu.bme.aut.datacollect.db.DaoBase;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName="sms", daoClass=SmsDao.class)
+@DatabaseTable(tableName="sms", daoClass=DaoBase.class)
 public class SmsData {
 
 	@DatabaseField(generatedId=true)

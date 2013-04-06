@@ -1,12 +1,12 @@
 package hu.bme.aut.datacollect.entity;
 
-import hu.bme.aut.datacollect.db.CallDao;
+import hu.bme.aut.datacollect.db.DaoBase;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 
-@DatabaseTable(tableName="calls", daoClass=CallDao.class)
+@DatabaseTable(tableName="calls", daoClass=DaoBase.class)
 public class CallData {
 
 	@DatabaseField(generatedId=true)

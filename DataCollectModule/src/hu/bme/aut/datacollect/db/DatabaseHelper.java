@@ -8,6 +8,8 @@ import hu.bme.aut.datacollect.entity.SmsData;
 import hu.bme.aut.datacollect.entity.TemperatureData;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -23,15 +25,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 	private static final int DATABASE_VERSION = 1;
 	private static final String DATABASE_NAME = "DataCollectDb.db";
 	
-	private AccelerationDao accelerationDao = null;
-	private CallDao callDao = null;
-	private LightDao lightDao = null;
-	private LocationDao locationDao = null;
-	private TemperatureDao temperatureDao = null;
-	private SmsDao smsDao = null;
+	@SuppressWarnings("rawtypes")
+	Map<Class, DaoBase> map = new HashMap<Class, DaoBase>();
 
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		
+		map.put(AccelerationData.class, null);
+		map.put(CallData.class, null);
+		map.put(LightData.class, null);
+		map.put(LocationData.class, null);
+		map.put(SmsData.class, null);
+		map.put(TemperatureData.class, null);
 	}
 	
 	@Override
@@ -40,12 +45,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 		
 		try {
 			Log.i(DatabaseHelper.class.getName(), "onCreate");
-			TableUtils.createTable(connectionSource, AccelerationData.class);
-			TableUtils.createTable(connectionSource, CallData.class);
-			TableUtils.createTable(connectionSource, LightData.class);
-			TableUtils.createTable(connectionSource, LocationData.class);
-			TableUtils.createTable(connectionSource, TemperatureData.class);
-			TableUtils.createTable(connectionSource, SmsData.class);
+			for (Class<Object> clazz : map.keySet()){
+				TableUtils.createTable(connectionSource, clazz);
+			}
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
 			throw new RuntimeException(e);
@@ -60,12 +62,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 
 		try {
 			Log.i(DatabaseHelper.class.getName(), "onUpgrade");
-			TableUtils.dropTable(connectionSource, AccelerationData.class, true);
-			TableUtils.dropTable(connectionSource, CallData.class, true);
-			TableUtils.dropTable(connectionSource, LightData.class, true);
-			TableUtils.dropTable(connectionSource, LocationData.class, true);
-			TableUtils.dropTable(connectionSource, TemperatureData.class, true);
-			TableUtils.dropTable(connectionSource, SmsData.class, true);
+			
+			for (Class<Object> clazz : map.keySet()){
+				TableUtils.dropTable(connectionSource, clazz, true);
+			}
 			// after we drop the old databases, we create the new ones
 			onCreate(database, connectionSource);
 		} catch (SQLException e) {
@@ -75,67 +75,31 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 
 	}
 	
-	public AccelerationDao getAccelerationDao(){
-		if (accelerationDao == null) {
-			accelerationDao = getDao(AccelerationData.class);			
-		}
-		return accelerationDao;
-	}
-	
-	public CallDao getCallDao(){
-		if (callDao == null) {
-			callDao = getDao(CallData.class);
-		}
-		return callDao;
-	}
-	
-	public LightDao getLightDao(){
-		if (lightDao == null) {
-			lightDao = getDao(LightData.class);
-		}
-		return lightDao;
-	}
-	
-	public LocationDao getLocationDao(){
-		if (locationDao == null) {
-			locationDao = getDao(LocationData.class);
-		}
-		return locationDao;
-	}
-	
-	public TemperatureDao getTemperatureDao(){
-		if (temperatureDao == null) {
-			temperatureDao = getDao(TemperatureData.class);
-		}
-		return temperatureDao;
-	}
-	
-	public SmsDao getSmsDao(){
-		if (smsDao == null){
-			smsDao = getDao(SmsData.class);
-		}
-		return smsDao;
-	}
-	
 	@Override
 	public void close(){
 		super.close();
-		accelerationDao = null;
-		callDao = null;
-		lightDao = null;
-		locationDao = null;
-		temperatureDao = null;
-		smsDao = null;
+		
+		for (Class<Object> clazz : map.keySet()){
+			map.put(clazz, null);
+		}
 	}
 
 	@Override
-	public <D extends Dao<T, ?>, T> D getDao(Class<T> clazz)
-			{
+	public <D extends Dao<T, ?>, T> D getDao(Class<T> clazz) {
 		try {
 			return super.getDao(clazz);
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> DaoBase<T> getDaoBase(Class<T> clazz) {
+		
+		if (map.get(clazz) == null){
+			map.put(clazz, (DaoBase<T>)this.getDao(clazz));
+		}
+		return map.get(clazz);
 	}
 	
 }

@@ -1,6 +1,6 @@
 package hu.bme.aut.datacollect.receiver;
 
-import hu.bme.aut.datacollect.db.LightDao;
+import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.LightData;
 
 import java.util.Calendar;
@@ -13,9 +13,9 @@ import android.hardware.SensorManager;
 public class LightSensorListener extends SensorsListener {
 
 	private final Sensor lightSensor;
-	private LightDao lightDao = null;
+	private DaoBase<LightData> lightDao = null;
 
-	public LightSensorListener(Context context, LightDao lDao) {
+	public LightSensorListener(Context context, DaoBase<LightData> lDao) {
 		super(context);
 		this.lightDao = lDao;
 

@@ -1,6 +1,6 @@
 package hu.bme.aut.datacollect.receiver;
 
-import hu.bme.aut.datacollect.db.CallDao;
+import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.CallData;
 
 import java.util.Calendar;
@@ -13,12 +13,12 @@ import android.os.Bundle;
 
 public class OutgoingCallReceiver extends BroadcastReceiver implements IListener{
 	
-	private CallDao callDao = null;
+	private DaoBase<CallData> callDao = null;
 	private Context context = null;
 	
 	private boolean regOutgoing = false;
 	
-	public OutgoingCallReceiver(CallDao callDao){
+	public OutgoingCallReceiver(DaoBase<CallData> callDao){
 		this.callDao = callDao;
 	}
 

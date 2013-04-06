@@ -34,6 +34,15 @@ public class DaoBase<T> extends BaseDaoImpl<T, Integer> {
 			throw new RuntimeException(e);
 		}
 	}
+
+	@Override
+	public T queryForId(Integer id){
+		try {
+			return super.queryForId(id);
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
 	
 

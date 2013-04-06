@@ -1,9 +1,10 @@
 package hu.bme.aut.datacollect.receiver;
 
+import hu.bme.aut.datacollect.db.DaoBase;
+import hu.bme.aut.datacollect.entity.SmsData;
+
 import java.util.Calendar;
 
-import hu.bme.aut.datacollect.db.SmsDao;
-import hu.bme.aut.datacollect.entity.SmsData;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,12 +12,12 @@ import android.content.IntentFilter;
 
 public class IncomingSmsReceiver extends BroadcastReceiver implements IListener {
 
-	private SmsDao smsDao = null;
+	private DaoBase<SmsData> smsDao = null;
 	private Context context = null;
 	
 	private boolean regInSms = false;
 	
-	public IncomingSmsReceiver(Context context, SmsDao smsDao){
+	public IncomingSmsReceiver(Context context, DaoBase<SmsData> smsDao){
 		this.smsDao = smsDao;
 		this.context = context;
 	}

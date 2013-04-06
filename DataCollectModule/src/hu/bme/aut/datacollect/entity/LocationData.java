@@ -1,12 +1,12 @@
 package hu.bme.aut.datacollect.entity;
 
-import hu.bme.aut.datacollect.db.LocationDao;
+import hu.bme.aut.datacollect.db.DaoBase;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 
-@DatabaseTable(tableName="locations", daoClass=LocationDao.class)
+@DatabaseTable(tableName="locations", daoClass=DaoBase.class)
 public class LocationData {
 	
 	@DatabaseField(generatedId=true)

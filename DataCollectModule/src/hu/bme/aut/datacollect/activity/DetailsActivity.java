@@ -1,6 +1,11 @@
 package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.datacollect.db.DatabaseHelper;
+import hu.bme.aut.datacollect.entity.AccelerationData;
+import hu.bme.aut.datacollect.entity.CallData;
+import hu.bme.aut.datacollect.entity.LightData;
+import hu.bme.aut.datacollect.entity.LocationData;
+import hu.bme.aut.datacollect.entity.TemperatureData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,23 +40,23 @@ public class DetailsActivity extends OrmLiteBaseActivity<DatabaseHelper>  {
 		switch (id) {
 		case R.id.buttonAcceleration:
 			text.setText("Acceleration");		
-			list = getHelper().getAccelerationDao().queryForAll();
+			list = getHelper().getDaoBase(AccelerationData.class).queryForAll();
 			break;
 		case R.id.buttonLight:
 			text.setText("Light");		
-			list = getHelper().getLightDao().queryForAll();
+			list = getHelper().getDaoBase(LightData.class).queryForAll();
 			break;
 		case R.id.buttonTemperature:
 			text.setText("Temperature");		
-			list = getHelper().getTemperatureDao().queryForAll();
+			list = getHelper().getDaoBase(TemperatureData.class).queryForAll();
 			break;
 		case R.id.buttonFineLocation:
 			text.setText("FineLocation");		
-			list = getHelper().getLocationDao().queryForAll();
+			list = getHelper().getDaoBase(LocationData.class).queryForAll();
 			break;
 		case R.id.buttonCalls:
 			text.setText("Calls");		
-			list = getHelper().getCallDao().queryForAll();
+			list = getHelper().getDaoBase(CallData.class).queryForAll();
 			break;
 		default:
 			list = new ArrayList<String>();

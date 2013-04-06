@@ -1,6 +1,6 @@
 package hu.bme.aut.datacollect.receiver;
 
-import hu.bme.aut.datacollect.db.TemperatureDao;
+import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.TemperatureData;
 
 import java.util.Calendar;
@@ -13,9 +13,9 @@ import android.hardware.SensorManager;
 public class TemperatureSensorListener extends SensorsListener {
 
 	private final Sensor ambientTempSensor;
-	private TemperatureDao temperatureDao = null;
+	private DaoBase<TemperatureData> temperatureDao = null;
 
-	public TemperatureSensorListener(Context context, TemperatureDao tDao) {
+	public TemperatureSensorListener(Context context, DaoBase<TemperatureData> tDao) {
 		super(context);
 		this.temperatureDao = tDao;
 

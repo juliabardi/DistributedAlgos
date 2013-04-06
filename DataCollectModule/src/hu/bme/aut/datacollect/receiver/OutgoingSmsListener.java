@@ -1,6 +1,6 @@
 package hu.bme.aut.datacollect.receiver;
 
-import hu.bme.aut.datacollect.db.SmsDao;
+import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.SmsData;
 
 import java.util.Calendar;
@@ -13,7 +13,7 @@ import android.os.Handler;
 
 public class OutgoingSmsListener extends ContentObserver implements IListener {
 
-	private SmsDao smsDao = null;
+	private DaoBase<SmsData> smsDao = null;
 	private Context context = null;
 	
 	private boolean regOutSms = false;
@@ -22,20 +22,22 @@ public class OutgoingSmsListener extends ContentObserver implements IListener {
 		super(handler);
 	}
 	
-	public OutgoingSmsListener(Context context, Handler handler, SmsDao smsDao){
+	public OutgoingSmsListener(Context context, Handler handler, DaoBase<SmsData> smsDao){
 		super(handler);
 		this.smsDao = smsDao;
 		this.context = context;
 	}
 
 	@Override
-	public void onChange(boolean selfChange) {
-		
-		smsDao.create(new SmsData(Calendar.getInstance().getTimeInMillis(), "out"));
-		
-		super.onChange(selfChange);
-	}
+	public void onChange(boolean selfChange) {		
+		this.onChange(selfChange, null);
+	}	
 	
+	@Override
+	public void onChange(boolean selfChange, Uri uri) {
+		smsDao.create(new SmsData(Calendar.getInstance().getTimeInMillis(), "out"));
+	}
+
 	@Override
 	public void register() {
 

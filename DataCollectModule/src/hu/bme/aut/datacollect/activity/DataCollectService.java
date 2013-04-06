@@ -1,6 +1,12 @@
 package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.datacollect.db.DatabaseHelper;
+import hu.bme.aut.datacollect.entity.AccelerationData;
+import hu.bme.aut.datacollect.entity.CallData;
+import hu.bme.aut.datacollect.entity.LightData;
+import hu.bme.aut.datacollect.entity.LocationData;
+import hu.bme.aut.datacollect.entity.SmsData;
+import hu.bme.aut.datacollect.entity.TemperatureData;
 import hu.bme.aut.datacollect.receiver.AccelerometerSensorListener;
 import hu.bme.aut.datacollect.receiver.IListener;
 import hu.bme.aut.datacollect.receiver.IncomingCallReceiver;
@@ -47,32 +53,32 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 
 		// instantiate class, it will register for loc updates
 		listeners.put("location", new LocationProvider(this, getHelper()
-				.getLocationDao()));
+				.getDaoBase(LocationData.class)));
 
 		// instantiate to register
 		listeners.put("acceleration", new AccelerometerSensorListener(this,
-				getHelper().getAccelerationDao()));
+				getHelper().getDaoBase(AccelerationData.class)));
 		listeners.put("light", new LightSensorListener(this, getHelper()
-				.getLightDao()));
+				.getDaoBase(LightData.class)));
 		listeners.put("temperature", new TemperatureSensorListener(this,
-				getHelper().getTemperatureDao()));
+				getHelper().getDaoBase(TemperatureData.class)));
 
 		listeners.put("incall", new IncomingCallReceiver(this, getHelper()
-				.getCallDao()));
+				.getDaoBase(CallData.class)));
 		listeners.put("outcall", new OutgoingCallReceiver(getHelper()
-				.getCallDao()));
+				.getDaoBase(CallData.class)));
 
 		listeners.put("insms", new IncomingSmsReceiver(this, getHelper()
-				.getSmsDao()));
+				.getDaoBase(SmsData.class)));
 		listeners.put("outsms", new OutgoingSmsListener(this, new Handler(),
-				getHelper().getSmsDao()));
+				getHelper().getDaoBase(SmsData.class)));
 
 		// get the current settings
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
-		
-		//register all listeners that are enabled
-		for (String key : MainActivity.sharedPrefKeys){			
+
+		// register all listeners that are enabled
+		for (String key : MainActivity.sharedPrefKeys) {
 			if (sharedPreferences.getBoolean(key, false))
 				listeners.get(key).register();
 		}
@@ -85,7 +91,7 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 		Intent notificationIntent = new Intent(this, MainActivity.class);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
 				notificationIntent, 0);
-		
+
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(
 				this).setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle("DataCollectModule")

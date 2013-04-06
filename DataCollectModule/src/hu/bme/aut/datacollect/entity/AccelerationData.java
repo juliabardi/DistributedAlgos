@@ -1,12 +1,12 @@
 package hu.bme.aut.datacollect.entity;
 
-import hu.bme.aut.datacollect.db.AccelerationDao;
+import hu.bme.aut.datacollect.db.DaoBase;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 
-@DatabaseTable(tableName="accelerations", daoClass=AccelerationDao.class)
+@DatabaseTable(tableName="accelerations", daoClass=DaoBase.class)
 public class AccelerationData {
 
 	@DatabaseField(generatedId=true)
