@@ -4,6 +4,7 @@ import hu.bme.aut.datacollect.entity.AccelerationData;
 import hu.bme.aut.datacollect.entity.CallData;
 import hu.bme.aut.datacollect.entity.LightData;
 import hu.bme.aut.datacollect.entity.LocationData;
+import hu.bme.aut.datacollect.entity.SmsData;
 import hu.bme.aut.datacollect.entity.TemperatureData;
 
 import java.sql.SQLException;
@@ -27,6 +28,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 	private LightDao lightDao = null;
 	private LocationDao locationDao = null;
 	private TemperatureDao temperatureDao = null;
+	private SmsDao smsDao = null;
 
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -43,6 +45,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 			TableUtils.createTable(connectionSource, LightData.class);
 			TableUtils.createTable(connectionSource, LocationData.class);
 			TableUtils.createTable(connectionSource, TemperatureData.class);
+			TableUtils.createTable(connectionSource, SmsData.class);
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
 			throw new RuntimeException(e);
@@ -62,6 +65,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 			TableUtils.dropTable(connectionSource, LightData.class, true);
 			TableUtils.dropTable(connectionSource, LocationData.class, true);
 			TableUtils.dropTable(connectionSource, TemperatureData.class, true);
+			TableUtils.dropTable(connectionSource, SmsData.class, true);
 			// after we drop the old databases, we create the new ones
 			onCreate(database, connectionSource);
 		} catch (SQLException e) {
@@ -73,7 +77,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 	
 	public AccelerationDao getAccelerationDao(){
 		if (accelerationDao == null) {
-			accelerationDao = getDao(AccelerationData.class);
+			accelerationDao = getDao(AccelerationData.class);			
 		}
 		return accelerationDao;
 	}
@@ -106,6 +110,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 		return temperatureDao;
 	}
 	
+	public SmsDao getSmsDao(){
+		if (smsDao == null){
+			smsDao = getDao(SmsData.class);
+		}
+		return smsDao;
+	}
+	
 	@Override
 	public void close(){
 		super.close();
@@ -114,6 +125,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 		lightDao = null;
 		locationDao = null;
 		temperatureDao = null;
+		smsDao = null;
 	}
 
 	@Override

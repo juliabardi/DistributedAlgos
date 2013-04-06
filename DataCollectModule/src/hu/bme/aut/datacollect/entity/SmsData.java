@@ -1,26 +1,26 @@
 package hu.bme.aut.datacollect.entity;
 
-import hu.bme.aut.datacollect.db.LightDao;
+import hu.bme.aut.datacollect.db.SmsDao;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName="lights", daoClass=LightDao.class)
-public class LightData {
-	
+@DatabaseTable(tableName="sms", daoClass=SmsDao.class)
+public class SmsData {
+
 	@DatabaseField(generatedId=true)
 	private int id;
 	@DatabaseField(canBeNull=false)
 	private long timestamp;
 	@DatabaseField(canBeNull=false)
-	private float lx;
+	private String direction;
 	
-	public LightData(){}
+	public SmsData(){}
 
-	public LightData(long timestamp, float lx) {
+	public SmsData(long timestamp, String direction) {
 		super();
 		this.timestamp = timestamp;
-		this.lx = lx;
+		this.direction = direction;
 	}
 
 	public int getId() {
@@ -35,20 +35,20 @@ public class LightData {
 		this.timestamp = timestamp;
 	}
 
-	public float getLx() {
-		return lx;
+	public String getDirection() {
+		return direction;
 	}
 
-	public void setLx(float lx) {
-		this.lx = lx;
+	public void setDirection(String direction) {
+		this.direction = direction;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("LightData [id=%s, timestamp=%s, lx=%s]", id,
-				timestamp, lx);
+		return String.format(
+				"CallData [id=%s, timestamp=%s, direction=%s]",
+				id, timestamp, direction);
 	}
-	
 	
 
 }

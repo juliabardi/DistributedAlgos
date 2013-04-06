@@ -2,13 +2,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     <PreferenceCategory android:title="Hívások figyelése" >
         <SwitchPreference
-		  android:title="Bejövő hívások"
-		  android:key="incall"
+		  android:title="Bejövő sms"
+		  android:key="insms"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
          <SwitchPreference
-		  android:title="Kimenő hívások"
-		  android:key="outcall"
+		  android:title="Kimenő sms"
+		  android:key="outsms"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
     </PreferenceCategory>

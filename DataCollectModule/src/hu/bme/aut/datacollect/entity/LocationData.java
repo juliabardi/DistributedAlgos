@@ -5,14 +5,6 @@ import hu.bme.aut.datacollect.db.LocationDao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-//private static final String CREATE_TABLE_LOCATION = "create table if not exists locations ( " +
-//	"id integer primary key autoincrement, " +
-//	"timestamp not null, " +
-//	"latitude not null, " +
-//	"longitude not null, " +
-//	"altitude " +
-//	")";
-//
 
 @DatabaseTable(tableName="locations", daoClass=LocationDao.class)
 public class LocationData {

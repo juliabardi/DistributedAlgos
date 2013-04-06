@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import com.j256.ormlite.support.ConnectionSource;
 
-public class AccelerationDao extends DaoBase<AccelerationData, Integer>{
+public class AccelerationDao extends DaoBase<AccelerationData>{
 
 	public AccelerationDao(ConnectionSource connectionSource,
 			Class<AccelerationData> dataClass) throws SQLException {

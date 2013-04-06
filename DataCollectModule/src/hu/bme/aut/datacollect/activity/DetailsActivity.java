@@ -1,7 +1,6 @@
 package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.datacollect.db.DatabaseHelper;
-import hu.bme.aut.datacollect.entity.AccelerationData;
 
 import java.util.ArrayList;
 import java.util.List;

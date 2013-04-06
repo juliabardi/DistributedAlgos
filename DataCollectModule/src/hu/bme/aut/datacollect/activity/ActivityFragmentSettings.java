@@ -50,4 +50,12 @@ public class ActivityFragmentSettings extends PreferenceActivity {
             addPreferencesFromResource(R.xml.callsettings);
         }
     }
+    
+    public static class FragmentSettingsSms extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.smssettings);
+        }
+    }
 }

@@ -8,15 +8,19 @@ import java.util.Calendar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
-import android.telephony.gsm.GsmCellLocation;
 
-public class IncomingCallReceiver extends BroadcastReceiver{
+public class IncomingCallReceiver extends BroadcastReceiver implements IListener{
 
 	private CallDao callDao = null;
+	private Context context = null;
 	
-	public IncomingCallReceiver(CallDao callDao){
+	private boolean regIncoming = false;
+	
+	public IncomingCallReceiver(Context context, CallDao callDao){
+		this.context = context;
 		this.callDao = callDao;
 	}
 	
@@ -32,13 +36,28 @@ public class IncomingCallReceiver extends BroadcastReceiver{
 		String callState = extras.getString(TelephonyManager.EXTRA_STATE);
 		
 		if (TelephonyManager.EXTRA_STATE_RINGING.equals(callState)){			
-			//get location
-			GsmCellLocation location = LocationProvider.getGsmCellLocation(context);
-			int lac = 0;
-			if (location != null) {
-				lac = location.getLac();
-			}
-			callDao.create(new CallData(Calendar.getInstance().getTimeInMillis(), "in", lac));
+			
+			callDao.create(new CallData(Calendar.getInstance().getTimeInMillis(), "in"));
+		}
+	}
+
+	
+	@Override
+	public void register() {
+		
+		if (!regIncoming){
+			IntentFilter intentFilter = new IntentFilter("android.intent.action.PHONE_STATE");
+			context.registerReceiver(this, intentFilter);
+			regIncoming = true;
+		}
+	}
+	
+	@Override
+	public void unregister() {
+		
+		if (regIncoming){
+			context.unregisterReceiver(this);
+			regIncoming = false;
 		}
 	}
 

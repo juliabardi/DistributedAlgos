@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import com.j256.ormlite.support.ConnectionSource;
 
-public class LightDao extends DaoBase<LightData, Integer> {
+public class LightDao extends DaoBase<LightData> {
 
 	public LightDao(ConnectionSource connectionSource,
 			Class<LightData> dataClass) throws SQLException {

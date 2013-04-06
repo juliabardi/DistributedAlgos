@@ -2,7 +2,7 @@ package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.datacollect.activity.DataCollectService.ServiceBinder;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
-import hu.bme.aut.datacollect.receiver.SensorsListener.Sensors;
+import hu.bme.aut.datacollect.receiver.IListener;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.ComponentName;
@@ -26,6 +26,9 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	private DataCollectService mService;	
 	private Intent intent = null;
 	private boolean mBound = false;
+	
+	public static final String[] sharedPrefKeys = new String[] { "acceleration", "light",
+			"temperature", "location", "incall", "outcall", "insms", "outsms" };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,47 +107,15 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		
-		//handle the preferences changes
-		if (key.equals("acceleration")){
-			if (sharedPreferences.getBoolean("acceleration", false)){
-				mService.registerSensorsListener(Sensors.ACCELEROMETER);
-			} else {
-				mService.unregisterSensorsListener(Sensors.ACCELEROMETER);
-			}
-		}
-		else if (key.equals("light")){
-			if (sharedPreferences.getBoolean("light", false)){
-				mService.registerSensorsListener(Sensors.LIGHT);
-			} else {
-				mService.unregisterSensorsListener(Sensors.LIGHT);
-			}
-		}
-		else if (key.equals("temperature")){
-			if (sharedPreferences.getBoolean("temperature", false)){
-				mService.registerSensorsListener(Sensors.TEMPERATURE);
-			} else {
-				mService.unregisterSensorsListener(Sensors.TEMPERATURE);
-			}
-		}
-		else if (key.equals("location")){
-			if (sharedPreferences.getBoolean("location", false)){
-				mService.registerLocationListener();
-			} else {
-				mService.unregisterLocationListener();
-			}
-		}
-		else if (key.equals("incoming")){
-			if (sharedPreferences.getBoolean("incoming", false)){
-				mService.registerReceiverIncoming();
-			} else {
-				mService.unregisterReceiverIncoming();
-			}
-		}
-		else if (key.equals("outgoing")){
-			if (sharedPreferences.getBoolean("outgoing", false)){
-				mService.registerReceiverOutgoing();
-			} else {
-				mService.unregisterReceiverOutgoing();
+		//finding which shared preference was changed, and register/unregister according to the value
+		for (String sharedKey : sharedPrefKeys){
+			if (sharedKey.equals(key)) {
+				IListener listener = mService.getListener(sharedKey);
+				if (sharedPreferences.getBoolean(sharedKey, false))
+					listener.register();
+				else
+					listener.unregister();
+				break;
 			}
 		}
 	}

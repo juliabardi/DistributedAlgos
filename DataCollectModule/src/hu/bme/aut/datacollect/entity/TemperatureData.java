@@ -5,11 +5,6 @@ import hu.bme.aut.datacollect.db.TemperatureDao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-//private static final String CREATE_TABLE_TEMPERATURES = "create table if not exists temperatures ( " +
-//	"id integer primary key autoincrement, " +
-//	"timestamp not null, " +
-//	"celsius not null)";
-//
 @DatabaseTable(tableName="temperatures", daoClass=TemperatureDao.class)
 public class TemperatureData {
 

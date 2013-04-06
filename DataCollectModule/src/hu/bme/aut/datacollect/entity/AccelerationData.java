@@ -5,12 +5,6 @@ import hu.bme.aut.datacollect.db.AccelerationDao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-//private static final String CREATE_TABLE_ACCELERATIONS = "create table if not exists accelerations ( " +
-//	"id integer primary key autoincrement, " +
-//	"timestamp not null, " +
-//	"accX not null, " +
-//	"accY not null, " +
-//	"accZ not null)";
 
 @DatabaseTable(tableName="accelerations", daoClass=AccelerationDao.class)
 public class AccelerationData {

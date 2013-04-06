@@ -98,5 +98,6 @@ public final class R {
         public static final int fragmentsettings=0x7f040001;
         public static final int locsettings=0x7f040002;
         public static final int sensorsettings=0x7f040003;
+        public static final int smssettings=0x7f040004;
     }
 }

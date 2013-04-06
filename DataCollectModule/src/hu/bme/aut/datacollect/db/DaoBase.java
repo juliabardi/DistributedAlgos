@@ -8,7 +8,7 @@ import android.util.Log;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
-public class DaoBase<T, ID> extends BaseDaoImpl<T, ID> {
+public class DaoBase<T> extends BaseDaoImpl<T, Integer> {
 
 	public DaoBase(ConnectionSource connectionSource, Class<T> dataClass)
 			throws SQLException {

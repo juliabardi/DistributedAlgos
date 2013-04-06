@@ -1,6 +1,5 @@
 package hu.bme.aut.datacollect.receiver;
 
-import hu.bme.aut.datacollect.activity.R;
 import hu.bme.aut.datacollect.db.LocationDao;
 import hu.bme.aut.datacollect.entity.LocationData;
 
@@ -18,7 +17,7 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 
-public class LocationProvider implements LocationListener{
+public class LocationProvider implements LocationListener, IListener{
 	
 	private final LocationManager locationManager;	
 	private LocationDao locationDao = null;
@@ -70,7 +69,8 @@ public class LocationProvider implements LocationListener{
 		
 	}
 	
-	public void registerListener() {
+	@Override
+	public void register() {
 		// locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
 		// 60000, 100, this);
 		final boolean gpsEnabled = locationManager
@@ -93,7 +93,8 @@ public class LocationProvider implements LocationListener{
 				6000, 1, this);
 	}
 	
-	public void unregisterListener(){
+	@Override
+	public void unregister(){
 		locationManager.removeUpdates(this);
 	}
 	

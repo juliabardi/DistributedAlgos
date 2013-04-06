@@ -1,34 +1,40 @@
 package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.datacollect.db.DatabaseHelper;
+import hu.bme.aut.datacollect.receiver.AccelerometerSensorListener;
+import hu.bme.aut.datacollect.receiver.IListener;
 import hu.bme.aut.datacollect.receiver.IncomingCallReceiver;
+import hu.bme.aut.datacollect.receiver.IncomingSmsReceiver;
+import hu.bme.aut.datacollect.receiver.LightSensorListener;
 import hu.bme.aut.datacollect.receiver.LocationProvider;
 import hu.bme.aut.datacollect.receiver.OutgoingCallReceiver;
-import hu.bme.aut.datacollect.receiver.SensorsListener;
-import hu.bme.aut.datacollect.receiver.SensorsListener.Sensors;
-import android.app.Notification;
+import hu.bme.aut.datacollect.receiver.OutgoingSmsListener;
+import hu.bme.aut.datacollect.receiver.TemperatureSensorListener;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseService;
 
 public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
-	
+
 	private final ServiceBinder mBinder = new ServiceBinder();
-	
-	private LocationProvider locProvider;
-	private SensorsListener sensorsListener;
-	private IncomingCallReceiver incomingReceiver;
-	private OutgoingCallReceiver outgoingReceiver;
-	
-	boolean regIncoming = false;
-	boolean regOutgoing = false;
+
+	private Map<String, IListener> listeners = new HashMap<String, IListener>();
+
+	public IListener getListener(String key) {
+		return listeners.get(key);
+	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -38,70 +44,64 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
-        //instantiate class, it will register for loc updates
-        locProvider = new LocationProvider(this, getHelper().getLocationDao());
-        
-        //instantiate to register
-		sensorsListener = new SensorsListener(this, getHelper()
-				.getAccelerationDao(), getHelper().getLightDao(), getHelper()
-				.getTemperatureDao());
- 
-        incomingReceiver = new IncomingCallReceiver(getHelper().getCallDao());
-        outgoingReceiver = new OutgoingCallReceiver(getHelper().getCallDao());
-        
-        //get the current settings
+
+		// instantiate class, it will register for loc updates
+		listeners.put("location", new LocationProvider(this, getHelper()
+				.getLocationDao()));
+
+		// instantiate to register
+		listeners.put("acceleration", new AccelerometerSensorListener(this,
+				getHelper().getAccelerationDao()));
+		listeners.put("light", new LightSensorListener(this, getHelper()
+				.getLightDao()));
+		listeners.put("temperature", new TemperatureSensorListener(this,
+				getHelper().getTemperatureDao()));
+
+		listeners.put("incall", new IncomingCallReceiver(this, getHelper()
+				.getCallDao()));
+		listeners.put("outcall", new OutgoingCallReceiver(getHelper()
+				.getCallDao()));
+
+		listeners.put("insms", new IncomingSmsReceiver(this, getHelper()
+				.getSmsDao()));
+		listeners.put("outsms", new OutgoingSmsListener(this, new Handler(),
+				getHelper().getSmsDao()));
+
+		// get the current settings
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
-		if (sharedPreferences.getBoolean("acceleration", false)) {
-			this.registerSensorsListener(Sensors.ACCELEROMETER);
-		}
-		if (sharedPreferences.getBoolean("light", false)) {
-			this.registerSensorsListener(Sensors.LIGHT);
-		}
-		if (sharedPreferences.getBoolean("temperature", false)) {
-			this.registerSensorsListener(Sensors.TEMPERATURE);
-		}
-		if (sharedPreferences.getBoolean("location", false)) {
-			this.registerLocationListener();
-		}
-		if (sharedPreferences.getBoolean("incoming", false)) {
-			this.registerReceiverIncoming();
-		}
-		if (sharedPreferences.getBoolean("outgoing", false)) {
-			this.registerReceiverOutgoing();
-
-		}
 		
+		//register all listeners that are enabled
+		for (String key : MainActivity.sharedPrefKeys){			
+			if (sharedPreferences.getBoolean(key, false))
+				listeners.get(key).register();
+		}
+
 		this.setupForeground();
 	}
-	
-	private void setupForeground(){
-		
+
+	private void setupForeground() {
+
 		Intent notificationIntent = new Intent(this, MainActivity.class);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
 				notificationIntent, 0);
 		
-		Notification notification = new Notification.Builder(this)
-				.setSmallIcon(R.drawable.ic_launcher)
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(
+				this).setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle("DataCollectModule")
-				.setContentText("Adatgyûjtés folyamatban.")
-				.setOngoing(true)
-				.setContentIntent(pendingIntent)
-				.getNotification();
+				.setContentText("Adatgyûjtés folyamatban.").setOngoing(true)
+				.setContentIntent(pendingIntent);
 
-		this.startForeground(1, notification);
+		this.startForeground(1, builder.build());
 	}
 
 	@Override
 	public void onDestroy() {
-		
-		//unregister stuff if necessary
-		locProvider.unregisterListener();
-		sensorsListener.unregisterListener();
-		this.unregisterReceiverIncoming();
-		this.unregisterReceiverOutgoing();
-		
+
+		// unregister stuff if necessary
+		for (String key : listeners.keySet()) {
+			listeners.get(key).unregister();
+		}
 		super.onDestroy();
 	}
 
@@ -114,61 +114,12 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	public boolean onUnbind(Intent intent) {
 		return super.onUnbind(intent);
 	}
-	
+
 	public class ServiceBinder extends Binder {
-		
-		DataCollectService getService(){
+
+		DataCollectService getService() {
 			return DataCollectService.this;
 		}
 	}
-	
-	public void registerReceiverIncoming(){
-		
-		if (!regIncoming){
-			IntentFilter intentFilter = new IntentFilter("android.intent.action.PHONE_STATE");
-			this.registerReceiver(incomingReceiver, intentFilter);
-			regIncoming = true;
-		}
-	}
-	
-	public void unregisterReceiverIncoming(){
-		
-		if (regIncoming){
-			this.unregisterReceiver(incomingReceiver);
-			regIncoming = false;
-		}
-	}
-	
-	public void registerReceiverOutgoing(){
-		
-		if (!regOutgoing){
-			IntentFilter intentFilter = new IntentFilter(Intent.ACTION_NEW_OUTGOING_CALL);
-			this.registerReceiver(outgoingReceiver, intentFilter);
-			regOutgoing = true;
-		}
-	}
-	
-	public void unregisterReceiverOutgoing(){
-		
-		if (regOutgoing){
-			this.unregisterReceiver(outgoingReceiver);
-			regOutgoing = false;
-		}
-	}
-	
-	public void registerSensorsListener(Sensors name){
-		sensorsListener.registerListener(name);
-	}
-	
-	public void unregisterSensorsListener(Sensors name){
-		sensorsListener.unregisterListener(name);
-	}
 
-	public void registerLocationListener(){
-		locProvider.registerListener();
-	}
-	
-	public void unregisterLocationListener(){
-		locProvider.unregisterListener();
-	}
 }
