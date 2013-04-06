@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     <PreferenceCategory android:title="Hívások figyelése" >
-        <SwitchPreference
+        <CheckBoxPreference
 		  android:title="Bejövő sms"
 		  android:key="insms"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
-         <SwitchPreference
+         <CheckBoxPreference
 		  android:title="Kimenő sms"
 		  android:key="outsms"
 		  android:summaryOff="Kikapcsolva"

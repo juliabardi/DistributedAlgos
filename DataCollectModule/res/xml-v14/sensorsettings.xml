@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     <PreferenceCategory android:title="Szenzorok monitorozása" >
-        <CheckBoxPreference
+        <SwitchPreference
 		  android:title="Gyorsulásmérő"
 		  android:key="acceleration"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
-        <CheckBoxPreference
+        <SwitchPreference
 		  android:title="Fényszenzor"
 		  android:key="light"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
-        <CheckBoxPreference
+        <SwitchPreference
 		  android:title="Hőmérő"
 		  android:key="temperature"
 		  android:summaryOff="Kikapcsolva"

@@ -4,7 +4,7 @@
         <Preference android:title="GPS beállítások" >
             <intent android:action="android.settings.LOCATION_SOURCE_SETTINGS" />
         </Preference>
-         <CheckBoxPreference
+         <SwitchPreference
 		  android:title="Hely monitorozása"
 		  android:key="location"
 		  android:summaryOff="Kikapcsolva"

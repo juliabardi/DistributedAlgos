@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <Preference
+        android:icon="@drawable/ic_launcher"
+        android:summary="Szenzor monitorozás beállítása"
+        android:title="Szenzorok" >
+        <intent
+            android:action="hu.bme.aut.datacollect.prefs.PREFS_SENSORS"
+            android:targetClass="hu.bme.aut.datacollect.activity.ActivityFragmentSettings"
+            android:targetPackage="hu.bme.aut.datacollect.activity" />
+    </Preference>
+    <Preference
+        android:icon="@drawable/ic_launcher"
+        android:summary="Hely monitorozása"
+        android:title="Helymeghatározás" >
+        <intent
+            android:action="hu.bme.aut.datacollect.prefs.PREFS_LOCATION"
+            android:targetClass="hu.bme.aut.datacollect.activity.ActivityFragmentSettings"
+            android:targetPackage="hu.bme.aut.datacollect.activity" />
+    </Preference>
+    <Preference
+        android:icon="@drawable/ic_launcher"
+        android:summary="Hívás monitorozás"
+        android:title="Hívások" >
+        <intent
+            android:action="hu.bme.aut.datacollect.prefs.PREFS_CALLS"
+            android:targetClass="hu.bme.aut.datacollect.activity.ActivityFragmentSettings"
+            android:targetPackage="hu.bme.aut.datacollect.activity" />
+    </Preference>
+    <Preference
+        android:icon="@drawable/ic_launcher"
+        android:summary="Smsek monitorozása"
+        android:title="Sms beállítások" >
+        <intent
+            android:action="hu.bme.aut.datacollect.prefs.PREFS_SMS"
+            android:targetClass="hu.bme.aut.datacollect.activity.ActivityFragmentSettings"
+            android:targetPackage="hu.bme.aut.datacollect.activity" />
+    </Preference>
+
+</PreferenceScreen>

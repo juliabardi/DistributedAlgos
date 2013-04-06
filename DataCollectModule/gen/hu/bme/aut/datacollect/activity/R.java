@@ -97,7 +97,8 @@ public final class R {
         public static final int callsettings=0x7f040000;
         public static final int fragmentsettings=0x7f040001;
         public static final int locsettings=0x7f040002;
-        public static final int sensorsettings=0x7f040003;
-        public static final int smssettings=0x7f040004;
+        public static final int preference_headers_legacy=0x7f040003;
+        public static final int sensorsettings=0x7f040004;
+        public static final int smssettings=0x7f040005;
     }
 }
