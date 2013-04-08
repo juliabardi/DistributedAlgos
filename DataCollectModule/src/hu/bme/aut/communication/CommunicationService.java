@@ -1,9 +1,8 @@
 package hu.bme.aut.communication;
 
-import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.activity.MainActivity;
 import hu.bme.aut.datacollect.activity.R;
-import hu.bme.aut.datacollect.activity.DataCollectService.ServiceBinder;
+
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
@@ -14,13 +13,15 @@ import android.support.v4.app.NotificationCompat;
 public class CommunicationService extends Service{
 
 	private final CommServiceBinder mBinder = new CommServiceBinder();
-	
+
 	public class CommServiceBinder extends Binder {
 
 		public CommunicationService getService() {
 			return CommunicationService.this;
 		}
 	}
+	
+	private String serverAddress="http://10.0.2.2:3000"; //emulator localhost test
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -44,6 +45,7 @@ public class CommunicationService extends Service{
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		registerPeer();
 		setupForeground();
 	}
 	
@@ -68,5 +70,18 @@ public class CommunicationService extends Service{
 		super.onDestroy();
 	}
 	
+	/**
+	 * Register peer need and offers when statring this service.
+	 */
+	private void registerPeer()
+	{
+		 new Thread(new Runnable() {
+			    public void run() {
+			      HttpManager.sendPostRequest(serverAddress,JsHelper.registerOfferNeed() );
+			    }
+			  }).start();
+
+		
+	}
 
 }

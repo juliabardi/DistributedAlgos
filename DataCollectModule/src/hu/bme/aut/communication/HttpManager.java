@@ -21,27 +21,13 @@ import org.json.JSONObject;
  */
 public class HttpManager {
 	
-	public static String sendRequest(String url,String type, JSONObject JSobject)
-	{
-		String answer="";
-		if(type.equals("get"))
-		{
-			answer=sendGetRequest(url);
-		}
-		else
-		{
-			answer=sendPostRequest(url, JSobject);
-		}
-		
-		return answer;
-	}
 	
 	/**
 	 * Send a GET request.
 	 * @param url
 	 * @return
 	 */
-	private static String sendGetRequest(String url)
+	public static String sendGetRequest(String url)
 	{
 	  	HttpClient httpclient = new DefaultHttpClient();
 	    HttpGet httpget = new HttpGet(url); 
@@ -60,7 +46,7 @@ public class HttpManager {
 	 * Send a POST request to the server.
 	 * @param url
 	 */
-	private static String sendPostRequest(String url, JSONObject JSobject)
+	public static String sendPostRequest(String url, JSONObject JSobject)
 	{
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpPost httppost = new HttpPost(url);
