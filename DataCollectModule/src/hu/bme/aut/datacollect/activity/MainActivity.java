@@ -1,5 +1,7 @@
 package hu.bme.aut.datacollect.activity;
 
+import hu.bme.aut.communication.CommunicationService;
+import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
 import hu.bme.aut.datacollect.activity.DataCollectService.ServiceBinder;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
 import hu.bme.aut.datacollect.receiver.IListener;
@@ -23,9 +25,12 @@ import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		OnSharedPreferenceChangeListener {
 	
-	private DataCollectService mService;	
+	private DataCollectService mService;
+	private CommunicationService commService;
 	private Intent intent = null;
+	private Intent commIntent=null;
 	private boolean mBound = false;
+	private boolean commBound = false;
 	
 	public static final String[] sharedPrefKeys = new String[] { "acceleration", "light",
 			"temperature", "location", "incall", "outcall", "insms", "outsms" };
@@ -38,11 +43,15 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		settings.registerOnSharedPreferenceChangeListener((OnSharedPreferenceChangeListener) this);
 		
-		intent = new Intent(this, DataCollectService.class);	
+		intent = new Intent(this, DataCollectService.class);
+		commIntent = new Intent(this,CommunicationService.class); 
 		
 		//start service if not already started
-		if (!isServiceRunning()){
+		if (!isServiceRunning(DataCollectService.class.getName())){
 			this.startService(intent);
+		}
+		if (!isServiceRunning(CommunicationService.class.getName())){
+			this.startService(commIntent);
 		}
     }
 	
@@ -50,6 +59,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	protected void onStart() {		
 		super.onStart();
 		this.bindService(intent, mConnection, 0);
+		this.bindService(commIntent, commConnection, 0);
 	}
 
 	@Override
@@ -58,6 +68,10 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
         if (mBound) {
             unbindService(mConnection);
             mBound = false;
+        }
+        if (commBound) {
+            unbindService(commConnection);
+            commBound = false;
         }
 	}
 
@@ -77,6 +91,24 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
             mBound = false;
         }
     };
+    
+    private ServiceConnection commConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            CommServiceBinder binder = (CommServiceBinder) service;
+            commService = binder.getService();
+            commBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            commBound = false;
+        }
+    };
+
 
 	public void onClick(View v){
 		
@@ -120,10 +152,10 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		}
 	}
 	
-	private boolean isServiceRunning() {
+	private boolean isServiceRunning(String serviceName) {
 	    ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-	        if (DataCollectService.class.getName().equals(service.service.getClassName())) {
+	        if (serviceName.equals(service.service.getClassName())) {
 	            return true;
 	        }
 	    }
@@ -132,5 +164,6 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	
 	public void stopClicked(View v){		
 		stopService(intent);
+		stopService(commIntent);
 	}
 }

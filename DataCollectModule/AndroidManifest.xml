@@ -45,6 +45,8 @@
 
         <service android:name="hu.bme.aut.datacollect.activity.DataCollectService" >
         </service>
+       <service android:name="hu.bme.aut.communication.CommunicationService" >
+        </service>
 
         <receiver android:name="hu.bme.aut.datacollect.receiver.IncomingCallReceiver" >
         </receiver>
