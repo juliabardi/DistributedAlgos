@@ -1,4 +1,4 @@
-package hu.bme.aut.datacollect.receiver;
+package hu.bme.aut.datacollect.listener;
 
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.CallData;

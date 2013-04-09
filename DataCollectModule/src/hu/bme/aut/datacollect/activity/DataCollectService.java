@@ -3,19 +3,21 @@ package hu.bme.aut.datacollect.activity;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
 import hu.bme.aut.datacollect.entity.AccelerationData;
 import hu.bme.aut.datacollect.entity.CallData;
+import hu.bme.aut.datacollect.entity.GyroscopeData;
 import hu.bme.aut.datacollect.entity.LightData;
 import hu.bme.aut.datacollect.entity.LocationData;
 import hu.bme.aut.datacollect.entity.SmsData;
 import hu.bme.aut.datacollect.entity.TemperatureData;
-import hu.bme.aut.datacollect.receiver.AccelerometerSensorListener;
-import hu.bme.aut.datacollect.receiver.IListener;
-import hu.bme.aut.datacollect.receiver.IncomingCallReceiver;
-import hu.bme.aut.datacollect.receiver.IncomingSmsReceiver;
-import hu.bme.aut.datacollect.receiver.LightSensorListener;
-import hu.bme.aut.datacollect.receiver.LocationProvider;
-import hu.bme.aut.datacollect.receiver.OutgoingCallReceiver;
-import hu.bme.aut.datacollect.receiver.OutgoingSmsListener;
-import hu.bme.aut.datacollect.receiver.TemperatureSensorListener;
+import hu.bme.aut.datacollect.listener.AccelerometerSensorListener;
+import hu.bme.aut.datacollect.listener.GyroscopeSensorListener;
+import hu.bme.aut.datacollect.listener.IListener;
+import hu.bme.aut.datacollect.listener.IncomingCallReceiver;
+import hu.bme.aut.datacollect.listener.IncomingSmsReceiver;
+import hu.bme.aut.datacollect.listener.LightSensorListener;
+import hu.bme.aut.datacollect.listener.LocationProvider;
+import hu.bme.aut.datacollect.listener.OutgoingCallReceiver;
+import hu.bme.aut.datacollect.listener.OutgoingSmsListener;
+import hu.bme.aut.datacollect.listener.TemperatureSensorListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +35,21 @@ import android.support.v4.app.NotificationCompat;
 import com.j256.ormlite.android.apptools.OrmLiteBaseService;
 
 public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
+	
+	//Cannot access the R.string.whatever from static place easily, so I keep here the strings
+	public static final String ACCELERATION = "acceleration";
+	public static final String LIGHT = "light";
+	public static final String TEMPERATURE = "temperature";
+	public static final String GYROSCOPE = "gyroscope";
+	public static final String LOCATION = "location";
+	public static final String INCOMING_CALL = "incall";
+	public static final String OUTGOING_CALL = "outcall";
+	public static final String INCOMING_SMS = "insms";
+	public static final String OUTGOING_SMS = "outsms";
+
+	public static final String[] sharedPrefKeys = new String[] { ACCELERATION,
+			LIGHT, TEMPERATURE, GYROSCOPE, LOCATION, INCOMING_CALL,
+			OUTGOING_CALL, INCOMING_SMS, OUTGOING_SMS };
 
 	private final ServiceBinder mBinder = new ServiceBinder();
 
@@ -51,26 +68,29 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	public void onCreate() {
 		super.onCreate();
 
+
 		// instantiate class, it will register for loc updates
-		listeners.put("location", new LocationProvider(this, getHelper()
+		listeners.put(LOCATION, new LocationProvider(this, getHelper()
 				.getDaoBase(LocationData.class)));
 
 		// instantiate to register
-		listeners.put("acceleration", new AccelerometerSensorListener(this,
+		listeners.put(ACCELERATION, new AccelerometerSensorListener(this,
 				getHelper().getDaoBase(AccelerationData.class)));
-		listeners.put("light", new LightSensorListener(this, getHelper()
+		listeners.put(LIGHT, new LightSensorListener(this, getHelper()
 				.getDaoBase(LightData.class)));
-		listeners.put("temperature", new TemperatureSensorListener(this,
+		listeners.put(TEMPERATURE, new TemperatureSensorListener(this,
 				getHelper().getDaoBase(TemperatureData.class)));
+		listeners.put(GYROSCOPE, new GyroscopeSensorListener(this,
+				getHelper().getDaoBase(GyroscopeData.class)));
 
-		listeners.put("incall", new IncomingCallReceiver(this, getHelper()
+		listeners.put(INCOMING_CALL, new IncomingCallReceiver(this, getHelper()
 				.getDaoBase(CallData.class)));
-		listeners.put("outcall", new OutgoingCallReceiver(getHelper()
+		listeners.put(OUTGOING_CALL, new OutgoingCallReceiver(getHelper()
 				.getDaoBase(CallData.class)));
 
-		listeners.put("insms", new IncomingSmsReceiver(this, getHelper()
+		listeners.put(INCOMING_SMS, new IncomingSmsReceiver(this, getHelper()
 				.getDaoBase(SmsData.class)));
-		listeners.put("outsms", new OutgoingSmsListener(this, new Handler(),
+		listeners.put(OUTGOING_SMS, new OutgoingSmsListener(this, new Handler(),
 				getHelper().getDaoBase(SmsData.class)));
 
 		// get the current settings
@@ -78,7 +98,7 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 				.getDefaultSharedPreferences(getApplicationContext());
 
 		// register all listeners that are enabled
-		for (String key : MainActivity.sharedPrefKeys) {
+		for (String key : DataCollectService.sharedPrefKeys) {
 			if (sharedPreferences.getBoolean(key, false))
 				listeners.get(key).register();
 		}

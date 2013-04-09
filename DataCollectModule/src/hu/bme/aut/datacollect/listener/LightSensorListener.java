@@ -1,4 +1,4 @@
-package hu.bme.aut.datacollect.receiver;
+package hu.bme.aut.datacollect.listener;
 
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.LightData;
@@ -10,7 +10,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 
-public class LightSensorListener extends SensorsListener {
+public class LightSensorListener extends SensorListener {
 
 	private final Sensor lightSensor;
 	private DaoBase<LightData> lightDao = null;

@@ -2,6 +2,7 @@ package hu.bme.aut.datacollect.db;
 
 import hu.bme.aut.datacollect.entity.AccelerationData;
 import hu.bme.aut.datacollect.entity.CallData;
+import hu.bme.aut.datacollect.entity.GyroscopeData;
 import hu.bme.aut.datacollect.entity.LightData;
 import hu.bme.aut.datacollect.entity.LocationData;
 import hu.bme.aut.datacollect.entity.SmsData;
@@ -37,6 +38,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 		map.put(LocationData.class, null);
 		map.put(SmsData.class, null);
 		map.put(TemperatureData.class, null);
+		map.put(GyroscopeData.class, null);
 	}
 	
 	@Override

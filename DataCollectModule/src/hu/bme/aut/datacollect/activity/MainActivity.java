@@ -4,7 +4,7 @@ import hu.bme.aut.communication.CommunicationService;
 import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
 import hu.bme.aut.datacollect.activity.DataCollectService.ServiceBinder;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
-import hu.bme.aut.datacollect.receiver.IListener;
+import hu.bme.aut.datacollect.listener.IListener;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.ComponentName;
@@ -32,9 +32,6 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	private boolean mBound = false;
 	private boolean commBound = false;
 	
-	public static final String[] sharedPrefKeys = new String[] { "acceleration", "light",
-			"temperature", "location", "incall", "outcall", "insms", "outsms" };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -140,7 +137,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 			String key) {
 		
 		//finding which shared preference was changed, and register/unregister according to the value
-		for (String sharedKey : sharedPrefKeys){
+		for (String sharedKey : DataCollectService.sharedPrefKeys){
 			if (sharedKey.equals(key)) {
 				IListener listener = mService.getListener(sharedKey);
 				if (sharedPreferences.getBoolean(sharedKey, false))

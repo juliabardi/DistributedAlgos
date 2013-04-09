@@ -1,4 +1,4 @@
-package hu.bme.aut.datacollect.receiver;
+package hu.bme.aut.datacollect.listener;
 
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.AccelerationData;
@@ -10,7 +10,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 
-public class AccelerometerSensorListener extends SensorsListener {
+public class AccelerometerSensorListener extends SensorListener {
 
 	private final Sensor accelerometerSensor;
 	private DaoBase<AccelerationData> accelerationDao = null;

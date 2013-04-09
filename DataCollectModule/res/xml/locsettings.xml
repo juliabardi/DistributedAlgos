@@ -6,7 +6,7 @@
         </Preference>
          <CheckBoxPreference
 		  android:title="Hely monitorozása"
-		  android:key="location"
+		  android:key="@string/location"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
     </PreferenceCategory>

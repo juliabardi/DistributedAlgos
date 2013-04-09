@@ -1,4 +1,4 @@
-package hu.bme.aut.datacollect.receiver;
+package hu.bme.aut.datacollect.listener;
 
 public interface IListener {
 

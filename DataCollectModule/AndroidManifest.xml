@@ -48,11 +48,11 @@
        <service android:name="hu.bme.aut.communication.CommunicationService" >
         </service>
 
-        <receiver android:name="hu.bme.aut.datacollect.receiver.IncomingCallReceiver" >
+        <receiver android:name="hu.bme.aut.datacollect.listener.IncomingCallReceiver" >
         </receiver>
-        <receiver android:name="hu.bme.aut.datacollect.receiver.OutgoingCallReceiver" >
+        <receiver android:name="hu.bme.aut.datacollect.listener.OutgoingCallReceiver" >
         </receiver>
-        <receiver android:name="hu.bme.aut.datacollect.receiver.IncomingSmsReceiver" >
+        <receiver android:name="hu.bme.aut.datacollect.listener.IncomingSmsReceiver" >
         </receiver>
     </application>
 

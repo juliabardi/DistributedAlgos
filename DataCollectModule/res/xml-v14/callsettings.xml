@@ -3,12 +3,12 @@
     <PreferenceCategory android:title="Hívások figyelése" >
         <SwitchPreference
 		  android:title="Bejövő hívások"
-		  android:key="incall"
+		  android:key="@string/incall"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
          <SwitchPreference
 		  android:title="Kimenő hívások"
-		  android:key="outcall"
+		  android:key="@string/outcall"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
     </PreferenceCategory>

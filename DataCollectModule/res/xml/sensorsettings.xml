@@ -3,17 +3,22 @@
     <PreferenceCategory android:title="Szenzorok monitorozása" >
         <CheckBoxPreference
 		  android:title="Gyorsulásmérő"
-		  android:key="acceleration"
+		  android:key="@string/acceleration"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
         <CheckBoxPreference
 		  android:title="Fényszenzor"
-		  android:key="light"
+		  android:key="@string/light"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
         <CheckBoxPreference
 		  android:title="Hőmérő"
-		  android:key="temperature"
+		  android:key="@string/temperature"
+		  android:summaryOff="Kikapcsolva"
+		  android:summaryOn="Bekapcsolva"/>
+        <CheckBoxPreference
+		  android:title="Giroszkóp"
+		  android:key="@string/gyroscope"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
     </PreferenceCategory>
