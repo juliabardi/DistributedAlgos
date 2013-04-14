@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.view.ViewDebug.FlagToString;
 
 public class CommunicationService extends Service{
 
@@ -21,7 +22,7 @@ public class CommunicationService extends Service{
 		}
 	}
 	
-	private String serverAddress="http://10.0.2.2:3000"; //emulator localhost test
+	private String serverAddress="http://10.0.2.2:3000/"; //emulator localhost test
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -77,7 +78,7 @@ public class CommunicationService extends Service{
 	{
 		 new Thread(new Runnable() {
 			    public void run() {
-			      HttpManager.sendPostRequest(serverAddress,JsHelper.registerOfferNeed() );
+			      HttpManager.sendPostRequest(serverAddress +"register",JsHelper.registerOfferNeed() );
 			    }
 			  }).start();
 

@@ -19,5 +19,6 @@
     <string name="gyroscope">gyroscope</string>
     <string name="insms">insms</string>
     <string name="outsms">outsms</string>
+    <string name="communicationStop">Kommunikáció leállítása</string>
 
 </resources>

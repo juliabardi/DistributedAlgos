@@ -133,5 +133,18 @@
             android:onClick="stopClicked"
             android:text="Mérés leállítása" />
     </TableRow>
+    
+    <TableRow
+        android:id="@+id/tableRow8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/buttonCommunicationStop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="stopClicked"
+            android:text="@string/communicationStop" />
+    </TableRow>
 
 </TableLayout>

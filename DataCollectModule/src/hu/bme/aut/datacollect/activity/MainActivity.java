@@ -19,6 +19,7 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 
@@ -31,11 +32,13 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	private Intent commIntent=null;
 	private boolean mBound = false;
 	private boolean commBound = false;
+	private Button communicationButton;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        communicationButton = (Button)findViewById(R.id.buttonCommunicationStop);
                         
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		settings.registerOnSharedPreferenceChangeListener((OnSharedPreferenceChangeListener) this);
@@ -55,8 +58,12 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	@Override
 	protected void onStart() {		
 		super.onStart();
-		this.bindService(intent, mConnection, 0);
-		this.bindService(commIntent, commConnection, 0);
+		if (isServiceRunning(DataCollectService.class.getName())){ // PendingIntent causes binding without a running service.
+			this.bindService(intent, mConnection, 0);
+		}
+		if (isServiceRunning(CommunicationService.class.getName())){
+			this.bindService(commIntent, commConnection, 0);
+		}
 	}
 
 	@Override
@@ -159,8 +166,29 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	    return false;
 	}
 	
-	public void stopClicked(View v){		
-		stopService(intent);
-		stopService(commIntent);
+	public void stopClicked(View v){
+		switch (v.getId())
+		{
+		case R.id.buttonStop:
+			stopService(intent);
+			break;
+		case R.id.buttonCommunicationStop:
+			if (isServiceRunning(CommunicationService.class.getName())){
+				stopService(commIntent);
+				if (commBound) {
+		            unbindService(commConnection);
+		            commBound = false;
+		        }
+				
+				communicationButton.setText("Kommunikáció indítása");
+			}
+			else{
+				startService(commIntent);
+				this.bindService(commIntent, commConnection, 0);
+				
+				communicationButton.setText("Kommunikáció leállítása");				
+			}
+			break;
+		}
 	}
 }

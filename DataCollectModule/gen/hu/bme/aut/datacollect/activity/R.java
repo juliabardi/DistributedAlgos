@@ -24,15 +24,16 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f090015;
+        public static final int action_settings=0x7f090017;
         public static final int buttonAcceleration=0x7f090004;
         public static final int buttonCalls=0x7f090010;
+        public static final int buttonCommunicationStop=0x7f090014;
         public static final int buttonFineLocation=0x7f09000d;
         public static final int buttonLight=0x7f090007;
         public static final int buttonStop=0x7f090012;
         public static final int buttonTemperature=0x7f09000a;
-        public static final int table=0x7f090014;
-        public static final int tableName=0x7f090013;
+        public static final int table=0x7f090016;
+        public static final int tableName=0x7f090015;
         public static final int tableRow1=0x7f090000;
         public static final int tableRow2=0x7f090002;
         public static final int tableRow3=0x7f090005;
@@ -40,6 +41,7 @@ public final class R {
         public static final int tableRow5=0x7f09000b;
         public static final int tableRow6=0x7f09000e;
         public static final int tableRow7=0x7f090011;
+        public static final int tableRow8=0x7f090013;
         public static final int textView1=0x7f090001;
         public static final int textView2=0x7f090003;
         public static final int textView3=0x7f090006;
@@ -60,6 +62,7 @@ public final class R {
         public static final int action_settings=0x7f060001;
         public static final int app_name=0x7f060000;
         public static final int calls=0x7f06000b;
+        public static final int communicationStop=0x7f060012;
         public static final int fine_location=0x7f06000a;
         public static final int gyroscope=0x7f06000f;
         public static final int hello_world=0x7f060002;
