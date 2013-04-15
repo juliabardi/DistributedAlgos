@@ -21,53 +21,68 @@ import org.json.JSONObject;
  */
 public class HttpManager {
 	
+	public interface HttpManagerListener {
+		public void responseArrived(String response);
+		public void errorOccuredDuringParse(String error);
+		public void errorOccured(String error);
+	}
+	
+	private HttpManagerListener listener;
+	
+	public HttpManager(HttpManagerListener aListener)
+	{
+		listener = aListener;
+	}
+	
 	
 	/**
 	 * Send a GET request.
 	 * @param url
 	 * @return
 	 */
-	public static String sendGetRequest(String url)
+	public void sendGetRequest(String url)
 	{
 	  	HttpClient httpclient = new DefaultHttpClient();
 	    HttpGet httpget = new HttpGet(url); 
 	    HttpResponse response;
 	    try {
 	        response = httpclient.execute(httpget);
-	        return handleJSONResponse(response);
+	        handleJSONResponse(response);
 	    } catch (Exception e) {
-			e.printStackTrace();
+	    	listener.errorOccured("Error occured during GET.");
+	    	e.printStackTrace();
 		}
 	    
-		return "Error occured GET.";
+		
 	}
 
 	/**
 	 * Send a POST request to the server.
 	 * @param url
 	 */
-	public static String sendPostRequest(String url, JSONObject JSobject)
+	public void sendPostRequest(String url, String JSobject)
 	{
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpPost httppost = new HttpPost(url);
-		try {// Post adat összeállítása
-		httppost.setEntity(new ByteArrayEntity(
-			    JSobject.toString().getBytes("UTF8")));
-		// HTTP Post kérés végrehajtása
-		HttpResponse response = httpclient.execute(httppost);
-		// … válasz feldolgozása
-		return handleJSONResponse(response);
+		try {
+			httppost.setEntity(new ByteArrayEntity(
+				    JSobject.getBytes("UTF8")));
+			
+			HttpResponse response = httpclient.execute(httppost);
+			
+			handleJSONResponse(response);
 		} catch (Exception e) {
+			listener.errorOccured( "Error occured during POST.");
 			e.printStackTrace();
 		}
-		return "Error occured POST.";
+		
 	}
 	
 	/**
 	 * Handle the server response.
 	 * @param response
 	 */
-	private static String handleJSONResponse(HttpResponse response)
+	private void handleJSONResponse(HttpResponse response)
 	{
 		InputStream is = null;
 		 try {
@@ -83,13 +98,13 @@ public class HttpManager {
 							bos.write(inChar);
 						}
 						
-						return bos.toString();
+						listener.responseArrived(bos.toString());
 			        }
 			        else
-			        	return "HttpEntity is empty"; //error
+			        	listener.errorOccured("HttpEntity is empty"); // Error
 		        }
 		    } catch (Exception e) {
-		    	return e.getMessage(); //error
+		    	listener.errorOccured(e.getMessage()); // Error
 		    } finally {
 		    	if (is != null)
 		    	{
@@ -100,7 +115,6 @@ public class HttpManager {
 					}
 		    	}
 		    }
-		return "Error occured in handling the response.";
 	}
 }
 

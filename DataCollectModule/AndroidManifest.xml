@@ -48,6 +48,8 @@
         </service>
        <service android:name="hu.bme.aut.communication.CommunicationService" >
         </service>
+        <service android:name="hu.bme.aut.communication.NodeCommunicationIntentService" >
+        </service>
 
         <receiver android:name="hu.bme.aut.datacollect.listener.IncomingCallReceiver" >
         </receiver>
