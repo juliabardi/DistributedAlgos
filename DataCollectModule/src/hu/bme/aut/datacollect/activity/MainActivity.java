@@ -46,7 +46,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		intent = new Intent(this, DataCollectService.class);
 		commIntent = new Intent(this,CommunicationService.class); 
 		
-		//start service if not already started
+		// Start service if not already started.
 		if (!isServiceRunning(DataCollectService.class.getName())){
 			this.startService(intent);
 		}
