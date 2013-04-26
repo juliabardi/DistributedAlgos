@@ -18,19 +18,14 @@ public class OutgoingCallReceiver extends BroadcastReceiver implements IListener
 	
 	private boolean regOutgoing = false;
 	
-	public OutgoingCallReceiver(DaoBase<CallData> callDao){
+	public OutgoingCallReceiver(Context context, DaoBase<CallData> callDao){
 		this.callDao = callDao;
+		this.context = context;
 	}
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		
-		Bundle extras = intent.getExtras();
-		
-		if (extras == null){
-			return;
-		}
-		
+				
 		callDao.create(new CallData(Calendar.getInstance().getTimeInMillis(), "out"));
 	}
 	

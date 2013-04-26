@@ -14,6 +14,7 @@ public class ActivityFragmentSettings extends PreferenceActivity {
 	final static String ACTION_PREFS_LOCATION = "hu.bme.aut.datacollect.prefs.PREFS_LOCATION";
 	final static String ACTION_PREFS_CALLS = "hu.bme.aut.datacollect.prefs.PREFS_CALLS";
 	final static String ACTION_PREFS_SMS = "hu.bme.aut.datacollect.prefs.PREFS_SMS";
+	final static String ACTION_PREFS_PACKAGE = "hu.bme.aut.datacollect.prefs.PREFS_PACKAGE";
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -33,6 +34,9 @@ public class ActivityFragmentSettings extends PreferenceActivity {
 	    }
 	    else if (action != null && action.equals(ACTION_PREFS_SMS)) {
 	        addPreferencesFromResource(R.xml.smssettings);
+	    }
+	    else if (action != null && action.equals(ACTION_PREFS_PACKAGE)){
+	    	addPreferencesFromResource(R.xml.packagesettings);
 	    }
 		
 	    else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
@@ -92,6 +96,15 @@ public class ActivityFragmentSettings extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.smssettings);
+        }
+    }
+	
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB) 
+    public static class FragmentSettingsPackage extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.packagesettings);
         }
     }
 }

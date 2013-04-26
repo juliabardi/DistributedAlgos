@@ -6,6 +6,7 @@ import hu.bme.aut.datacollect.entity.CallData;
 import hu.bme.aut.datacollect.entity.GyroscopeData;
 import hu.bme.aut.datacollect.entity.LightData;
 import hu.bme.aut.datacollect.entity.LocationData;
+import hu.bme.aut.datacollect.entity.PackageData;
 import hu.bme.aut.datacollect.entity.SmsData;
 import hu.bme.aut.datacollect.entity.TemperatureData;
 import hu.bme.aut.datacollect.listener.AccelerometerSensorListener;
@@ -17,6 +18,7 @@ import hu.bme.aut.datacollect.listener.LightSensorListener;
 import hu.bme.aut.datacollect.listener.LocationProvider;
 import hu.bme.aut.datacollect.listener.OutgoingCallReceiver;
 import hu.bme.aut.datacollect.listener.OutgoingSmsListener;
+import hu.bme.aut.datacollect.listener.PackageReceiver;
 import hu.bme.aut.datacollect.listener.TemperatureSensorListener;
 
 import java.util.HashMap;
@@ -46,10 +48,11 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	public static final String OUTGOING_CALL = "outcall";
 	public static final String INCOMING_SMS = "insms";
 	public static final String OUTGOING_SMS = "outsms";
+	public static final String PACKAGE = "package";
 
 	public static final String[] sharedPrefKeys = new String[] { ACCELERATION,
 			LIGHT, TEMPERATURE, GYROSCOPE, LOCATION, INCOMING_CALL,
-			OUTGOING_CALL, INCOMING_SMS, OUTGOING_SMS };
+			OUTGOING_CALL, INCOMING_SMS, OUTGOING_SMS, PACKAGE };
 
 	private final ServiceBinder mBinder = new ServiceBinder();
 
@@ -85,13 +88,15 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 
 		listeners.put(INCOMING_CALL, new IncomingCallReceiver(this, getHelper()
 				.getDaoBase(CallData.class)));
-		listeners.put(OUTGOING_CALL, new OutgoingCallReceiver(getHelper()
+		listeners.put(OUTGOING_CALL, new OutgoingCallReceiver(this, getHelper()
 				.getDaoBase(CallData.class)));
 
 		listeners.put(INCOMING_SMS, new IncomingSmsReceiver(this, getHelper()
 				.getDaoBase(SmsData.class)));
 		listeners.put(OUTGOING_SMS, new OutgoingSmsListener(this, new Handler(),
 				getHelper().getDaoBase(SmsData.class)));
+		
+		listeners.put(PACKAGE, new PackageReceiver(this, getHelper().getDaoBase(PackageData.class)));
 
 		// get the current settings
 		SharedPreferences sharedPreferences = PreferenceManager

@@ -20,5 +20,6 @@
     <string name="insms">insms</string>
     <string name="outsms">outsms</string>
     <string name="communicationStop">Kommunikáció leállítása</string>
+    <string name="packages">package</string>
 
 </resources>

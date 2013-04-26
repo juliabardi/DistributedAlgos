@@ -17,11 +17,7 @@ public class OutgoingSmsListener extends ContentObserver implements IListener {
 	private Context context = null;
 	
 	private boolean regOutSms = false;
-	
-	public OutgoingSmsListener(Handler handler) {
-		super(handler);
-	}
-	
+		
 	public OutgoingSmsListener(Context context, Handler handler, DaoBase<SmsData> smsDao){
 		super(handler);
 		this.smsDao = smsDao;

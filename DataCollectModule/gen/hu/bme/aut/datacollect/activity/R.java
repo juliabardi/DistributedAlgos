@@ -73,6 +73,7 @@ public final class R {
         public static final int location=0x7f06000e;
         public static final int outcall=0x7f06000d;
         public static final int outsms=0x7f060011;
+        public static final int packages=0x7f060013;
         public static final int sensors=0x7f060003;
         public static final int temp=0x7f060006;
         public static final int temperature=0x7f060009;
@@ -109,8 +110,9 @@ public final class R {
         public static final int callsettings=0x7f040000;
         public static final int fragmentsettings=0x7f040001;
         public static final int locsettings=0x7f040002;
-        public static final int preference_headers_legacy=0x7f040003;
-        public static final int sensorsettings=0x7f040004;
-        public static final int smssettings=0x7f040005;
+        public static final int packagesettings=0x7f040003;
+        public static final int preference_headers_legacy=0x7f040004;
+        public static final int sensorsettings=0x7f040005;
+        public static final int smssettings=0x7f040006;
     }
 }
