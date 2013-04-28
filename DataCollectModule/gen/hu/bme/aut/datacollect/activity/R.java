@@ -60,10 +60,18 @@ public final class R {
         public static final int acc=0x7f060004;
         public static final int acceleration=0x7f060007;
         public static final int action_settings=0x7f060001;
+        public static final int already_registered=0x7f060015;
         public static final int app_name=0x7f060000;
         public static final int calls=0x7f06000b;
         public static final int communicationStop=0x7f060012;
+        public static final int error_config=0x7f060014;
         public static final int fine_location=0x7f06000a;
+        public static final int gcm_deleted=0x7f06001b;
+        public static final int gcm_error=0x7f060019;
+        public static final int gcm_message=0x7f060018;
+        public static final int gcm_recoverable_error=0x7f06001a;
+        public static final int gcm_registered=0x7f060016;
+        public static final int gcm_unregistered=0x7f060017;
         public static final int gyroscope=0x7f06000f;
         public static final int hello_world=0x7f060002;
         public static final int incall=0x7f06000c;
@@ -75,6 +83,11 @@ public final class R {
         public static final int outsms=0x7f060011;
         public static final int packages=0x7f060013;
         public static final int sensors=0x7f060003;
+        public static final int server_register_error=0x7f06001f;
+        public static final int server_registered=0x7f06001d;
+        public static final int server_registering=0x7f06001c;
+        public static final int server_unregister_error=0x7f060020;
+        public static final int server_unregistered=0x7f06001e;
         public static final int temp=0x7f060006;
         public static final int temperature=0x7f060009;
     }
