@@ -55,4 +55,12 @@ public class TemperatureSensorListener extends SensorListener {
 	public void unregister() {
 		sensorManager.unregisterListener(this, ambientTempSensor);
 	}
+	
+	@Override
+	public boolean isAvailable() {
+		if (this.ambientTempSensor != null){
+			return true;
+		}
+		return false;
+	}
 }

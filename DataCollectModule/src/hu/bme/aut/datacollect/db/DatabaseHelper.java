@@ -45,12 +45,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 	
 	@Override
 	public void onCreate(SQLiteDatabase database,
-			ConnectionSource connectionSource) {
+			ConnectionSource connSource) {
 		
 		try {
 			Log.i(DatabaseHelper.class.getName(), "onCreate");
 			for (Class<Object> clazz : map.keySet()){
-				TableUtils.createTable(connectionSource, clazz);
+				TableUtils.createTable(connSource, clazz);
 			}
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
@@ -62,16 +62,16 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 	//TODO: is it right to drop the old db?
 	@Override
 	public void onUpgrade(SQLiteDatabase database,
-			ConnectionSource connectionSource, int oldVersion, int newVersion) {
+			ConnectionSource connSource, int oldVersion, int newVersion) {
 
 		try {
 			Log.i(DatabaseHelper.class.getName(), "onUpgrade");
 			
 			for (Class<Object> clazz : map.keySet()){
-				TableUtils.dropTable(connectionSource, clazz, true);
+				TableUtils.dropTable(connSource, clazz, true);
 			}
 			// after we drop the old databases, we create the new ones
-			onCreate(database, connectionSource);
+			onCreate(database, connSource);
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Can't drop databases", e);
 			throw new RuntimeException(e);

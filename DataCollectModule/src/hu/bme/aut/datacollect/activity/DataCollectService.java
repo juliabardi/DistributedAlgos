@@ -104,9 +104,12 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 
 		// register all listeners that are enabled
 		for (String key : DataCollectService.sharedPrefKeys) {
-			if (sharedPreferences.getBoolean(key, false))
+			if (sharedPreferences.getBoolean(key, false) && listeners.get(key).isAvailable()){
 				listeners.get(key).register();
+			}				
 		}
+		
+		
 
 		this.setupForeground();
 	}
@@ -131,7 +134,9 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 
 		// unregister stuff if necessary
 		for (String key : listeners.keySet()) {
-			listeners.get(key).unregister();
+			if (listeners.get(key).isAvailable()){
+				listeners.get(key).unregister();
+			}
 		}
 		super.onDestroy();
 	}

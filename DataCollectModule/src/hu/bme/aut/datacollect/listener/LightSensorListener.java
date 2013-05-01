@@ -55,4 +55,11 @@ public class LightSensorListener extends SensorListener {
 		sensorManager.unregisterListener(this, lightSensor);
 	}
 
+	@Override
+	public boolean isAvailable() {
+		if (this.lightSensor != null){
+			return true;
+		}
+		return false;
+	}
 }

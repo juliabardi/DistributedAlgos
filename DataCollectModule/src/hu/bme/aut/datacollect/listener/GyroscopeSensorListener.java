@@ -52,4 +52,11 @@ public class GyroscopeSensorListener extends SensorListener {
 		sensorManager.unregisterListener(this, gyroscopeSensor);
 	}
 
+	@Override
+	public boolean isAvailable() {
+		if (this.gyroscopeSensor != null){
+			return true;
+		}
+		return false;
+	}
 }

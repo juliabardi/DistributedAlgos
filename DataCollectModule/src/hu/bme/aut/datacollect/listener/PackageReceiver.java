@@ -12,14 +12,14 @@ import android.content.IntentFilter;
 public class PackageReceiver extends BroadcastReceiver implements IListener {
 
 	private DaoBase<PackageData> packageDao = null;
-	private Context context = null;
+	private Context mContext = null;
 	
 	private boolean regPackage = false;
 	
 	public PackageReceiver(Context context, DaoBase<PackageData> packageDao) {
 		super();
 		this.packageDao = packageDao;
-		this.context = context;
+		this.mContext = context;
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class PackageReceiver extends BroadcastReceiver implements IListener {
 	        filter.addAction(Intent.ACTION_PACKAGE_RESTARTED);
 	        filter.addDataScheme("package");
 	        
-	        this.context.registerReceiver(this, filter);
+	        this.mContext.registerReceiver(this, filter);
 	        
 	        this.regPackage = true;
 		}
@@ -53,8 +53,14 @@ public class PackageReceiver extends BroadcastReceiver implements IListener {
 	public void unregister() {
 		
 		if (this.regPackage){
-			this.context.unregisterReceiver(this);
+			this.mContext.unregisterReceiver(this);
 			this.regPackage = false;
 		}
+	}
+	
+	@Override
+	public boolean isAvailable() {
+		//receiving packages is available on every device
+		return true;
 	}
 }

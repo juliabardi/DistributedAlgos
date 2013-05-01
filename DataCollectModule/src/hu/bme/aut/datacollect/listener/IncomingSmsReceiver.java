@@ -9,17 +9,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.telephony.TelephonyManager;
 
 public class IncomingSmsReceiver extends BroadcastReceiver implements IListener {
 
 	private DaoBase<SmsData> smsDao = null;
-	private Context context = null;
+	private Context mContext = null;
 	
 	private boolean regInSms = false;
 	
 	public IncomingSmsReceiver(Context context, DaoBase<SmsData> smsDao){
 		this.smsDao = smsDao;
-		this.context = context;
+		this.mContext = context;
 	}
 	
 	@Override
@@ -36,7 +37,7 @@ public class IncomingSmsReceiver extends BroadcastReceiver implements IListener 
 		
 		if (!regInSms){
 			IntentFilter intentFilter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
-			context.registerReceiver(this, intentFilter);
+			mContext.registerReceiver(this, intentFilter);
 			regInSms = true;
 		}
 	}
@@ -45,9 +46,18 @@ public class IncomingSmsReceiver extends BroadcastReceiver implements IListener 
 	public void unregister(){
 		
 		if (regInSms){
-			context.unregisterReceiver(this);
+			mContext.unregisterReceiver(this);
 			regInSms = false;
 		}
 	}
 
+	@Override
+	public boolean isAvailable() {
+		
+		TelephonyManager tm = (TelephonyManager) this.mContext.getSystemService(Context.TELEPHONY_SERVICE);  //gets the current TelephonyManager
+		if (tm.getSimState() != TelephonyManager.SIM_STATE_ABSENT){
+			return true;
+		}
+		return false;
+	}
 }

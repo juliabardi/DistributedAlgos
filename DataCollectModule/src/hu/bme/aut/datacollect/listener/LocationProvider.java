@@ -79,6 +79,7 @@ public class LocationProvider implements LocationListener, IListener{
 			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 			builder.setPositiveButton("OK",
 					new DialogInterface.OnClickListener() {
+						@Override
 						public void onClick(DialogInterface dialog, int id) {
 							enableLocationSettings();
 						}
@@ -98,9 +99,17 @@ public class LocationProvider implements LocationListener, IListener{
 		locationManager.removeUpdates(this);
 	}
 	
-	private void enableLocationSettings() {
+	void enableLocationSettings() {
 	    Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 	    mContext.startActivity(settingsIntent);
 	}
 	
+	@Override
+	public boolean isAvailable() {
+		//in absence of gps provider should i use network provider?
+		if (this.locationManager.getProvider(LocationManager.GPS_PROVIDER) != null) {
+			return true;
+		}
+		return false;
+	}
 }

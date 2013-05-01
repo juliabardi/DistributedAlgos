@@ -10,6 +10,7 @@ import android.content.Context;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Handler;
+import android.telephony.TelephonyManager;
 
 public class OutgoingSmsListener extends ContentObserver implements IListener {
 
@@ -53,5 +54,15 @@ public class OutgoingSmsListener extends ContentObserver implements IListener {
 			contentResolver.unregisterContentObserver(this);
 			regOutSms = false;
 		}
+	}
+	
+	@Override
+	public boolean isAvailable() {
+		
+		TelephonyManager tm = (TelephonyManager) this.context.getSystemService(Context.TELEPHONY_SERVICE);  //gets the current TelephonyManager
+		if (tm.getSimState() != TelephonyManager.SIM_STATE_ABSENT){
+			return true;
+		}
+		return false;
 	}
 }

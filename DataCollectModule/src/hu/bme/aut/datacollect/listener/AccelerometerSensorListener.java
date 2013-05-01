@@ -69,4 +69,12 @@ public class AccelerometerSensorListener extends SensorListener {
 		sensorManager.unregisterListener(this, accelerometerSensor);
 	}
 
+	@Override
+	public boolean isAvailable() {
+		if (this.accelerometerSensor != null){
+			return true;
+		}
+		return false;
+	}
+
 }

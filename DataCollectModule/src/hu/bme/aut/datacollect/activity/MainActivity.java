@@ -117,7 +117,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	public void onClick(View v){
 		
 		//navigate to the details
-		Intent intent = new Intent(this, DetailsActivity.class);
+		intent = new Intent(this, DetailsActivity.class);
 		intent.putExtra("id", v.getId());
 		this.startActivity(intent);		
 	}
@@ -134,6 +134,10 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		if (item.getItemId() == R.id.action_settings) {
 			Intent i = new Intent();
 			i.setClass(this, ActivityFragmentSettings.class);
+			//sending the listener availability in a bundle
+			for (String sharedKey : DataCollectService.sharedPrefKeys){
+				i.putExtra(sharedKey, this.mService.getListener(sharedKey).isAvailable());
+			}
 			startActivityForResult(i, 0);
 		}
 		return super.onOptionsItemSelected(item);
@@ -147,10 +151,12 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		for (String sharedKey : DataCollectService.sharedPrefKeys){
 			if (sharedKey.equals(key)) {
 				IListener listener = mService.getListener(sharedKey);
-				if (sharedPreferences.getBoolean(sharedKey, false))
-					listener.register();
-				else
-					listener.unregister();
+				if (sharedPreferences.getBoolean(sharedKey, false)){
+					if (listener.isAvailable()){ listener.register(); }
+				}					
+				else{
+					if (listener.isAvailable()){ listener.unregister(); }
+				}					
 				break;
 			}
 		}
