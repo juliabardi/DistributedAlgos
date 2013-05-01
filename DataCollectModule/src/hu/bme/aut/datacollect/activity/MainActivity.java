@@ -4,7 +4,14 @@ import hu.bme.aut.communication.CommunicationService;
 import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
 import hu.bme.aut.datacollect.activity.DataCollectService.ServiceBinder;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
+import hu.bme.aut.datacollect.imageupload.ImageUploadTask;
+import hu.bme.aut.datacollect.imageupload.ImageUploadTaskQueue;
 import hu.bme.aut.datacollect.listener.IListener;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.ComponentName;
@@ -13,9 +20,13 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +44,14 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	private boolean mBound = false;
 	private boolean commBound = false;
 	private Button communicationButton;
+	
+	public static final int MEDIA_TYPE_IMAGE = 1;
+	public static final int MEDIA_TYPE_VIDEO = 2;
+	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+	
+	private ImageUploadTaskQueue queue = ImageUploadTaskQueue.instance();
+	private Uri fileUri;
+	private int limit = 0;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,5 +215,82 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 			}
 			break;
 		}
+	}
+	
+	//trying out tape: make 3 image task, and start the service to upload them
+	public void uploadImages(View v){
+		
+//		queue.add(new ImageUploadTask(this));
+//		queue.add(new ImageUploadTask(this));
+//		queue.add(new ImageUploadTask(this));
+//		queue.startService(this);
+		
+		//TODO get permission
+		this.captureImage();
+	}
+	
+	private void captureImage() {
+		
+		if (limit < 3){
+			Log.i("Tape:ImageUpload", "Capturing image...");
+			intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+			fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); 
+			this.startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+			limit++;
+		}
+		else {
+			queue.startService(this);
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+			if (resultCode == RESULT_OK) {
+				Log.i("Tape:ImageUpload", "Captured image: " + fileUri.getPath());
+				queue.add(new ImageUploadTask(fileUri));
+				this.captureImage();
+			} else if (resultCode == RESULT_CANCELED) {
+				// User cancelled the image capture
+			} else {
+				// Image capture failed, advise user
+			}
+		}
+	}
+
+	/** Create a file Uri for saving an image or video */
+	private Uri getOutputMediaFileUri(int type) {
+		return Uri.fromFile(getOutputMediaFile(type));
+	}
+
+	/** Create a File for saving an image or video */
+	private File getOutputMediaFile(int type) {
+		// To be safe, you should check that the SDCard is mounted
+		// using Environment.getExternalStorageState() before doing this.
+		File mediaStorageDir = new File(
+				Environment
+						.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+				"DistributedAlgosCamera");
+		if (!mediaStorageDir.exists()) {
+			if (!mediaStorageDir.mkdirs()) {
+				Log.d("DistributedAlgosCamera", "failed to create directory");
+				return null;
+			}
+		}
+		// Create a media file name
+		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+		File mediaFile;
+		if (type == MEDIA_TYPE_IMAGE) {
+			mediaFile = new File(mediaStorageDir.getPath() + File.separator
+					+ "IMG_" + timeStamp + ".jpg");
+		} else if (type == MEDIA_TYPE_VIDEO) {
+			mediaFile = new File(mediaStorageDir.getPath() + File.separator
+					+ "VID_" + timeStamp + ".mp4");
+		} else {
+			return null;
+		}
+
+		return mediaFile;
 	}
 }
