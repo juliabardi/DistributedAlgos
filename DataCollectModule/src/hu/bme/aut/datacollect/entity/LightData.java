@@ -1,12 +1,15 @@
 package hu.bme.aut.datacollect.entity;
 
+import java.util.Arrays;
+import java.util.List;
+
 import hu.bme.aut.datacollect.db.DaoBase;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName="lights", daoClass=DaoBase.class)
-public class LightData {
+public class LightData extends IData{
 	
 	@DatabaseField(generatedId=true)
 	private int id;
@@ -49,6 +52,15 @@ public class LightData {
 				timestamp, lx);
 	}
 	
+	@Override
+	public List<String> getParams(){
+		return Arrays.asList("id", "timestamp", "lx");
+	}
 	
+	@Override
+	public List<String> getValues(){
+		return Arrays.asList(String.valueOf(id), String.valueOf(timestamp), 
+				String.valueOf(lx));
+	}
 
 }

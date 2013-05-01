@@ -2,12 +2,15 @@ package hu.bme.aut.datacollect.entity;
 
 import hu.bme.aut.datacollect.db.DaoBase;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 
 @DatabaseTable(tableName="accelerations", daoClass=DaoBase.class)
-public class AccelerationData {
+public class AccelerationData extends IData {
 
 	@DatabaseField(generatedId=true)
 	private int id;
@@ -84,4 +87,16 @@ public class AccelerationData {
 		}
 		return false;
 	}
+	
+	@Override
+	public List<String> getParams(){
+		return Arrays.asList("id", "timestamp", "accX", "accY", "accZ");
+	}
+	
+	@Override
+	public List<String> getValues(){
+		return Arrays.asList(String.valueOf(id), String.valueOf(timestamp), 
+				String.valueOf(accX), String.valueOf(accY), String.valueOf(accY));
+	}
+	
 }

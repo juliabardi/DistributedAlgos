@@ -1,12 +1,15 @@
 package hu.bme.aut.datacollect.entity;
 
+import java.util.Arrays;
+import java.util.List;
+
 import hu.bme.aut.datacollect.db.DaoBase;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName="gyroscope", daoClass=DaoBase.class)
-public class GyroscopeData {
+public class GyroscopeData extends IData{
 
 	@DatabaseField(generatedId=true)
 	private int id;
@@ -72,5 +75,15 @@ public class GyroscopeData {
 						id, timestamp, axisX, axisY, axisZ);
 	}
 	
+	@Override
+	public List<String> getParams(){
+		return Arrays.asList("id", "timestamp", "axisX", "axisY", "axisZ");
+	}
+	
+	@Override
+	public List<String> getValues(){
+		return Arrays.asList(String.valueOf(id), String.valueOf(timestamp), 
+				String.valueOf(axisX), String.valueOf(axisY), String.valueOf(axisZ));
+	}
 }
 

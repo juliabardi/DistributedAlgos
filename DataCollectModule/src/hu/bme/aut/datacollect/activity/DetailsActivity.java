@@ -3,6 +3,7 @@ package hu.bme.aut.datacollect.activity;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
 import hu.bme.aut.datacollect.entity.AccelerationData;
 import hu.bme.aut.datacollect.entity.CallData;
+import hu.bme.aut.datacollect.entity.IData;
 import hu.bme.aut.datacollect.entity.LightData;
 import hu.bme.aut.datacollect.entity.LocationData;
 import hu.bme.aut.datacollect.entity.TemperatureData;
@@ -10,7 +11,10 @@ import hu.bme.aut.datacollect.entity.TemperatureData;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONException;
+
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -35,7 +39,7 @@ public class DetailsActivity extends OrmLiteBaseActivity<DatabaseHelper>  {
 		
 		TextView text = (TextView)findViewById(R.id.tableName);
 		TableLayout table = (TableLayout)findViewById(R.id.table);
-		List<?> list = null;
+		List<? extends IData> list = null;
 		
 		switch (id) {
 		case R.id.buttonAcceleration:
@@ -59,10 +63,15 @@ public class DetailsActivity extends OrmLiteBaseActivity<DatabaseHelper>  {
 			list = getHelper().getDaoBase(CallData.class).queryForAll();
 			break;
 		default:
-			list = new ArrayList<String>();
+			list = new ArrayList<IData>();
 			break;
 		}
-		
+		try {
+			//logging the json form of the data list
+			Log.d("JSON.serialize", IData.toJSONObject(list).toString());
+		} catch (JSONException e) {
+			Log.e("JSON.serialize", e.getMessage());
+		}
 		this.constructRows(table, list);
 		
 	}
