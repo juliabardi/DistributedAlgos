@@ -1,5 +1,9 @@
 package hu.bme.aut.datacollect.imageupload;
 
+import hu.bme.aut.communication.CommunicationService;
+import hu.bme.aut.communication.HttpManager;
+import hu.bme.aut.communication.HttpManager.HttpManagerListener;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -7,7 +11,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Random;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,7 +21,7 @@ import android.util.Log;
 
 import com.squareup.tape.Task;
 
-public class ImageUploadTask implements Task<ImageUploadTask.Callback> {
+public class ImageUploadTask implements Task<ImageUploadTask.Callback>, HttpManagerListener {
 
 	private static final long serialVersionUID = -8650032781289859212L;
 
@@ -29,9 +32,12 @@ public class ImageUploadTask implements Task<ImageUploadTask.Callback> {
 
 	public interface Callback {
 		void onSuccess(String url);
-
 		void onFailure();
 	}
+	
+	private Callback mCallback;
+	
+	private HttpManager httpManager = new HttpManager(this);
 
 	public ImageUploadTask(File file) {
 		this.file = file;
@@ -43,39 +49,20 @@ public class ImageUploadTask implements Task<ImageUploadTask.Callback> {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-
+				
 				Log.d(TAG, "Uploading file: " + file.getAbsolutePath());
+				ImageUploadTask.this.mCallback = callback;
 				
 				//write to json and upload
 				byte[] message = ImageUploadTask.this.writeMessage();
 				if (message == null){
 					Log.d(TAG, "Failed to create message.");
 					return;
-				}				
-				//TODO: send the message to the server
-				//httpManager.sendPostRequest(url, message);
-
-				// if success
-				if (new Random().nextBoolean()) {
-					Log.i(TAG, "Upload success!");					
-					
-					MAIN_THREAD.post(new Runnable() {
-						@Override
-						public void run() {
-							callback.onSuccess("url");
-						}
-					});
-				} else {
-					Log.i(TAG, "Upload failed :(");
-
-					// Get back to the main thread before invoking a callback.
-					MAIN_THREAD.post(new Runnable() {
-						@Override
-						public void run() {
-							callback.onFailure();
-						}
-					});
 				}
+				
+				httpManager.sendPostRequest(CommunicationService.NodeServerAddress, message);
+				//httpManager.sendPostRequest("url", message);
+
 				//delete the file in any case
 				file.delete();
 			}
@@ -125,5 +112,46 @@ public class ImageUploadTask implements Task<ImageUploadTask.Callback> {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public void responseArrived(String response) {
+		Log.d(TAG, response);
+		this.uploadSuccess();
+	}
+
+	@Override
+	public void errorOccuredDuringParse(String error) {
+		Log.e(TAG, error);
+		this.uploadFailed();
+	}
+
+	@Override
+	public void errorOccured(String error) {
+		Log.e(TAG, error);
+		this.uploadFailed();
+	}
+	
+	private void uploadFailed(){
+		Log.i(TAG, "Upload failed :(");
+
+		// Get back to the main thread before invoking a callback.
+		MAIN_THREAD.post(new Runnable() {
+			@Override
+			public void run() {
+				mCallback.onFailure();
+			}
+		});
+	}
+	
+	private void uploadSuccess(){
+		Log.i(TAG, "Upload success!");					
+		
+		MAIN_THREAD.post(new Runnable() {
+			@Override
+			public void run() {
+				mCallback.onSuccess("url");
+			}
+		});
 	}
 }

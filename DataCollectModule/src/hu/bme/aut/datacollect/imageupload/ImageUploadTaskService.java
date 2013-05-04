@@ -10,7 +10,7 @@ public class ImageUploadTaskService extends Service implements
 
 	private static final String TAG = "Tape:ImageUploadTaskService";
 
-	private ImageUploadTaskQueue queue = ImageUploadTaskQueue.instance();
+	private ImageUploadTaskQueue queue = ImageUploadTaskQueue.instance(this);
 	private boolean running;
 	
 	@Override
@@ -45,7 +45,7 @@ public class ImageUploadTaskService extends Service implements
 
 	@Override
 	public void onFailure() {
-		Log.d(TAG, "Failure.");
+		Log.d(TAG, "Failure, executing next.");
 		//continuing the upload in case of failure for now
 		running = false;
 		queue.remove();

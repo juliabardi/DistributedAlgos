@@ -8,27 +8,29 @@ import com.squareup.tape.TaskQueue;
 
 public class ImageUploadTaskQueue extends TaskQueue<ImageUploadTask> {
 	
-	private static ImageUploadTaskQueue instance;
+	private static ImageUploadTaskQueue instance;	
+	private Context mContext;
 	
-	public static ImageUploadTaskQueue instance(){
+	public static ImageUploadTaskQueue instance(Context context){
 		if (instance == null){
-			instance = new ImageUploadTaskQueue();
+			instance = new ImageUploadTaskQueue(context);
 		}
 		return instance;
 	}
 	
-	private ImageUploadTaskQueue() {
+	private ImageUploadTaskQueue(Context context) {
 		super(new InMemoryObjectQueue<ImageUploadTask>());
+		this.mContext = context;
 	}
 	
-	public void startService(Context context) {
-		context.startService(new Intent(context, ImageUploadTaskService.class));
+	public void startService() {
+		mContext.startService(new Intent(mContext, ImageUploadTaskService.class));
 	}
 
 	@Override
 	public void add(ImageUploadTask entry) {
 		super.add(entry);
-		//startService();
+		this.startService();
 	}
 
 	@Override

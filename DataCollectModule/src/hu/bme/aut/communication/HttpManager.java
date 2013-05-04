@@ -3,6 +3,7 @@ package hu.bme.aut.communication;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -62,20 +63,26 @@ public class HttpManager {
 	 */
 	public void sendPostRequest(String url, String JSobject)
 	{
+		try {
+			this.sendPostRequest(url, JSobject.getBytes("UTF8"));
+		} catch (UnsupportedEncodingException e) {
+			listener.errorOccured( "Error occured during POST.");
+			e.printStackTrace();
+		}		
+	}
+	
+	public void sendPostRequest(String url, byte[] message)
+	{
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpPost httppost = new HttpPost(url);
 		try {
-			httppost.setEntity(new ByteArrayEntity(
-				    JSobject.getBytes("UTF8")));
-			
-			HttpResponse response = httpclient.execute(httppost);
-			
+			httppost.setEntity(new ByteArrayEntity(message));			
+			HttpResponse response = httpclient.execute(httppost);			
 			handleJSONResponse(response);
 		} catch (Exception e) {
 			listener.errorOccured( "Error occured during POST.");
 			e.printStackTrace();
 		}
-		
 	}
 	
 	/**

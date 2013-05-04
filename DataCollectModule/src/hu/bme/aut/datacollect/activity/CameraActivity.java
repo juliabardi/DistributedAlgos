@@ -33,7 +33,7 @@ public class CameraActivity extends Activity {
 	private static final String TAG = "DataCollect:CameraActivity";
 	
 	private static final int MAX_TIMES = 5;
-	private static final int FREQUENCY = 5000;
+	private static final int FREQUENCY = 1000;
 
 	private CameraPreview mPreview;
 	private Camera mCamera;
@@ -50,7 +50,7 @@ public class CameraActivity extends Activity {
 	private Object signalObject = new Object();
 	private boolean imageInProgress = false;
 	
-	private ImageUploadTaskQueue queue = ImageUploadTaskQueue.instance();
+	private ImageUploadTaskQueue queue = ImageUploadTaskQueue.instance(this);
 
 	private PictureCallback mPicture = new PictureCallback() {
 
@@ -122,7 +122,7 @@ public class CameraActivity extends Activity {
 	
 	private void TimerMethod() {
 
-		//not good, thread has to own the monitor object by calling some synch method..
+		//waiting for the other thread to complete the picture if it's in progress
 		if (imageInProgress){
 			synchronized (signalObject){
 				try {
@@ -134,17 +134,10 @@ public class CameraActivity extends Activity {
 		}
 		
 		if (times >= MAX_TIMES){
-			Log.d(TAG, "Reached " + MAX_TIMES + " times, trying to start ImageUploadTaskService.");
+			Log.d(TAG, "Reached " + MAX_TIMES + " times, cancelling task");
 			mCamera.stopPreview();
 			mCamera.release();
 			mPreview.removePreview();
-			//start upload
-			this.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					queue.startService(CameraActivity.this);
-				}
-			});
 			timerTask.cancel();
 			return;
 		}

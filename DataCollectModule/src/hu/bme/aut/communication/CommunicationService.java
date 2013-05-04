@@ -60,7 +60,7 @@ public class CommunicationService extends Service implements OnSharedPreferenceC
 	}
 	
 	// Server specific
-	private static String NodeServerAddress="http://10.0.2.2:3000/"; // Emulator localhost test
+	public static String NodeServerAddress="http://10.0.2.2:3000/"; // Emulator localhost test
 	private static String TAG=CommunicationService.class.getSimpleName();
 	
 	
