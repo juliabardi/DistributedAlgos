@@ -18,6 +18,7 @@ public abstract class IData {
 		JSONObject json = new JSONObject();
 		if (data != null && data.size() != 0) {
 			json.put("name", data.get(0).getClass().getSimpleName());
+			json.put("type", "simple");
 			json.put("params", new JSONArray(data.get(0).getParams()));
 
 			JSONArray values = new JSONArray();
