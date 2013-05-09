@@ -44,6 +44,13 @@ public class DaoBase<T> extends BaseDaoImpl<T, Integer> {
 		}
 	}
 	
-	
+	public List<T> queryAfterTimestamp(long timestamp){
+		
+		try {
+			return this.queryBuilder().where().ge("timestamp", timestamp).query();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 }

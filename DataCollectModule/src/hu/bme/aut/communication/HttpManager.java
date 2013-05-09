@@ -13,7 +13,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
 /**
  * Manage the HTTP communication with the server.
@@ -73,7 +75,7 @@ public class HttpManager {
 	
 	public void sendPostRequest(String url, byte[] message)
 	{
-		HttpClient httpclient = new DefaultHttpClient();
+		HttpClient httpclient = new DefaultHttpClient(this.getHttpParams());
 		HttpPost httppost = new HttpPost(url);
 		try {
 			httppost.setEntity(new ByteArrayEntity(message));			
@@ -83,6 +85,16 @@ public class HttpManager {
 			listener.errorOccured( "Error occured during POST.");
 			e.printStackTrace();
 		}
+	}
+	
+	private HttpParams getHttpParams(){
+		
+		HttpParams httpParameters = new BasicHttpParams();
+		int timeoutConnection = 3000;
+		HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+		int timeoutSocket = 5000;
+		HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+		return httpParameters;
 	}
 	
 	/**
