@@ -7,15 +7,20 @@ import hu.bme.aut.datacollect.db.DatabaseHelper;
 import hu.bme.aut.datacollect.listener.IListener;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,7 +58,36 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		if (!isServiceRunning(CommunicationService.class.getName())){
 			this.startService(commIntent);
 		}
+		
+		checkWifiAvaiable();
     }
+    
+	private void checkWifiAvaiable() {
+		ConnectivityManager connectivityManager = (ConnectivityManager) this
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo wifi = connectivityManager
+				.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		if (wifi != null ) {
+			if(!wifi.isAvailable()) // Wifi is disabled, notify user and navigate to settings.
+			{
+				AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
+				alertbox.setTitle("Wi-Fi state");
+				alertbox.setMessage("Wi-Fi kapcsolat nincs engedélyezve. Kívánja engedélyezni? Enélkül a kommunikációs modul nem tudja feladatát elvégezni.");
+				alertbox.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface arg0, int arg1) {
+					startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+					}
+				});
+				alertbox.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface arg0, int arg1) {
+						 // No
+						}
+					});
+				alertbox.show();				
+			}			
+		}
+		
+	}
 	
 	@Override
 	protected void onStart() {		
