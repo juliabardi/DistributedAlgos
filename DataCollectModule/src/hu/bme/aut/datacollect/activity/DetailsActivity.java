@@ -11,8 +11,6 @@ import hu.bme.aut.datacollect.entity.TemperatureData;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONException;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TableLayout;
@@ -65,12 +63,6 @@ public class DetailsActivity extends OrmLiteBaseActivity<DatabaseHelper>  {
 		default:
 			list = new ArrayList<IData>();
 			break;
-		}
-		try {
-			//logging the json form of the data list
-			Log.d("JSON.serialize", IData.toJSONObject(list).toString());
-		} catch (JSONException e) {
-			Log.e("JSON.serialize", e.getMessage());
 		}
 		this.constructRows(table, list);
 		
