@@ -38,12 +38,14 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	private boolean mBound = false;
 	private boolean commBound = false;
 	private Button communicationButton;
+	private Button measureButton;
 		
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         communicationButton = (Button)findViewById(R.id.buttonCommunicationStop);
+        measureButton = (Button)findViewById(R.id.buttonStop);
                         
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		settings.registerOnSharedPreferenceChangeListener((OnSharedPreferenceChangeListener) this);
@@ -210,7 +212,20 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		switch (v.getId())
 		{
 		case R.id.buttonStop:
-			stopService(intent);
+			if (isServiceRunning(DataCollectService.class.getName())){
+				stopService(intent);
+				if (mBound) {
+		            unbindService(mConnection);
+		            mBound = false;
+		        }				
+				measureButton.setText("Mérés indítása");
+			}
+			else{
+				startService(intent);
+				this.bindService(intent, mConnection, 0);
+				
+				measureButton.setText("Mérés leállítása");				
+			}
 			break;
 		case R.id.buttonCommunicationStop:
 			if (isServiceRunning(CommunicationService.class.getName())){
