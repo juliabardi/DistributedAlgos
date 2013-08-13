@@ -17,6 +17,7 @@ package hu.bme.aut.datacollect.activity;
 
 import static hu.bme.aut.communication.GCM.CommonUtilities.SENDER_ID;
 import static hu.bme.aut.communication.GCM.CommonUtilities.displayMessage;
+import hu.bme.aut.communication.GCM.MessageHandler;
 import hu.bme.aut.communication.GCM.ServerUtilities;
 import hu.bme.aut.datacollect.activity.R;
 import hu.bme.aut.datacollect.activity.R.string;
@@ -39,6 +40,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     @SuppressWarnings("hiding")
     private static final String TAG = "GCMIntentService";
+    private MessageHandler msgHandler= new MessageHandler(); 
 
     public GCMIntentService() {
         super(SENDER_ID);
@@ -71,6 +73,7 @@ public class GCMIntentService extends GCMBaseIntentService {
         displayMessage(context, message);
         // notifies user
         generateNotification(context, message);
+        msgHandler.handleGCMMessage(message);
     }
 
     @Override

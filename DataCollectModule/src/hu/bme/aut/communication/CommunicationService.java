@@ -7,7 +7,7 @@ import static hu.bme.aut.communication.GCM.CommonUtilities.SERVER_URL;
 import hu.bme.aut.communication.GCM.ServerUtilities;
 import hu.bme.aut.datacollect.activity.MainActivity;
 import hu.bme.aut.datacollect.activity.R;
-
+import hu.bme.aut.communication.Constants;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -80,18 +80,8 @@ public class CommunicationService extends Service implements
 		}
 	}
 
-	// Server specific
-	public static String NodeServerAddress = "http://10.0.2.2:3000/"; // Emulator
-																		// localhost
-																		// test
 	private static String TAG = CommunicationService.class.getSimpleName();
 
-	// Message specific, only these messages can be sent to the server
-	private static final String ALGTYPE = "DistributedAlgos";
-	private static final String REGISTER = "register";
-	private static final String NEED = "need";
-	private static final String OFFER = "offer";
-	private static final String UNREGISTER_OFFER = "unregisterOffer";
 
 	// SharedPref
 	private SharedPreferences settings = null;
@@ -225,10 +215,10 @@ public class CommunicationService extends Service implements
 			}
 		}
 
-		JSONObject message = JsHelper.createMainBodyWithAlgos(ALGTYPE, JsHelper
+		JSONObject message = JsHelper.createMainBodyWithAlgos(Constants.ALGTYPE, JsHelper
 				.createAlgoBody(JsHelper.createSimpleArray(offerList), null));
 
-		sendJobToNodeService(NodeServerAddress + REGISTER, message.toString());
+		sendJobToNodeService(Constants.NodeServerAddress + Constants.REGISTER, message.toString());
 	}
 
 	/**
@@ -243,11 +233,11 @@ public class CommunicationService extends Service implements
 		if (IsWifiAvaiable()) {
 			String url = "";
 			if (value == true) {
-				url = NodeServerAddress + OFFER + "?" + "algType=" + ALGTYPE
+				url = Constants.NodeServerAddress + Constants.OFFER + "?" + "algType=" + Constants.ALGTYPE
 						+ "&" + "name=" + key;
 			} else {
-				url = NodeServerAddress + UNREGISTER_OFFER + "?" + "algType="
-						+ ALGTYPE + "&" + "name=" + key;
+				url = Constants.NodeServerAddress + Constants.UNREGISTER_OFFER + "?" + "algType="
+						+ Constants.ALGTYPE + "&" + "name=" + key;
 			}
 
 			sendJobToNodeService(url, null);

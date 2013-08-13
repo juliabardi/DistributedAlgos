@@ -1,6 +1,6 @@
 package hu.bme.aut.datacollect.imageupload;
 
-import hu.bme.aut.communication.CommunicationService;
+import hu.bme.aut.communication.Constants;
 import hu.bme.aut.communication.HttpManager;
 import hu.bme.aut.communication.HttpManager.HttpManagerListener;
 
@@ -60,7 +60,7 @@ public class ImageUploadTask implements Task<ImageUploadTask.Callback>, HttpMana
 					return;
 				}
 				
-				httpManager.sendPostRequest(CommunicationService.NodeServerAddress, message);
+				httpManager.sendPostRequest(Constants.NodeServerAddress, message);
 				//httpManager.sendPostRequest("url", message);
 
 				//delete the file in any case

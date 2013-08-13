@@ -49,17 +49,17 @@ public class NodeCommunicationIntentService extends IntentService implements Htt
 
 	@Override
 	public void responseArrived(String response) {
-		Log.i("TEST", "resArrived: "+ response);
+		Log.i(this.getClass().getName(), "resArrived: "+ response);
 	}
 
 	@Override
 	public void errorOccuredDuringParse(String error) {
-		Log.i("TEST", "error in Parsing: " + error);
+		Log.i(this.getClass().getName(), "error in Parsing: " + error);
 	}
 
 	@Override
 	public void errorOccured(String error) {
-		Log.i("TEST", "error: "+ error);
+		Log.i(this.getClass().getName(), "error: "+ error);
 	}
 
 }
