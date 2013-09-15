@@ -1,4 +1,4 @@
-package hu.bme.aut.datacollect.imageupload;
+package hu.bme.aut.datacollect.upload;
 
 import hu.bme.aut.communication.HttpManager;
 import hu.bme.aut.communication.HttpManager.HttpManagerListener;

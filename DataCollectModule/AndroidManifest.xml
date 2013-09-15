@@ -82,7 +82,7 @@
         </service>
         <service android:name="hu.bme.aut.communication.NodeCommunicationIntentService" >
         </service>
-        <service android:name="hu.bme.aut.datacollect.imageupload.UploadTaskService" >
+        <service android:name="hu.bme.aut.datacollect.upload.UploadTaskService" >
         </service>
         
             <!--

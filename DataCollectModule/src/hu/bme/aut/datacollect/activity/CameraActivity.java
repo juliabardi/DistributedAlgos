@@ -1,8 +1,8 @@
 package hu.bme.aut.datacollect.activity;
 
-import hu.bme.aut.datacollect.imageupload.CameraPreview;
-import hu.bme.aut.datacollect.imageupload.ImageUploadTask;
-import hu.bme.aut.datacollect.imageupload.UploadTaskQueue;
+import hu.bme.aut.datacollect.upload.CameraPreview;
+import hu.bme.aut.datacollect.upload.ImageUploadTask;
+import hu.bme.aut.datacollect.upload.UploadTaskQueue;
 
 import java.io.File;
 import java.io.FileNotFoundException;

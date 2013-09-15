@@ -1,4 +1,4 @@
-package hu.bme.aut.datacollect.imageupload;
+package hu.bme.aut.datacollect.upload;
 
 import hu.bme.aut.communication.Constants;
 

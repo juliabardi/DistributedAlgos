@@ -1,4 +1,4 @@
-package hu.bme.aut.datacollect.imageupload;
+package hu.bme.aut.datacollect.upload;
 
 import android.content.Context;
 import android.content.Intent;
