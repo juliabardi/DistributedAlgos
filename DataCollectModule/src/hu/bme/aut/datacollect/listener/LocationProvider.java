@@ -32,6 +32,10 @@ public class LocationProvider implements LocationListener, IListener{
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 	}
 	
+	public void setContext(Context context){
+		this.mContext = context;
+	}
+	
 	public static GsmCellLocation getGsmCellLocation(Context context){
 		
 		GsmCellLocation location = null;
@@ -76,19 +80,21 @@ public class LocationProvider implements LocationListener, IListener{
 		final boolean gpsEnabled = locationManager
 				.isProviderEnabled(LocationManager.GPS_PROVIDER);
 		if (!gpsEnabled) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-			builder.setPositiveButton("OK",
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int id) {
-							enableLocationSettings();
-						}
-					})
-					.setNegativeButton("Most nem", null)
-					.setTitle("GPS engedélyezése")
-					.setMessage(
-							"A pontos helyeadatok gyûjtéséhez szükséges bekapcsolni a GPS-t. Akarja most bekapcsolni?")
-					.create().show();
+			//alert dialog cannot be opened with a service as context
+			//TODO inject activity as context somehow
+//			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+//			builder.setPositiveButton("OK",
+//					new DialogInterface.OnClickListener() {
+//						@Override
+//						public void onClick(DialogInterface dialog, int id) {
+//							enableLocationSettings();
+//						}
+//					})
+//					.setNegativeButton("Most nem", null)
+//					.setTitle("GPS engedélyezése")
+//					.setMessage(
+//							"A pontos helyeadatok gyûjtéséhez szükséges bekapcsolni a GPS-t. Akarja most bekapcsolni?")
+//					.create().show();
 		}
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 				6000, 1, this);

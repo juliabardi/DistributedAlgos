@@ -1,8 +1,6 @@
 package hu.bme.aut.datacollect.imageupload;
 
 import hu.bme.aut.communication.Constants;
-import hu.bme.aut.communication.HttpManager;
-import hu.bme.aut.communication.HttpManager.HttpManagerListener;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,29 +13,17 @@ import java.io.InputStream;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
-import com.squareup.tape.Task;
-
-public class ImageUploadTask implements Task<ImageUploadTask.Callback>, HttpManagerListener {
+public class ImageUploadTask extends UploadTask {
 
 	private static final long serialVersionUID = -8650032781289859212L;
 
-	private static final String TAG = "Tape:ImageUploadTask";
-	private static final Handler MAIN_THREAD = new Handler(
-			Looper.getMainLooper());
 	private File file;
-
-	public interface Callback {
-		void onSuccess(String url);
-		void onFailure();
+	
+	static {
+		TAG = "DataCollect:ImageUploadTask";
 	}
-	
-	private Callback mCallback;
-	
-	private HttpManager httpManager = new HttpManager(this);
 
 	public ImageUploadTask(File file) {
 		this.file = file;
@@ -61,7 +47,6 @@ public class ImageUploadTask implements Task<ImageUploadTask.Callback>, HttpMana
 				}
 				
 				httpManager.sendPostRequest(Constants.NodeServerAddress, message);
-				//httpManager.sendPostRequest("url", message);
 
 				//delete the file in any case
 				file.delete();
@@ -112,46 +97,5 @@ public class ImageUploadTask implements Task<ImageUploadTask.Callback>, HttpMana
 			}
 		}
 		return null;
-	}
-
-	@Override
-	public void responseArrived(String response) {
-		Log.d(TAG, response);
-		this.uploadSuccess();
-	}
-
-	@Override
-	public void errorOccuredDuringParse(String error) {
-		Log.e(TAG, error);
-		this.uploadFailed();
-	}
-
-	@Override
-	public void errorOccured(String error) {
-		Log.e(TAG, error);
-		this.uploadFailed();
-	}
-	
-	private void uploadFailed(){
-		Log.i(TAG, "Upload failed :(");
-
-		// Get back to the main thread before invoking a callback.
-		MAIN_THREAD.post(new Runnable() {
-			@Override
-			public void run() {
-				mCallback.onFailure();
-			}
-		});
-	}
-	
-	private void uploadSuccess(){
-		Log.i(TAG, "Upload success!");					
-		
-		MAIN_THREAD.post(new Runnable() {
-			@Override
-			public void run() {
-				mCallback.onSuccess("url");
-			}
-		});
 	}
 }

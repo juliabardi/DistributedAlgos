@@ -23,6 +23,8 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
+	
+	private static final String TAG ="DataCollect:DatabaseHelper";
 
 	private static final int DATABASE_VERSION = 1;
 	private static final String DATABASE_NAME = "DataCollectDb.db";
@@ -48,12 +50,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 			ConnectionSource connSource) {
 		
 		try {
-			Log.i(DatabaseHelper.class.getName(), "onCreate");
+			Log.i(TAG, "onCreate");
 			for (Class<Object> clazz : map.keySet()){
 				TableUtils.createTable(connSource, clazz);
 			}
 		} catch (SQLException e) {
-			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
+			Log.e(TAG, "Can't create database", e);
 			throw new RuntimeException(e);
 		}
 		
@@ -65,7 +67,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 			ConnectionSource connSource, int oldVersion, int newVersion) {
 
 		try {
-			Log.i(DatabaseHelper.class.getName(), "onUpgrade");
+			Log.i(TAG, "onUpgrade");
 			
 			for (Class<Object> clazz : map.keySet()){
 				TableUtils.dropTable(connSource, clazz, true);
@@ -73,7 +75,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 			// after we drop the old databases, we create the new ones
 			onCreate(database, connSource);
 		} catch (SQLException e) {
-			Log.e(DatabaseHelper.class.getName(), "Can't drop databases", e);
+			Log.e(TAG, "Can't drop databases", e);
 			throw new RuntimeException(e);
 		}
 

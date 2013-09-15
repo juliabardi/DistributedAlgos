@@ -6,29 +6,29 @@ import android.content.Intent;
 import com.squareup.tape.InMemoryObjectQueue;
 import com.squareup.tape.TaskQueue;
 
-public class ImageUploadTaskQueue extends TaskQueue<ImageUploadTask> {
+public class UploadTaskQueue extends TaskQueue<UploadTask> {
 	
-	private static ImageUploadTaskQueue instance;	
+	private static UploadTaskQueue instance;	
 	private Context mContext;
 	
-	public static ImageUploadTaskQueue instance(Context context){
+	public static UploadTaskQueue instance(Context context){
 		if (instance == null){
-			instance = new ImageUploadTaskQueue(context);
+			instance = new UploadTaskQueue(context);
 		}
 		return instance;
 	}
 	
-	private ImageUploadTaskQueue(Context context) {
-		super(new InMemoryObjectQueue<ImageUploadTask>());
+	private UploadTaskQueue(Context context) {
+		super(new InMemoryObjectQueue<UploadTask>());
 		this.mContext = context;
 	}
 	
 	public void startService() {
-		mContext.startService(new Intent(mContext, ImageUploadTaskService.class));
+		mContext.startService(new Intent(mContext, UploadTaskService.class));
 	}
 
 	@Override
-	public void add(ImageUploadTask entry) {
+	public void add(UploadTask entry) {
 		super.add(entry);
 		this.startService();
 	}

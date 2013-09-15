@@ -1,7 +1,9 @@
 package hu.bme.aut.datacollect.entity;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import hu.bme.aut.datacollect.db.DaoBase;
 
@@ -83,8 +85,14 @@ public class LocationData extends IData {
 	}
 	
 	@Override
-	public List<String> getValues(){
-		return Arrays.asList(String.valueOf(id), String.valueOf(timestamp), 
-				String.valueOf(latitude), String.valueOf(longitude), String.valueOf(altitude));
+	public Map<String,String> getValues(){
+		
+		Map<String,String> values = new HashMap<String,String>();
+		values.put("id", String.valueOf(id));
+		values.put("timestamp", String.valueOf(timestamp));
+		values.put("latitude", String.valueOf(latitude));
+		values.put("longitude", String.valueOf(longitude));
+		values.put("altitude", String.valueOf(altitude));
+		return values;
 	}
 }

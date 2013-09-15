@@ -1,7 +1,9 @@
 package hu.bme.aut.datacollect.entity;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import hu.bme.aut.datacollect.db.DaoBase;
 
@@ -81,9 +83,15 @@ public class GyroscopeData extends IData{
 	}
 	
 	@Override
-	public List<String> getValues(){
-		return Arrays.asList(String.valueOf(id), String.valueOf(timestamp), 
-				String.valueOf(axisX), String.valueOf(axisY), String.valueOf(axisZ));
+	public Map<String,String> getValues(){
+		
+		Map<String,String> values = new HashMap<String,String>();
+		values.put("id", String.valueOf(id));
+		values.put("timestamp", String.valueOf(timestamp));
+		values.put("axisX", String.valueOf(axisX));
+		values.put("axisY", String.valueOf(axisY));
+		values.put("axisZ", String.valueOf(axisZ));
+		return values;
 	}
 }
 

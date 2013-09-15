@@ -3,7 +3,9 @@ package hu.bme.aut.datacollect.entity;
 import hu.bme.aut.datacollect.db.DaoBase;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -94,9 +96,15 @@ public class AccelerationData extends IData {
 	}
 	
 	@Override
-	public List<String> getValues(){
-		return Arrays.asList(String.valueOf(id), String.valueOf(timestamp), 
-				String.valueOf(accX), String.valueOf(accY), String.valueOf(accY));
+	public Map<String,String> getValues(){
+		
+		Map<String,String> values = new HashMap<String,String>();
+		values.put("id", String.valueOf(id));
+		values.put("timestamp", String.valueOf(timestamp));
+		values.put("accX", String.valueOf(accX));
+		values.put("accY", String.valueOf(accY));
+		values.put("accZ", String.valueOf(accZ));
+		return values;
 	}
 	
 }

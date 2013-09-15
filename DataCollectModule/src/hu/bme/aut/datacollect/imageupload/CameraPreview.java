@@ -83,7 +83,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
 	@Override
 	public void onShutter() {
-		Log.d(TAG, "Camera shutter.");
+		//Log.d(TAG, "Camera shutter.");
 	}
 	
 	public void setCamera(Camera camera){

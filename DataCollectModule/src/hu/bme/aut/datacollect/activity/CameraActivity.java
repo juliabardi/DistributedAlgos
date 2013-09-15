@@ -2,7 +2,7 @@ package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.datacollect.imageupload.CameraPreview;
 import hu.bme.aut.datacollect.imageupload.ImageUploadTask;
-import hu.bme.aut.datacollect.imageupload.ImageUploadTaskQueue;
+import hu.bme.aut.datacollect.imageupload.UploadTaskQueue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,7 +32,7 @@ public class CameraActivity extends Activity {
 	public static final int MEDIA_TYPE_VIDEO = 2;
 	private static final String TAG = "DataCollect:CameraActivity";
 	
-	private static final int MAX_TIMES = 5;
+	private static final int MAX_TIMES = 1;
 	private static final int FREQUENCY = 1000;
 
 	private CameraPreview mPreview;
@@ -50,7 +50,7 @@ public class CameraActivity extends Activity {
 	private Object signalObject = new Object();
 	private boolean imageInProgress = false;
 	
-	private ImageUploadTaskQueue queue = ImageUploadTaskQueue.instance(this);
+	private UploadTaskQueue queue = UploadTaskQueue.instance(this);
 
 	private PictureCallback mPicture = new PictureCallback() {
 
@@ -99,7 +99,7 @@ public class CameraActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.camera_layout);
-		Log.d(TAG, "onCreate called");
+		//Log.d(TAG, "onCreate called");
 
 		if (this.checkCameraHardware()) {
 			mCamera = getCameraInstance();
@@ -211,7 +211,7 @@ public class CameraActivity extends Activity {
 
 	@Override
 	protected void onPause() {
-		Log.d(TAG, "onPause called");
+		//Log.d(TAG, "onPause called");
 		super.onPause();
 		// releaseMediaRecorder(); 
 		releaseCamera(); // release the camera immediately on pause event
@@ -223,7 +223,7 @@ public class CameraActivity extends Activity {
 	@Override
 	protected void onResume(){
 		super.onResume();
-		Log.d(TAG, "onResume called");
+		//Log.d(TAG, "onResume called");
 		this.openCamera();
 		mPreview.initPreview();
 	}
@@ -231,7 +231,7 @@ public class CameraActivity extends Activity {
 	@Override
 	protected void onDestroy(){
 		super.onDestroy();
-		Log.d(TAG, "onDestroy called");
+		//Log.d(TAG, "onDestroy called");
 		releaseCamera();
 		mPreview.removePreview();
 		

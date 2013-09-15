@@ -3,8 +3,17 @@ package hu.bme.aut.datacollect.activity;
 import hu.bme.aut.communication.CommunicationService;
 import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
 import hu.bme.aut.datacollect.activity.DataCollectService.ServiceBinder;
+import hu.bme.aut.datacollect.db.DataProvider;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
+import hu.bme.aut.datacollect.db.IDataProvider;
 import hu.bme.aut.datacollect.listener.IListener;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
@@ -21,6 +30,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +41,8 @@ import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		OnSharedPreferenceChangeListener {
 	
+	private static final String TAG ="DataCollect:MainActivity";
+	
 	private DataCollectService mService;
 	private CommunicationService commService;
 	private Intent intent = null;
@@ -39,6 +51,8 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	private boolean commBound = false;
 	private Button communicationButton;
 	private Button measureButton;
+	
+	private IDataProvider dataProvider;
 		
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +76,8 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		}
 		
 		checkWifiAvaiable();
+		
+		this.dataProvider = new DataProvider(this);
     }
     
 	private void checkWifiAvaiable() {
@@ -255,4 +271,43 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		this.startActivity(intent);
 	}
 	
+	public void sendData(View v){
+		//send here some data
+		
+		Log.d(TAG, "Sending some columns");
+		this.dataProvider.getAllData("AccelerationData", 1, Arrays.asList("id", "timestamp", "accX", "accY"));
+		
+		Log.d(TAG, "Sending all columns");
+		this.dataProvider.getAllData("LightData", 2);
+		
+		Log.d(TAG, "Sending all columns after date");
+		
+		Date date = null;
+		try {
+			date = new SimpleDateFormat("yyyy/MM/dd").parse("2013/09/01");
+		} catch (ParseException e) {
+			Log.e(TAG, e.getMessage());
+		}
+		this.dataProvider.getDataAfterDate("AccelerationData", 3, date);
+		
+		Log.d(TAG, "Sending buggy name");
+		this.dataProvider.getAllData("NotExists", 4);
+		
+		Log.d(TAG, "Sending some columns after date");
+		this.dataProvider.getDataAfterDate("AccelerationData", 5, date, Arrays.asList("id"));
+	}
+
+	@Override
+	protected void onDestroy() {
+		
+		if (this.dataProvider != null){
+			try {
+				this.dataProvider.close();
+			} catch (IOException e) {
+				Log.e(TAG, e.getMessage());
+			}
+		}
+		
+		super.onDestroy();
+	}
 }

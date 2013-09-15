@@ -1,7 +1,9 @@
 package hu.bme.aut.datacollect.entity;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import hu.bme.aut.datacollect.db.DaoBase;
 
@@ -58,9 +60,13 @@ public class LightData extends IData{
 	}
 	
 	@Override
-	public List<String> getValues(){
-		return Arrays.asList(String.valueOf(id), String.valueOf(timestamp), 
-				String.valueOf(lx));
+	public Map<String,String> getValues(){
+		
+		Map<String,String> values = new HashMap<String,String>();
+		values.put("id", String.valueOf(id));
+		values.put("timestamp", String.valueOf(timestamp));
+		values.put("lx", String.valueOf(lx));
+		return values;
 	}
 
 }

@@ -5,12 +5,12 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
-public class ImageUploadTaskService extends Service implements
-		ImageUploadTask.Callback {
+public class UploadTaskService extends Service implements
+		UploadTask.Callback {
 
-	private static final String TAG = "Tape:ImageUploadTaskService";
+	private static final String TAG = "DataCollect:UploadTaskService";
 
-	private ImageUploadTaskQueue queue = ImageUploadTaskQueue.instance(this);
+	private UploadTaskQueue queue = UploadTaskQueue.instance(this);
 	private boolean running;
 	
 	@Override
@@ -25,7 +25,7 @@ public class ImageUploadTaskService extends Service implements
 			return; // Only one task at a time.
 		}
 
-		ImageUploadTask task = queue.peek();
+		UploadTask task = queue.peek();
 		if (task != null) {
 			running = true;
 			task.execute(this);

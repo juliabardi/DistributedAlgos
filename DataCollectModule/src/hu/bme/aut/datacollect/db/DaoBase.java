@@ -9,6 +9,8 @@ import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
 public class DaoBase<T> extends BaseDaoImpl<T, Integer> {
+	
+	private static final String TAG ="DataCollect:DaoBase";
 
 	public DaoBase(ConnectionSource connectionSource, Class<T> dataClass)
 			throws SQLException {
@@ -19,7 +21,7 @@ public class DaoBase<T> extends BaseDaoImpl<T, Integer> {
 	public int create(T data) {
 		try {
 			int rowId = super.create(data);
-			Log.d("hu.bme.aut.sqlite", "Inserted row into " + dataClass.getSimpleName() + ", modified rows: " + rowId);
+			Log.d(TAG, "Inserted row into " + dataClass.getSimpleName() + ", modified rows: " + rowId);
 			return rowId;
 		} catch (SQLException e) {
 			throw new RuntimeException(e);

@@ -3,6 +3,7 @@ package hu.bme.aut.datacollect.db;
 import hu.bme.aut.datacollect.entity.IData;
 
 import java.io.Closeable;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -14,21 +15,16 @@ import org.json.JSONObject;
  *
  */
 public interface IDataProvider extends Closeable  {
-
-	/**
-	 * Method providing all existing data of a given type.
-	 * @param clazz the required data type
-	 * @param reqId the id to identify the request
-	 * @return list of the data found
-	 */
-	public <T extends IData> JSONObject getAllData(Class<T> clazz, int reqId);
 	
-	/**
-	 * Method providing the data of a given type from the given timestamp
-	 * @param clazz the required data type
-	 * @param reqId the id to identify the request
-	 * @param timestamp the required beginning timestamp
-	 * @return list of the data found
-	 */
-	public <T extends IData> JSONObject getDataAfterTimestamp(Class<T> clazz, int reqId, long timestamp);
+	public <T extends IData> JSONObject getAllData(Class<T> clazz, int reqId, List<String> params);
+	
+	public <T extends IData> JSONObject getDataAfterTimestamp(Class<T> clazz, int reqId, long timestamp, List<String> params);
+	
+	public JSONObject getAllData(String name, int reqId);
+	
+	public JSONObject getAllData(String name, int reqId, List<String> params);
+	
+	public JSONObject getDataAfterDate(String name, int reqId, Date date);
+	
+	public JSONObject getDataAfterDate(String name, int reqId, Date date, List<String> params);
 }
