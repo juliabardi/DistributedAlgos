@@ -31,13 +31,13 @@ public class ImageUploadTask extends UploadTask {
 
 	@Override
 	public void execute(final Callback callback) {
-
+		super.execute(callback);
+		
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				
 				Log.d(TAG, "Uploading file: " + file.getAbsolutePath());
-				ImageUploadTask.this.mCallback = callback;
 				
 				//write to json and upload
 				byte[] message = ImageUploadTask.this.writeMessage();

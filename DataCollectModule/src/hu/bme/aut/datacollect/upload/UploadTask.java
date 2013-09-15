@@ -56,6 +56,8 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 				mCallback.onFailure();
 			}
 		});
+		
+		this.cleanup();
 	}
 	
 	private void uploadSuccess(){
@@ -67,12 +69,19 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 				mCallback.onSuccess("url");
 			}
 		});
+		
+		this.cleanup();
 	}
 
-//	@Override
-//	public void execute(Callback arg0) {
-//		// TODO Auto-generated method stub
-//		
-//	}
+	//function to clean up when the task finished
+	protected void cleanup(){}
+
+	/**
+	 * Call this in your implementation
+	 */
+	@Override
+	public void execute(Callback callback) {
+		this.mCallback = callback;		
+	}
 
 }

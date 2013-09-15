@@ -188,7 +188,7 @@ public class CameraActivity extends Activity {
 				"DistributedAlgosCamera");
 		if (!mediaStorageDir.exists()) {
 			if (!mediaStorageDir.mkdirs()) {
-				Log.d("DistributedAlgosCamera", "failed to create directory");
+				Log.d(TAG, "failed to create directory");
 				return null;
 			}
 		}
