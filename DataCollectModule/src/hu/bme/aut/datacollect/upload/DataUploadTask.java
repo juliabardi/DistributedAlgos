@@ -67,7 +67,7 @@ public class DataUploadTask extends UploadTask {
 				JSONObject result;
 				
 				if (date == null){
-					result = dataProvider.getAllData(name, reqId, params);
+					result = dataProvider.getAllDataParams(name, reqId, params);
 				}
 				else {
 					result = dataProvider.getDataAfterDate(name, reqId, date, params);

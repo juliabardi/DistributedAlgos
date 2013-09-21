@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/ormlite-core-4.44.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ormlite-core-4.44.jar" sourcepath="ormlite-core-4.44-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ormlite-android-4.44.jar" sourcepath="ormlite-android-4.44-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/android-support-v4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gcm.jar"/>

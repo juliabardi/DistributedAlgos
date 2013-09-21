@@ -305,6 +305,13 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 //		this.dataProvider.getDataAfterDate("AccelerationData", 5, date, Arrays.asList("id"));
 		this.queue.add(new DataUploadTask(this, "AccelerationData", 5, date, Arrays.asList("id")));
 	}
+	
+	public void loadJavascript(View v){
+		
+		//Testing AlgorithmActivity
+		intent = new Intent(this, AlgorithmActivity.class);
+		this.startActivity(intent);
+	}
 
 	@Override
 	protected void onDestroy() {

@@ -3,13 +3,16 @@ package hu.bme.aut.datacollect.db;
 import hu.bme.aut.datacollect.entity.IData;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.util.Log;
+import android.webkit.JavascriptInterface;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
@@ -43,12 +46,13 @@ public class DataProvider implements IDataProvider{
 	}
 	
 	@Override
+	@JavascriptInterface
 	public JSONObject getAllData(String name, int reqId) {		
-		return this.getAllData(name, reqId, null);
+		return this.getAllDataParams(name, reqId, null);
 	}
 	
 	@Override
-	public JSONObject getAllData(String name, int reqId, List<String> params) {
+	public JSONObject getAllDataParams(String name, int reqId, List<String> params) {
 		
 		Class clazz;
 		try {
@@ -80,4 +84,26 @@ public class DataProvider implements IDataProvider{
 		return this.getDataAfterTimestamp(clazz, reqId, date.getTime(), params);
 	}
 	
+	public void setSum(String sum){
+		Log.d(TAG, "Javascript returned sum: " + sum);
+	}
+	
+	public void setJSON(String json){
+		
+		JSONObject j = null;
+		try {
+			j = new JSONObject(json);
+		} catch (JSONException e) {
+			Log.e(TAG, "Javascript-returned json parse failed.");
+		}
+		Log.d(TAG, "Javascript returned json: " + j);
+	}
+	
+	@Override
+	@JavascriptInterface
+	public JSONObject getAllDataParamsString(String name, int reqId, String params){
+		String[] p = params.split(",");
+		Log.d(TAG, "Javascript params: " + params);
+		return this.getAllDataParams(name, reqId, Arrays.asList(p));		
+	}
 }
