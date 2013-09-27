@@ -68,7 +68,8 @@ public class AlgorithmActivity extends Activity {
 		    } 
 		});
 		
-		this.webView.loadUrl("https://www.google.com/");
+		//this.webView.loadUrl("https://www.google.com/");
+		this.webView.loadUrl("file:///android_asset/sensors.html");
 	}
 
 	@Override

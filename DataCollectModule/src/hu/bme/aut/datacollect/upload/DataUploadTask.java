@@ -78,7 +78,7 @@ public class DataUploadTask extends UploadTask {
 					return;
 				}
 				
-				httpManager.sendPostRequest(Constants.NodeServerAddress, result.toString());
+				httpManager.sendPostRequest(Constants.DataCollectorServerAddress, result.toString());
 				
 				
 			}}).start();

@@ -3,14 +3,16 @@ package hu.bme.aut.datacollect.activity;
 import hu.bme.aut.communication.CommunicationService;
 import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
 import hu.bme.aut.datacollect.activity.DataCollectService.ServiceBinder;
-import hu.bme.aut.datacollect.db.DataProvider;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
-import hu.bme.aut.datacollect.db.IDataProvider;
 import hu.bme.aut.datacollect.listener.IListener;
 import hu.bme.aut.datacollect.upload.DataUploadTask;
 import hu.bme.aut.datacollect.upload.UploadTaskQueue;
+import hu.bme.aut.datacollect.utils.FileUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -26,9 +28,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -53,8 +57,6 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	private boolean commBound = false;
 	private Button communicationButton;
 	private Button measureButton;
-	
-//	private IDataProvider dataProvider;
 	
 	private UploadTaskQueue queue = UploadTaskQueue.instance(this);
 		
@@ -81,7 +83,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		
 		checkWifiAvaiable();
 		
-		//this.dataProvider = new DataProvider(this);
+		this.copyHtmlToSd();
     }
     
 	private void checkWifiAvaiable() {
@@ -279,30 +281,24 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		//send here some data
 		
 		Log.d(TAG, "Sending some columns");
-		//this.dataProvider.getAllData("AccelerationData", 1, Arrays.asList("id", "timestamp", "accX", "accY"));
 		this.queue.add(new DataUploadTask(this, "AccelerationData", 1, Arrays.asList("id", "timestamp", "accX", "accY")));
 		
 		Log.d(TAG, "Sending all columns");
-		//this.dataProvider.getAllData("LightData", 2);
 		this.queue.add(new DataUploadTask(this, "LightData", 2));
 		
-		Log.d(TAG, "Sending all columns after date");
-		
+		Log.d(TAG, "Sending all columns after date");		
 		Date date = null;
 		try {
 			date = new SimpleDateFormat("yyyy/MM/dd").parse("2013/09/01");
 		} catch (ParseException e) {
 			Log.e(TAG, e.getMessage());
 		}
-		//this.dataProvider.getDataAfterDate("AccelerationData", 3, date);
 		this.queue.add(new DataUploadTask(this, "AccelerationData", 3, date));
 		
 		Log.d(TAG, "Sending buggy name");
-		//this.dataProvider.getAllData("NotExists", 4);
 		this.queue.add(new DataUploadTask(this, "NotExists", 4));
 		
 		Log.d(TAG, "Sending some columns after date");
-//		this.dataProvider.getDataAfterDate("AccelerationData", 5, date, Arrays.asList("id"));
 		this.queue.add(new DataUploadTask(this, "AccelerationData", 5, date, Arrays.asList("id")));
 	}
 	
@@ -314,16 +310,42 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	}
 
 	@Override
-	protected void onDestroy() {
-		
-//		if (this.dataProvider != null){
-//			try {
-//				this.dataProvider.close();
-//			} catch (IOException e) {
-//				Log.e(TAG, e.getMessage());
-//			}
-//		}
-		
+	protected void onDestroy() {		
 		super.onDestroy();
+	}
+	
+	/**
+	 * Helper method to copy the sensors.html file from /assets to the sd card
+	 */
+	public void copyHtmlToSd() {
+
+		AssetManager am = this.getAssets();
+		FileOutputStream fos = null;
+		InputStream is = null;
+		try {
+			// Create new file to copy into.
+			File file = new File(Environment.getExternalStorageDirectory()
+					+ "/DistributedAlgos/sensors.html");
+			file.createNewFile();
+			is = am.open("sensors.html");
+			fos = new FileOutputStream(file);
+
+			FileUtils.copy(is, fos);
+
+		} catch (IOException e) {
+			Log.e(TAG, e.getMessage());
+		} finally {
+			if (fos != null)
+				try {
+					fos.close();
+				} catch (IOException e) {
+				}
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+				}
+			}
+		}
 	}
 }

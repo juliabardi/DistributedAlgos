@@ -16,6 +16,9 @@ public class Constants {
 	// Server specific
 //	public static final String NodeServerAddress = "http://10.0.2.2:3000/"; // Emulator localhost test
 	public static final String NodeServerAddress = "http://152.66.183.84:3000/";
+//	public static final String NodeServerAddress = "http://192.168.1.105:3000/";
+	public static final String DataCollectorServerAddress = "http://192.168.1.105:3001/";
+	
 	//GCM specific
 	public static final String OFFER_TO_NEED="OfferToNeed";
 	public static final String NEED_TO_OFFER="NeedToOffer";

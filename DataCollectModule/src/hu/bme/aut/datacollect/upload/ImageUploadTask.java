@@ -46,7 +46,7 @@ public class ImageUploadTask extends UploadTask {
 					return;
 				}
 				
-				httpManager.sendPostRequest(Constants.NodeServerAddress, message);
+				httpManager.sendPostRequest(Constants.DataCollectorServerAddress, message);
 
 				//delete the file in any case
 				file.delete();
@@ -75,8 +75,9 @@ public class ImageUploadTask extends UploadTask {
 			
 			bos.reset();
 			bos.write(json.toString().getBytes());
-			bos.write("\0".getBytes());
-			bos.write(imageBytes);
+			//Removing image bytes, because the server can't read this
+			//bos.write("\0".getBytes());
+			//bos.write(imageBytes);
 			//Log.d(TAG, bos.toString());
 			return bos.toByteArray();
 					
