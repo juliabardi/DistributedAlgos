@@ -2,7 +2,9 @@ package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.datacollect.db.DatabaseHelper;
 import hu.bme.aut.datacollect.entity.AccelerationData;
+import hu.bme.aut.datacollect.entity.BatteryData;
 import hu.bme.aut.datacollect.entity.CallData;
+import hu.bme.aut.datacollect.entity.ConnectivityData;
 import hu.bme.aut.datacollect.entity.GyroscopeData;
 import hu.bme.aut.datacollect.entity.LightData;
 import hu.bme.aut.datacollect.entity.LocationData;
@@ -10,6 +12,8 @@ import hu.bme.aut.datacollect.entity.PackageData;
 import hu.bme.aut.datacollect.entity.SmsData;
 import hu.bme.aut.datacollect.entity.TemperatureData;
 import hu.bme.aut.datacollect.listener.AccelerometerSensorListener;
+import hu.bme.aut.datacollect.listener.BatteryReceiver;
+import hu.bme.aut.datacollect.listener.ConnectivityReceiver;
 import hu.bme.aut.datacollect.listener.GyroscopeSensorListener;
 import hu.bme.aut.datacollect.listener.IListener;
 import hu.bme.aut.datacollect.listener.IncomingCallReceiver;
@@ -49,10 +53,16 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	public static final String INCOMING_SMS = "insms";
 	public static final String OUTGOING_SMS = "outsms";
 	public static final String PACKAGE = "package";
+	public static final String CONNECTIVITY = "connectivity";
+	public static final String BATTERY = "battery";
+	
+	//no listeners yet
+	public static final String ROTATION = "rotation";
+	public static final String PROXIMITY = "proximity";
 
 	public static final String[] sharedPrefKeys = new String[] { ACCELERATION,
 			LIGHT, TEMPERATURE, GYROSCOPE, LOCATION, INCOMING_CALL,
-			OUTGOING_CALL, INCOMING_SMS, OUTGOING_SMS, PACKAGE };
+			OUTGOING_CALL, INCOMING_SMS, OUTGOING_SMS, PACKAGE, CONNECTIVITY, BATTERY};
 
 	private final ServiceBinder mBinder = new ServiceBinder();
 
@@ -97,7 +107,11 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 				getHelper().getDaoBase(SmsData.class)));
 		
 		listeners.put(PACKAGE, new PackageReceiver(this, getHelper().getDaoBase(PackageData.class)));
-
+		
+		listeners.put(CONNECTIVITY, new ConnectivityReceiver(this, getHelper().getDaoBase(ConnectivityData.class)));
+				
+		listeners.put(BATTERY, new BatteryReceiver(this, getHelper().getDaoBase(BatteryData.class)));
+		
 		// get the current settings
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());

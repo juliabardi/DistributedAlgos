@@ -29,17 +29,17 @@
             android:targetPackage="hu.bme.aut.datacollect.activity" />
     </Preference>
 
-    <CheckBoxPreference
+    <SwitchPreference
 		  android:title="App változások"
 		  android:key="@string/packages"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
-     <CheckBoxPreference
+     <SwitchPreference
 		  android:title="Csatlakozás változásai"
 		  android:key="@string/connectivity"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
-    <CheckBoxPreference
+    <SwitchPreference
 		  android:title="Akkumulátor események"
 		  android:key="@string/battery"
 		  android:summaryOff="Kikapcsolva"

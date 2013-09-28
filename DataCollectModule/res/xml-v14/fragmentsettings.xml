@@ -13,17 +13,7 @@
 
     <header android:fragment="hu.bme.aut.datacollect.activity.ActivityFragmentSettings$FragmentSettingsCalls"
         	android:icon="@drawable/ic_launcher"
-            android:title="Hívások"
-            android:summary="Hívás monitorozás">
-    </header>
-    <header android:fragment="hu.bme.aut.datacollect.activity.ActivityFragmentSettings$FragmentSettingsSms"
-        	android:icon="@drawable/ic_launcher"
-            android:title="Sms beállítások"
-            android:summary="Smsek monitorozása">
-    </header>
-    <header android:fragment="hu.bme.aut.datacollect.activity.ActivityFragmentSettings$FragmentSettingsPackage"
-        	android:icon="@drawable/ic_launcher"
-            android:title="App változások"
-            android:summary="Telepítés, törlés monitorozása">
+            android:title="Hívások, smsek"
+            android:summary="Hívás, sms monitorozás">
     </header>
 </preference-headers>

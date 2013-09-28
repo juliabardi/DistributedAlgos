@@ -115,12 +115,12 @@
         <service android:name=".GCMIntentService" />
         
 
-        <receiver android:name="hu.bme.aut.datacollect.listener.IncomingCallReceiver" >
-        </receiver>
-        <receiver android:name="hu.bme.aut.datacollect.listener.OutgoingCallReceiver" >
-        </receiver>
-        <receiver android:name="hu.bme.aut.datacollect.listener.IncomingSmsReceiver" >
-        </receiver>
+        <receiver android:name="hu.bme.aut.datacollect.listener.IncomingCallReceiver" ></receiver>
+        <receiver android:name="hu.bme.aut.datacollect.listener.OutgoingCallReceiver" ></receiver>
+        <receiver android:name="hu.bme.aut.datacollect.listener.IncomingSmsReceiver" ></receiver>
+        <receiver android:name="hu.bme.aut.datacollect.listener.PackageReceiver" ></receiver>
+        <receiver android:name="hu.bme.aut.datacollect.listener.ConnectivityReceiver" ></receiver>
+        <receiver android:name="hu.bme.aut.datacollect.listener.BatteryReceiver" ></receiver>
     </application>
 
 </manifest>

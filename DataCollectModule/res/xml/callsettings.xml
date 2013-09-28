@@ -12,4 +12,16 @@
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
     </PreferenceCategory>
+    <PreferenceCategory android:title="Smsek figyelése" >
+        <CheckBoxPreference
+		  android:title="Bejövő sms"
+		  android:key="@string/insms"
+		  android:summaryOff="Kikapcsolva"
+		  android:summaryOn="Bekapcsolva"/>
+         <CheckBoxPreference
+		  android:title="Kimenő sms"
+		  android:key="@string/outsms"
+		  android:summaryOff="Kikapcsolva"
+		  android:summaryOn="Bekapcsolva"/>
+    </PreferenceCategory>
 </PreferenceScreen>
