@@ -76,6 +76,7 @@
             android:screenOrientation="landscape" >
         </activity>
         <activity android:name="hu.bme.aut.datacollect.activity.AlgorithmActivity" />
+        <activity android:name="hu.bme.aut.datacollect.activity.CommunicationActivity" />
 
         <service android:name="hu.bme.aut.datacollect.activity.DataCollectService" >
         </service>

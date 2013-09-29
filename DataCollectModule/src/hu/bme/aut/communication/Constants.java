@@ -13,10 +13,15 @@ public class Constants {
 	public static final String OFFER = "offer";
 	public static final String UNREGISTER_OFFER = "unregisterOffer";
 	
+	// For syncronization
+	public static final String MESSAGE_TYPE = "messageType";
+	public static final String ITEM_NAME = "itemName";
+	public static final String ITEM_SYNC_VALUE = "itemValue";
+	
 	// Server specific
 //	public static final String NodeServerAddress = "http://10.0.2.2:3000/"; // Emulator localhost test
-	public static final String NodeServerAddress = "http://152.66.183.84:3000/";
-//	public static final String NodeServerAddress = "http://192.168.1.105:3000/";
+//	public static final String NodeServerAddress = "http://152.66.183.84:3000/";
+	public static final String NodeServerAddress = "http://192.168.1.113:3000/";
 	public static final String DataCollectorServerAddress = "http://192.168.1.105:3001/";
 	
 	//GCM specific

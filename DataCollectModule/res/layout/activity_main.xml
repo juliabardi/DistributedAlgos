@@ -151,6 +151,12 @@
                     android:layout_height="wrap_content"
                     android:onClick="stopClicked"
                     android:text="@string/communicationStop" />
+                <Button
+                    android:id="@+id/buttonCommunicationDetails"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="communicationDetailsClicked"
+                    android:text="@string/communication_details" />
             </TableRow>
         </TableLayout>
 

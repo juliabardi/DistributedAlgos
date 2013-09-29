@@ -9,6 +9,8 @@ import hu.bme.aut.datacollect.activity.MainActivity;
 import hu.bme.aut.datacollect.activity.R;
 import hu.bme.aut.communication.Constants;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import org.json.JSONObject;
@@ -28,7 +30,10 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.ResultReceiver;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
@@ -68,10 +73,31 @@ import com.google.android.gcm.GCMRegistrar;
  */
 public class CommunicationService extends Service implements
 		OnSharedPreferenceChangeListener {
+	public static enum SyncronizationValues{
+		TRUE,FALSE,NONE
+	}
 
 	private final CommServiceBinder mBinder = new CommServiceBinder();
 	private NotificationManager manager;
 	private boolean isWifiListener = false;
+	
+	private Boolean registeredToGCM=false; //dec_admin
+	private Boolean registeredToDistributedAlgos=false; //dec_node
+	private boolean isSyncronized=false; // If all need/offer data could be sent to server.
+	private HashMap<String,SyncronizationValues> offerSyncronizationInfo;
+	private MyResultReceiver theReceiver = null;
+	
+	public Boolean getRegisteredtoGCM(){
+		return registeredToGCM;
+	}
+	
+	public Boolean getregisteredToDistributedAlgos(){
+		return registeredToDistributedAlgos;
+	}
+	
+	public HashMap getOfferSyncronizationInfo(){
+		return offerSyncronizationInfo;
+	} 
 
 	public class CommServiceBinder extends Binder {
 
@@ -111,6 +137,10 @@ public class CommunicationService extends Service implements
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		theReceiver = new MyResultReceiver(new Handler());
+	    theReceiver.setParentContext(this);
+	    
+		offerSyncronizationInfo = new HashMap<String,SyncronizationValues>();		
 		manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		settings = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
@@ -120,9 +150,11 @@ public class CommunicationService extends Service implements
 		registerReceiver(mGCMHandleMessageReceiver, new IntentFilter(
 				DISPLAY_MESSAGE_ACTION));
 		if (IsWifiAvaiable()) {
+			setupSyncronizationInfo(SyncronizationValues.NONE);
 			registerToServers();
 		} else // Start to listen to update when registration can be done.
 		{
+			setupSyncronizationInfo(SyncronizationValues.FALSE);			
 			registerReceiver(mWifiConnectionChangedReceiver, new IntentFilter(
 					WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION));
 			isWifiListener=true;
@@ -147,6 +179,14 @@ public class CommunicationService extends Service implements
 			unregisterReceiver(mWifiConnectionChangedReceiver);
 		}
 		super.onDestroy();
+	}
+	
+	private void setupSyncronizationInfo(SyncronizationValues syncValue){
+		Map<String, ?> keys = settings.getAll();
+		for (Map.Entry<String, ?> entry : keys.entrySet()) {
+			offerSyncronizationInfo.put(entry.getKey(),syncValue);
+		}
+		
 	}
 
 	private void registerToServers() {
@@ -218,7 +258,7 @@ public class CommunicationService extends Service implements
 		JSONObject message = JsHelper.createMainBodyWithAlgos(Constants.ALGTYPE, JsHelper
 				.createAlgoBody(JsHelper.createSimpleArray(offerList), null));
 
-		sendJobToNodeService(Constants.NodeServerAddress + Constants.REGISTER, message.toString());
+		sendJobToNodeService(Constants.REGISTER,Constants.REGISTER,Constants.NodeServerAddress + Constants.REGISTER, message.toString());
 	}
 
 	/**
@@ -240,7 +280,7 @@ public class CommunicationService extends Service implements
 						+ Constants.ALGTYPE + "&" + "name=" + key;
 			}
 
-			sendJobToNodeService(url, null);
+			sendJobToNodeService(Constants.OFFER,key,url, null);
 		} else {
 			Log.i(TAG,
 					String.format(
@@ -249,9 +289,12 @@ public class CommunicationService extends Service implements
 		}
 	}
 
-	private void sendJobToNodeService(String url, String jsObj) {
+	private void sendJobToNodeService(String messageType, String itemName,String url, String jsObj) {
 		Intent intent = new Intent(this, NodeCommunicationIntentService.class);
 		intent.putExtra(NodeCommunicationIntentService.URL, url);
+		intent.putExtra(Constants.MESSAGE_TYPE, messageType);
+		intent.putExtra(Constants.ITEM_NAME, itemName);
+		intent.putExtra("resReceiver", theReceiver);
 
 		if (jsObj != null) {
 			intent.putExtra(NodeCommunicationIntentService.JSOBJ, jsObj);
@@ -369,5 +412,42 @@ public class CommunicationService extends Service implements
 			}
 		}
 	};
+	
+	/**
+	 * Log offer sync values from IntentService. 
+	 */
+	public class MyResultReceiver extends ResultReceiver {
+
+	    private Context context = null;
+
+	    protected void setParentContext (Context context) {
+	        this.context = context;
+	    }
+
+	    public MyResultReceiver(Handler handler) {
+	        super(handler);
+	    }
+
+	    @Override
+	    protected void onReceiveResult (int resultCode, Bundle resultData) {
+	    	Log.i(Constants.ALGTYPE,"My resultCode for reg: "+ resultCode);
+	        String messageType = resultData.getString(Constants.MESSAGE_TYPE);
+	        if(messageType.equals(Constants.REGISTER)){
+	        	if(resultData.getBoolean(Constants.ITEM_SYNC_VALUE, false)){
+	        		setupSyncronizationInfo(SyncronizationValues.TRUE);	        		
+	        	}else{
+	        		setupSyncronizationInfo(SyncronizationValues.FALSE);
+	        	}
+	        }
+	        else{
+	        	String itemName = resultData.getString(Constants.ITEM_NAME);
+	        	if(resultData.getBoolean(Constants.ITEM_SYNC_VALUE, false)){
+	        		offerSyncronizationInfo.put(itemName, SyncronizationValues.TRUE);
+	        	}else{
+	        		offerSyncronizationInfo.put(itemName, SyncronizationValues.FALSE);
+	        	}
+	        }
+	    }
+	}
 
 }

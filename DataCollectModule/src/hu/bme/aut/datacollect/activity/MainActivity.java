@@ -269,6 +269,11 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		}
 	}
 	
+	public void communicationDetailsClicked(View view){
+		Intent i = new Intent(this, CommunicationActivity.class);
+		this.startActivity(i);
+	}
+	
 	//starting CameraActivity to take pictures
 	public void uploadImages(View v){				
 		//TODO get permission
