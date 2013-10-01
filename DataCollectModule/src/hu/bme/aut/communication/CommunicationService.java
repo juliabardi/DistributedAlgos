@@ -74,18 +74,24 @@ import com.google.android.gcm.GCMRegistrar;
 public class CommunicationService extends Service implements
 		OnSharedPreferenceChangeListener {
 	public static enum SyncronizationValues{
-		TRUE,FALSE,NONE
+		TRUE,FALSE,NONE,SENDING
 	}
 
 	private final CommServiceBinder mBinder = new CommServiceBinder();
 	private NotificationManager manager;
 	private boolean isWifiListener = false;
 	
-	private Boolean registeredToGCM=false; //dec_admin
+	private Boolean registeredToServer=false; //dec_admin accessed server
+	private Boolean registeredToGCM=false; // got valid ID
 	private Boolean registeredToDistributedAlgos=false; //dec_node
 	private boolean isSyncronized=false; // If all need/offer data could be sent to server.
 	private HashMap<String,SyncronizationValues> offerSyncronizationInfo;
 	private MyResultReceiver theReceiver = null;
+	private GCMRegistrationListener gcmRegListener= new GCMRegistrationListener();
+	
+	public Boolean getRegisteredtoServer(){
+		return registeredToServer;
+	}
 	
 	public Boolean getRegisteredtoGCM(){
 		return registeredToGCM;
@@ -139,6 +145,10 @@ public class CommunicationService extends Service implements
 		super.onCreate();
 		theReceiver = new MyResultReceiver(new Handler());
 	    theReceiver.setParentContext(this);
+	    registeredToGCM=false;
+	    registeredToServer=false;
+	    registeredToDistributedAlgos=false;
+	    registerReceiver(gcmRegListener, new IntentFilter(Constants.GCM_REG_ACTION));
 	    
 		offerSyncronizationInfo = new HashMap<String,SyncronizationValues>();		
 		manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -259,6 +269,7 @@ public class CommunicationService extends Service implements
 				.createAlgoBody(JsHelper.createSimpleArray(offerList), null));
 
 		sendJobToNodeService(Constants.REGISTER,Constants.REGISTER,Constants.NodeServerAddress + Constants.REGISTER, message.toString());
+		setupSyncronizationInfo(SyncronizationValues.SENDING);
 	}
 
 	/**
@@ -281,7 +292,9 @@ public class CommunicationService extends Service implements
 			}
 
 			sendJobToNodeService(Constants.OFFER,key,url, null);
+			offerSyncronizationInfo.put(key, SyncronizationValues.SENDING);
 		} else {
+			offerSyncronizationInfo.put(key, SyncronizationValues.FALSE);
 			Log.i(TAG,
 					String.format(
 							"Could not notify server about offer state change: %s, Wi-Fi connection is not avaiable.",
@@ -318,12 +331,15 @@ public class CommunicationService extends Service implements
 		final String regId = GCMRegistrar.getRegistrationId(this);
 		if (regId.equals("")) {
 			// Automatically registers application on startup.
+			registeredToGCM=false;
 			GCMRegistrar.register(this, SENDER_ID);
 		} else {
+			registeredToGCM=true;
 			// Device is already registered on GCM, check server.
 			if (GCMRegistrar.isRegisteredOnServer(this)) {
 				// Skips registration.
 				Log.i(TAG, "Already registered.");
+				registeredToServer=true;
 			} else {
 				// Try to register again, but not in the UI thread.
 				// It's also necessary to cancel the thread onDestroy(),
@@ -341,6 +357,7 @@ public class CommunicationService extends Service implements
 						// it is restarted. Note that GCM will send an
 						// unregistered callback upon completion, but
 						// GCMIntentService.onUnregistered() will ignore it.
+						registeredToServer=registered;
 						if (!registered) {
 							GCMRegistrar.unregister(context);
 						}
@@ -434,6 +451,7 @@ public class CommunicationService extends Service implements
 	        String messageType = resultData.getString(Constants.MESSAGE_TYPE);
 	        if(messageType.equals(Constants.REGISTER)){
 	        	if(resultData.getBoolean(Constants.ITEM_SYNC_VALUE, false)){
+	        		registeredToDistributedAlgos=true;
 	        		setupSyncronizationInfo(SyncronizationValues.TRUE);	        		
 	        	}else{
 	        		setupSyncronizationInfo(SyncronizationValues.FALSE);
@@ -442,12 +460,29 @@ public class CommunicationService extends Service implements
 	        else{
 	        	String itemName = resultData.getString(Constants.ITEM_NAME);
 	        	if(resultData.getBoolean(Constants.ITEM_SYNC_VALUE, false)){
-	        		offerSyncronizationInfo.put(itemName, SyncronizationValues.TRUE);
+	        		offerSyncronizationInfo.put(itemName, SyncronizationValues.TRUE); // Managed to set requested value.
 	        	}else{
-	        		offerSyncronizationInfo.put(itemName, SyncronizationValues.FALSE);
+	        		offerSyncronizationInfo.put(itemName, SyncronizationValues.FALSE); // Could not send to server.
 	        	}
 	        }
 	    }
 	}
 
+	/**
+	 * Inner Class to listen to result of GCM registration.
+	 */
+	public class GCMRegistrationListener extends BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			try {
+				Bundle bundle = intent.getExtras();
+				registeredToGCM = bundle.getBoolean(Constants.GCM_REG_MSG,false);
+				Log.i(this.getClass().getName(), "Received GCM registration update.");
+			} catch (Exception e) {
+				e.printStackTrace();
+
+			}
+		}
+
+	}
 }

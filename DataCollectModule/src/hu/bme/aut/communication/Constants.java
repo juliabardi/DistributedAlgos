@@ -17,6 +17,8 @@ public class Constants {
 	public static final String MESSAGE_TYPE = "messageType";
 	public static final String ITEM_NAME = "itemName";
 	public static final String ITEM_SYNC_VALUE = "itemValue";
+	public static final String GCM_REG_ACTION = "GCM_Rec_State";
+	public static final String GCM_REG_MSG = "Gcm_Reg_Msg";
 	
 	// Server specific
 //	public static final String NodeServerAddress = "http://10.0.2.2:3000/"; // Emulator localhost test

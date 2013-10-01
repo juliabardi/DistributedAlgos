@@ -22,6 +22,7 @@ import android.widget.TextView;
  * @author Eva Pataji
  *
  */
+// TODO Update data on server events.
 public class CommunicationActivity extends Activity {
 	private CommunicationService commService;
 	private boolean commBound = false;
@@ -88,13 +89,14 @@ public class CommunicationActivity extends Activity {
             commService = binder.getService();
             commBound = true;
             StringBuilder builder = new StringBuilder();
-            builder.append("GCM connection: "+commService.getRegisteredtoGCM().toString()+"\n" +
-    				"Distributed Algos connection: "+commService.getregisteredToDistributedAlgos().toString()+"\n");
+            builder.append("GCM registration(got ID from service): "+commService.getRegisteredtoGCM().toString()+"\n" +
+            		"GCM server connection: "+commService.getRegisteredtoServer().toString()+"\n" +
+    				"Distributed Algos server connection: "+commService.getregisteredToDistributedAlgos().toString()+"\n");
     		HashMap<String, CommunicationService.SyncronizationValues> syncInfo=commService.getOfferSyncronizationInfo();
     		builder.append("\n");
+    		builder.append("Offer Items | Server synced");
     		for (Map.Entry<String, CommunicationService.SyncronizationValues> entry : syncInfo.entrySet()) {
     			builder.append("\n"); 
-    			builder.append("Offer Items registered at server:");
     			builder.append("Key = " + entry.getKey() + ", Value = " + entry.getValue()); }
     		builder.append("\n");
     		tv.setText(builder.toString());
