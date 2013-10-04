@@ -7,35 +7,85 @@
 
         <script type="text/javascript">
                 
-	        var id = 1;
-			var url = "http://192.168.1.105:3001/";
-			var method = "POST";
-			var async = true;	
+	        var id = 1;	
+			
+			//set the enabled flags, the url, the updateRate
+			var config = {
+				url : "http://192.168.1.105:3001/",
+				acceleration : true,
+				rotation : true,
+				light : true,
+				proximity : true,
+				location : true,
+				battery : true,
+				updateRate : 30,  //send message after updateRate seconds
+				method : "POST",
+				async : true
+			};
+			
+			var lastUpdate = null;
+			
+			var data = {			
+				accelerationJSON : createJSON("AccelerationData", ["accX","accY","accZ","timestamp"]),
+				rotationJSON : createJSON("GyroscopeData", ["axisX","axisY","axisZ","timestamp"]),
+				lightJSON : createJSON("LightData", ["lx","timestamp"]),
+				proximityJSON : createJSON("ProximityData", ["proximity","timestamp"]),
+				locationJSON : createJSON("LocationData", ["latitude","longitude","timestamp"]),
+				batteryJSON : createJSON("BatteryData", ["percent", "status", "timestamp"])	,
+				orientationJSON : createJSON("OrientationData", ["alpha", "beta", "gamma", "timestamp"])
+			};
+			
+			function sendAll(){
+			
+				var ms = new Date().getTime();
+				if (lastUpdate != null && (ms-lastUpdate)/1000 < config.updateRate){
+					console.log("Not sending, elapsed seconds: " + ((ms-lastUpdate)/1000));
+					return;
+				}				
+				lastUpdate = ms;
+				
+				for ( var name in data ){
+					if (data[name].values.length != 0){
+						console.log("Sending " + name);
+						startRequest(data[name]);
+						
+						//reset values
+						data[name].values = [];
+						data[name].id = ++id;
+					}
+				}
+			}
 	        
 			function startRequest(postData){
+			
 				var request = new XMLHttpRequest();
 			    request.onreadystatechange = function() {
 					if (request.readyState == 4) {	// 4 = finished
 						document.getElementById("status").innerHTML = request.status;
 					}
 				};
-				request.open(method, url, async);
+				request.open(config.method, config.url, config.async);
                 request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-				request.send(postData);
+				request.send(JSON.stringify(postData));  
 			}
 			
-			function createJSONString(name, params, values){
+			function createJSON(name, params){
 					
 				var json = {};
 				json["id"] = ++id;
 				json["type"] = "simple";
 				json["name"] = name;
 				json["params"] = params;
-				var array = [];
-				array[0] = values;
-				json["values"] = array;
+				json["values"] = [];
 				console.log(JSON.stringify(json));
-				return JSON.stringify(json);
+				return json;
+			}
+			
+			function addValues(json, values){
+				
+				var array = json["values"];
+				array[array.length] = values;
+				return json;
 			}
  
  			// --- Accelerometer and Rotation
@@ -56,44 +106,73 @@
                         document.getElementById("rotationBeta").innerHTML = rotB;
                         document.getElementById("rotationGamma").innerHTML = rotC;
 						
-						//no rotation in android app
-						var ms = new Date().getTime();
-						var params = ["rotA","rotB","rotC","timestamp"];
-						var values = [rotA, rotB, rotC, ms];
-						startRequest(createJSONString("RotationData", params, values));
+						if (config.rotation){
+							//no rotation in android app
+							var ms = new Date().getTime();
+							var values = [rotA, rotB, rotC, ms];
+							addValues(data.rotationJSON, values);
+							sendAll();
+							
+						}
                     }
                     
-					var ms = new Date().getTime();
-					var params = ["accX","accY","accZ","timestamp"];
-					var values = [accX, accY, accZ, ms];
-					startRequest(createJSONString("AccelerationData", params, values));
+					if (config.acceleration){
+						var ms = new Date().getTime();
+						var values = [accX, accY, accZ, ms];
+						addValues(data.accelerationJSON, values);
+						sendAll();
+					}
                 }
             }
+			
+			// = Gyroscope
+			if (window.DeviceOrientationEvent != undefined) {
+				window.ondeviceorientation = function(e) {
+				
+					document.getElementById("orientationAlpha").innerHTML = e.alpha;
+					document.getElementById("orientationBeta").innerHTML = e.beta;
+					document.getElementById("orientationGamma").innerHTML = e.gamma;
+				
+					var ms = new Date().getTime();
+					var values = [e.alpha, e.beta, e.gamma, ms];
+					addValues(data.orientationJSON, values);
+					sendAll();
+				
+				};
+			}
 
 			// --- Light sensor
             window.addEventListener('devicelight', function(e) {
-            	document.getElementById("lightSensor").innerHTML = e.value;
-				var ms = new Date().getTime();
-				var params = ["lx","timestamp"];
-				var values = [e.value, ms];
-				startRequest(createJSONString("LightData", params, values));
+			
+				document.getElementById("lightSensor").innerHTML = e.value;
+				if (config.light){					
+					var ms = new Date().getTime();
+					var values = [e.value, ms];
+					addValues(data.lightJSON, values);
+					sendAll();
+				}
 			});
 
 			// --- Proximity
 			window.addEventListener('deviceproximity', function(e) {
 			    document.getElementById("proximity").innerHTML = e.value;
 
-			    //no proximity in the android app
-				var ms = new Date().getTime();
-				var params = ["proximity","timestamp"];
-				var values = [e.value, ms];
-				startRequest(createJSONString("ProximityData", params, values));
+				if (config.proximity){
+					//no proximity in the android app
+					var ms = new Date().getTime();
+					var values = [e.value, ms];
+					addValues(data.proximityJSON, values);
+					sendAll();
+				}
 			});
 
 
             // --- GeoLocation
             if (navigator.geolocation) {
-			    navigator.geolocation.getCurrentPosition(success, fail);
+			    //navigator.geolocation.getCurrentPosition(success, fail);
+				navigator.geolocation.watchPosition(success, fail, {
+					maximumAge: (config.updateRate*1000)
+				});
 			}
 
 			function success(position) {
@@ -101,11 +180,12 @@
 				var lon = position.coords.longitude;
 				document.getElementById("geoLocation").innerHTML = 'Latitude: '+ lat + ', Longitude: '+ lon;
 
-				var ms = new Date().getTime();				
-				var params = ["latitude","longitude","timestamp"];
-				var values = [lat, lon, ms];
-				var json = createJSONString("LocationData", params, values);
-				startRequest(json);
+				if (config.location){
+					var ms = new Date().getTime();				
+					var values = [lat, lon, ms];	
+					addValues(data.locationJSON, values);
+					sendAll();
+				}
 			}
 
 			function fail() {
@@ -116,21 +196,24 @@
 			var battery = navigator.battery || navigator.mozBattery;
 
 			if (battery != null) {
-				battery.addEventListener('chargingchange', updateStatus);  
+				battery.addEventListener('chargingchange', updateStatus); 				
 			}
 
 			function updateStatus() { 
 				var batteryP = battery.level * 100;
 				document.getElementById("battery").innerHTML = ' ' + batteryP + ' %';
+				var status = 4;
 				if (battery.charging) {
-				alert('Phone is charging');   
+					//alert('Phone is charging');     //add charge info?
+					status = 2;
 				}
 			  
-			    //battery data does not exist in android app
-			  	var ms = new Date().getTime();
-				var params = ["battery","timestamp"];
-				var values = [batteryP, ms];
-				startRequest(createJSONString("BatteryData", params, values));
+			    if (config.battery){
+					var ms = new Date().getTime();
+					var values = [batteryP, status, ms];
+					addValues(data.batteryJSON, values);
+					sendAll();
+				}
 			}  
 
         </script>
@@ -154,13 +237,16 @@
                 <li>Proximity: <span id="proximity"></span></li>
                 <li>GeoLocation: <span id="geoLocation"></span></li>
                 <li>Battery status: <span id="battery"></span></li>
+				<li>orientation alpha: <span id="orientationAlpha"></span></li>
+                <li>orientation beta: <span id="orientationBeta"></span></li>
+                <li>orientation gamma: <span id="orientationGamma"></span></li>
 				<br/>
 				<li>Request status: <span id="status"></span></li>
             </ul>
 			<br/>
 			<br/>
 
-			Source: <a href="http://atleast.aut.bme.hu/mobilesensors"/>
+			Source: <a href="http://atleast.aut.bme.hu/mobilesensors"></a>
 			<br/>
         </div>
 

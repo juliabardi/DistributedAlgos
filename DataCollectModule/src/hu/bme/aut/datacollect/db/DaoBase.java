@@ -54,5 +54,14 @@ public class DaoBase<T> extends BaseDaoImpl<T, Integer> {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public T queryLast(){
+		
+		try {
+			return this.queryBuilder().orderBy("timestamp", false).limit(1L).queryForFirst();			
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 }

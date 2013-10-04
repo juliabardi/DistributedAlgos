@@ -57,7 +57,7 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	public static final String BATTERY = "battery";
 	
 	//no listeners yet
-	public static final String ROTATION = "rotation";
+	public static final String ORIENTAION = "orientation";
 	public static final String PROXIMITY = "proximity";
 
 	public static final String[] sharedPrefKeys = new String[] { ACCELERATION,

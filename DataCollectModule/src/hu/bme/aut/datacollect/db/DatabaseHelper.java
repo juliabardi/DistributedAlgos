@@ -9,7 +9,7 @@ import hu.bme.aut.datacollect.entity.LightData;
 import hu.bme.aut.datacollect.entity.LocationData;
 import hu.bme.aut.datacollect.entity.PackageData;
 import hu.bme.aut.datacollect.entity.ProximityData;
-import hu.bme.aut.datacollect.entity.RotationData;
+import hu.bme.aut.datacollect.entity.OrientationData;
 import hu.bme.aut.datacollect.entity.SmsData;
 import hu.bme.aut.datacollect.entity.TemperatureData;
 
@@ -49,7 +49,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 		map.put(PackageData.class, null);
 		map.put(BatteryData.class, null);
 		map.put(ProximityData.class, null);
-		map.put(RotationData.class, null);
+		map.put(OrientationData.class, null);
 		map.put(ConnectivityData.class, null);
 	}
 	

@@ -37,6 +37,13 @@ public class BatteryReceiver extends BroadcastReceiver implements IListener {
 
 		float batteryPct = (level / (float)scale) * 100;
 		
+		BatteryData last = this.batteryDao.queryLast();
+		if (last!=null && batteryPct == last.getPercent() && status == last.getStatus() 
+				&& chargePlug == last.getPlugged()){
+			//no need to save, nothing changed
+			return;
+		}
+		
 		Log.d(TAG, String.format("BatteryData: %s %%, status: %s , plugged: %s", 
 				batteryPct, status, chargePlug));
 		this.batteryDao.create(new BatteryData(Calendar.getInstance().getTimeInMillis(), 

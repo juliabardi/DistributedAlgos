@@ -11,28 +11,28 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 
-@DatabaseTable(tableName="rotations", daoClass=DaoBase.class)
-public class RotationData extends IData {
+@DatabaseTable(tableName="orientations", daoClass=DaoBase.class)
+public class OrientationData extends IData {
 
 	@DatabaseField(generatedId=true)
 	private int id;
 	@DatabaseField(canBeNull=false)
 	private long timestamp;
 	@DatabaseField(canBeNull=false)
-	private float rotA;
+	private float alpha;
 	@DatabaseField(canBeNull=false)
-	private float rotB;
+	private float beta;
 	@DatabaseField(canBeNull=false)
-	private float rotC;
+	private float gamma;
 	
-	public RotationData(){}
+	public OrientationData(){}
 	
-	public RotationData(long timestamp, float rotA, float rotB, float rotC) {
+	public OrientationData(long timestamp, float alpha, float beta, float gamma) {
 		super();
 		this.timestamp = timestamp;
-		this.rotA = rotA;
-		this.rotB = rotB;
-		this.rotC = rotC;
+		this.alpha = alpha;
+		this.beta = beta;
+		this.gamma = gamma;
 	}
 
 	public int getId() {
@@ -46,41 +46,41 @@ public class RotationData extends IData {
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
-	
-	public float getRotA() {
-		return rotA;
+
+	public float getAlpha() {
+		return alpha;
 	}
 
-	public void setRotA(float rotA) {
-		this.rotA = rotA;
+	public void setAlpha(float alpha) {
+		this.alpha = alpha;
 	}
 
-	public float getRotB() {
-		return rotB;
+	public float getBeta() {
+		return beta;
 	}
 
-	public void setRotB(float rotB) {
-		this.rotB = rotB;
+	public void setBeta(float beta) {
+		this.beta = beta;
 	}
 
-	public float getRotC() {
-		return rotC;
+	public float getGamma() {
+		return gamma;
 	}
 
-	public void setRotC(float rotC) {
-		this.rotC = rotC;
+	public void setGamma(float gamma) {
+		this.gamma = gamma;
 	}
 
 	@Override
 	public String toString() {
 		return String
-				.format("RotationData [id=%s, timestamp=%s, rotA=%s, rotB=%s, rotC=%s]",
-						id, timestamp, rotA, rotB, rotC);
+				.format("RotationData [id=%s, timestamp=%s, alpha=%s, beta=%s, gamma=%s]",
+						id, timestamp, alpha, beta, gamma);
 	}
 
 	@Override
 	public List<String> getParams(){
-		return Arrays.asList("id", "timestamp", "rotA", "rotB", "rotC");
+		return Arrays.asList("id", "timestamp", "alpha", "beta", "gamma");
 	}
 	
 	@Override
@@ -89,9 +89,9 @@ public class RotationData extends IData {
 		Map<String,String> values = new HashMap<String,String>();
 		values.put("id", String.valueOf(id));
 		values.put("timestamp", String.valueOf(timestamp));
-		values.put("rotA", String.valueOf(rotA));
-		values.put("rotB", String.valueOf(rotB));
-		values.put("rotC", String.valueOf(rotC));
+		values.put("alpha", String.valueOf(alpha));
+		values.put("beta", String.valueOf(beta));
+		values.put("gamma", String.valueOf(gamma));
 		return values;
 	}
 	
