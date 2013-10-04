@@ -19,10 +19,16 @@ public class ActivityFragmentSettings extends PreferenceActivity {
 	
 	static Map<String, Boolean> availableListeners = new HashMap<String, Boolean>();
 	
+	//used by LocationProvider to show alert dialog if GPS is not enabled
+	//instance is not null between onCreate and onDestroy
+	public static ActivityFragmentSettings instance = null;
+	
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		ActivityFragmentSettings.instance = this;
 		
 		//handling sdk pre11
 	    String action = getIntent().getAction();
@@ -73,6 +79,12 @@ public class ActivityFragmentSettings extends PreferenceActivity {
 	    }
 	}
 	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		ActivityFragmentSettings.instance = null;
+	}
+
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB) 
 	@Override
 	public void onBuildHeaders(List<Header> target) {

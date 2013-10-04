@@ -5,6 +5,7 @@ import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
 import hu.bme.aut.datacollect.activity.DataCollectService.ServiceBinder;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
 import hu.bme.aut.datacollect.listener.IListener;
+import hu.bme.aut.datacollect.listener.LocationProvider;
 import hu.bme.aut.datacollect.upload.DataUploadTask;
 import hu.bme.aut.datacollect.upload.UploadTaskQueue;
 import hu.bme.aut.datacollect.utils.FileUtils;
@@ -194,7 +195,9 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 			i.setClass(this, ActivityFragmentSettings.class);
 			//sending the listener availability in a bundle
 			for (String sharedKey : DataCollectService.sharedPrefKeys){
-				i.putExtra(sharedKey, this.mService.getListener(sharedKey).isAvailable());
+				//if listener does not exist, then put true
+				i.putExtra(sharedKey, this.mService.getListener(sharedKey)==null ? true : 
+					this.mService.getListener(sharedKey).isAvailable());
 			}
 			startActivityForResult(i, 0);
 		}
@@ -209,12 +212,15 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		for (String sharedKey : DataCollectService.sharedPrefKeys){
 			if (sharedKey.equals(key)) {
 				IListener listener = mService.getListener(sharedKey);
-				if (sharedPreferences.getBoolean(sharedKey, false)){
-					if (listener.isAvailable()){ listener.register(); }
-				}					
-				else{
-					if (listener.isAvailable()){ listener.unregister(); }
-				}					
+				if (listener != null){
+					//register/unregister listener
+					if (sharedPreferences.getBoolean(sharedKey, false)){
+						if (listener.isAvailable()){ listener.register(); }
+					}					
+					else{
+						if (listener.isAvailable()){ listener.unregister(); }
+					}	
+				}
 				break;
 			}
 		}

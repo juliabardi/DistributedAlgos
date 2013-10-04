@@ -120,6 +120,7 @@
         <receiver android:name="hu.bme.aut.datacollect.listener.PackageReceiver" ></receiver>
         <receiver android:name="hu.bme.aut.datacollect.listener.ConnectivityReceiver" ></receiver>
         <receiver android:name="hu.bme.aut.datacollect.listener.BatteryReceiver" ></receiver>
+		<receiver android:name="hu.bme.aut.datacollect.listener.ScreenReceiver" ></receiver>
     </application>
 
 </manifest>

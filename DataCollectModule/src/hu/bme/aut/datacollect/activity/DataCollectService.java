@@ -10,6 +10,7 @@ import hu.bme.aut.datacollect.entity.LightData;
 import hu.bme.aut.datacollect.entity.LocationData;
 import hu.bme.aut.datacollect.entity.PackageData;
 import hu.bme.aut.datacollect.entity.ProximityData;
+import hu.bme.aut.datacollect.entity.ScreenData;
 import hu.bme.aut.datacollect.entity.SmsData;
 import hu.bme.aut.datacollect.entity.TemperatureData;
 import hu.bme.aut.datacollect.listener.AccelerometerSensorListener;
@@ -22,6 +23,7 @@ import hu.bme.aut.datacollect.listener.LightSensorListener;
 import hu.bme.aut.datacollect.listener.LocationProvider;
 import hu.bme.aut.datacollect.listener.PackageReceiver;
 import hu.bme.aut.datacollect.listener.ProximitySensorListener;
+import hu.bme.aut.datacollect.listener.ScreenReceiver;
 import hu.bme.aut.datacollect.listener.SmsListener;
 import hu.bme.aut.datacollect.listener.TemperatureSensorListener;
 
@@ -54,13 +56,15 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	public static final String CONNECTIVITY = "ConnectivityData";
 	public static final String BATTERY = "BatteryData";
 	public static final String PROXIMITY = "ProximityData";
+	public static final String SCREEN = "ScreenData";
 	
+	public static final String IMAGE = "ImageData";	
 	//no listeners yet
 	public static final String ORIENTAION = "OrientationData";
 
 	public static final String[] sharedPrefKeys = new String[] { ACCELERATION,
 			LIGHT, TEMPERATURE, GYROSCOPE, LOCATION, CALL,
-			SMS, PACKAGE, CONNECTIVITY, BATTERY, PROXIMITY};
+			SMS, PACKAGE, CONNECTIVITY, BATTERY, PROXIMITY, SCREEN, IMAGE};
 
 	private final ServiceBinder mBinder = new ServiceBinder();
 
@@ -100,20 +104,19 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 				getHelper().getDaoBase(SmsData.class)));
 		
 		listeners.put(PACKAGE, new PackageReceiver(this, getHelper().getDaoBase(PackageData.class)));
-		
 		listeners.put(CONNECTIVITY, new ConnectivityReceiver(this, getHelper().getDaoBase(ConnectivityData.class)));
-				
 		listeners.put(BATTERY, new BatteryReceiver(this, getHelper().getDaoBase(BatteryData.class)));
-		
 		listeners.put(PROXIMITY, new ProximitySensorListener(this, getHelper().getDaoBase(ProximityData.class)));
+		listeners.put(SCREEN, new ScreenReceiver(this, getHelper().getDaoBase(ScreenData.class)));		
 		
 		// get the current settings
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 
-		// register all listeners that are enabled
+		// register all listeners that are enabled (and has listener)
 		for (String key : DataCollectService.sharedPrefKeys) {
-			if (sharedPreferences.getBoolean(key, false) && listeners.get(key).isAvailable()){
+			if (sharedPreferences.getBoolean(key, false) && listeners.get(key) != null &&
+					listeners.get(key).isAvailable()){
 				listeners.get(key).register();
 			}				
 		}

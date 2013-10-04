@@ -1,11 +1,14 @@
 package hu.bme.aut.datacollect.listener;
 
+import hu.bme.aut.datacollect.activity.ActivityFragmentSettings;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.LocationData;
 
 import java.util.Calendar;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
@@ -22,21 +25,16 @@ public class LocationProvider implements LocationListener, IListener{
 	
 	private final LocationManager locationManager;	
 	private DaoBase<LocationData> locationDao = null;
-	private Context mContext;
 	
 	public LocationProvider(Context context, DaoBase<LocationData> locationDao){
 			
-		this.mContext = context;
 		this.locationDao = locationDao;
 		
 		//request location updates
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 	}
 	
-	public void setContext(Context context){
-		this.mContext = context;
-	}
-	
+	//where should i use this?
 	public static GsmCellLocation getGsmCellLocation(Context context){
 		
 		GsmCellLocation location = null;
@@ -51,6 +49,11 @@ public class LocationProvider implements LocationListener, IListener{
 	@Override
 	public void onLocationChanged(Location location) {
 		// insert new location
+		this.createLocationData(location);
+	}
+	
+	private void createLocationData(Location location){
+		
 		Log.d(TAG, String.format("LocationData: lat: %s, lon: %s, alt: %s", location.getLatitude(), 
 				location.getLongitude(), location.getAltitude()));
 		locationDao.create(new LocationData(Calendar.getInstance()
@@ -59,15 +62,22 @@ public class LocationProvider implements LocationListener, IListener{
 	}
 
 	@Override
-	public void onProviderDisabled(String arg0) {
-		// TODO Auto-generated method stub
+	public void onProviderDisabled(String provider) {
 		
+		Log.d(TAG, String.format("Provider disabled: %s",provider));	
+		if (LocationManager.GPS_PROVIDER.equals(provider)){
+			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, this);
+		}
 	}
 
 	@Override
-	public void onProviderEnabled(String arg0) {
-		// TODO Auto-generated method stub
+	public void onProviderEnabled(String provider) {
 		
+		Log.d(TAG, String.format("Provider enabled: %s",provider));	
+		if (LocationManager.GPS_PROVIDER.equals(provider)){
+			locationManager.removeUpdates(this);
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
+		}
 	}
 
 	@Override
@@ -78,29 +88,56 @@ public class LocationProvider implements LocationListener, IListener{
 	
 	@Override
 	public void register() {
-		// locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-		// 60000, 100, this);
-		final boolean gpsEnabled = locationManager
-				.isProviderEnabled(LocationManager.GPS_PROVIDER);
-		if (!gpsEnabled) {
-			//alert dialog cannot be opened with a service as context
-			//TODO inject activity as context somehow
-//			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-//			builder.setPositiveButton("OK",
-//					new DialogInterface.OnClickListener() {
-//						@Override
-//						public void onClick(DialogInterface dialog, int id) {
-//							enableLocationSettings();
-//						}
-//					})
-//					.setNegativeButton("Most nem", null)
-//					.setTitle("GPS engedélyezése")
-//					.setMessage(
-//							"A pontos helyeadatok gyûjtéséhez szükséges bekapcsolni a GPS-t. Akarja most bekapcsolni?")
-//					.create().show();
+		
+		if (!isGPSEnabled()) {
+			if (ActivityFragmentSettings.instance != null)
+				this.showAlert(ActivityFragmentSettings.instance);
 		}
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-				6000, 1, this);
+		
+		if (isGPSEnabled()){
+			Log.d(TAG, "Registering to GPS Provider");
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
+			//create a LocationData with the last known location
+			this.createLocationData(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+			return;
+		}
+		//register both to get notification when one of them is enabled
+		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, this);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
+		
+		if (isNetworkProviderEnabled()) {
+			//create a LocationData with the last known location
+			this.createLocationData(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER));
+		}
+	}
+	
+	public boolean isGPSEnabled(){
+		return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+	}
+	
+	public boolean isNetworkProviderEnabled(){
+		return locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+	}
+	
+	public void showAlert(final Context context){
+		
+		String message = "Helyadatok gyûjtéséhez szükséges bekapcsolni a GPS-t vagy a hálózati szolgáltatást. Akarja most bekapcsolni valamelyiket?";
+		if (isNetworkProviderEnabled()){
+			message = "Pontos helyadatok gyûjtéséhez szükséges bekapcsolni a GPS-t. Akarja most bekapcsolni?";
+		}
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setPositiveButton("OK",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						enableLocationSettings(context);
+					}
+				})
+				.setNegativeButton("Most nem", null)
+				.setTitle("Helyadatok engedélyezése")
+				.setMessage(message)
+				.create().show();
 	}
 	
 	@Override
@@ -108,15 +145,16 @@ public class LocationProvider implements LocationListener, IListener{
 		locationManager.removeUpdates(this);
 	}
 	
-	void enableLocationSettings() {
+	void enableLocationSettings(Context context) {
 	    Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-	    mContext.startActivity(settingsIntent);
+	    context.startActivity(settingsIntent);
 	}
 	
 	@Override
 	public boolean isAvailable() {
 		//in absence of gps provider should i use network provider?
-		if (this.locationManager.getProvider(LocationManager.GPS_PROVIDER) != null) {
+		if (this.locationManager.getProvider(LocationManager.GPS_PROVIDER) != null
+				|| this.locationManager.getProvider(LocationManager.NETWORK_PROVIDER) != null) {
 			return true;
 		}
 		return false;
