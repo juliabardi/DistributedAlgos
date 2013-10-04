@@ -49,11 +49,9 @@ public class ActivityFragmentSettings extends PreferenceActivity {
 	    }
 	    else if (action != null && action.equals(ACTION_PREFS_CALLS)) {
 	        addPreferencesFromResource(R.xml.callsettings);
-	        if (!availableListeners.get(DataCollectService.INCOMING_CALL)){
-	        	this.findPreference(DataCollectService.INCOMING_CALL).setEnabled(false);
-	        	this.findPreference(DataCollectService.OUTGOING_CALL).setEnabled(false);
-	        	this.findPreference(DataCollectService.INCOMING_SMS).setEnabled(false);
-	        	this.findPreference(DataCollectService.OUTGOING_SMS).setEnabled(false);
+	        if (!availableListeners.get(DataCollectService.CALL)){
+	        	this.findPreference(DataCollectService.CALL).setEnabled(false);
+	        	this.findPreference(DataCollectService.SMS).setEnabled(false);
 	        } 
 	    }
 	    
@@ -118,11 +116,9 @@ public class ActivityFragmentSettings extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.callsettings);
-            if (!availableListeners.get(DataCollectService.INCOMING_CALL)){
-            	this.findPreference(DataCollectService.INCOMING_CALL).setEnabled(false);
-            	this.findPreference(DataCollectService.OUTGOING_CALL).setEnabled(false);
-            	this.findPreference(DataCollectService.INCOMING_SMS).setEnabled(false);
-            	this.findPreference(DataCollectService.OUTGOING_SMS).setEnabled(false);
+            if (!availableListeners.get(DataCollectService.CALL)){
+            	this.findPreference(DataCollectService.CALL).setEnabled(false);
+            	this.findPreference(DataCollectService.SMS).setEnabled(false);
             }
         }
     }

@@ -13,16 +13,14 @@ import hu.bme.aut.datacollect.entity.SmsData;
 import hu.bme.aut.datacollect.entity.TemperatureData;
 import hu.bme.aut.datacollect.listener.AccelerometerSensorListener;
 import hu.bme.aut.datacollect.listener.BatteryReceiver;
+import hu.bme.aut.datacollect.listener.CallReceiver;
 import hu.bme.aut.datacollect.listener.ConnectivityReceiver;
 import hu.bme.aut.datacollect.listener.GyroscopeSensorListener;
 import hu.bme.aut.datacollect.listener.IListener;
-import hu.bme.aut.datacollect.listener.IncomingCallReceiver;
-import hu.bme.aut.datacollect.listener.IncomingSmsReceiver;
 import hu.bme.aut.datacollect.listener.LightSensorListener;
 import hu.bme.aut.datacollect.listener.LocationProvider;
-import hu.bme.aut.datacollect.listener.OutgoingCallReceiver;
-import hu.bme.aut.datacollect.listener.OutgoingSmsListener;
 import hu.bme.aut.datacollect.listener.PackageReceiver;
+import hu.bme.aut.datacollect.listener.SmsListener;
 import hu.bme.aut.datacollect.listener.TemperatureSensorListener;
 
 import java.util.HashMap;
@@ -43,26 +41,24 @@ import com.j256.ormlite.android.apptools.OrmLiteBaseService;
 public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	
 	//Cannot access the R.string.whatever from static place easily, so I keep here the strings
-	public static final String ACCELERATION = "acceleration";
-	public static final String LIGHT = "light";
-	public static final String TEMPERATURE = "temperature";
-	public static final String GYROSCOPE = "gyroscope";
-	public static final String LOCATION = "location";
-	public static final String INCOMING_CALL = "incall";
-	public static final String OUTGOING_CALL = "outcall";
-	public static final String INCOMING_SMS = "insms";
-	public static final String OUTGOING_SMS = "outsms";
-	public static final String PACKAGE = "package";
-	public static final String CONNECTIVITY = "connectivity";
-	public static final String BATTERY = "battery";
+	public static final String ACCELERATION = "AccelerationData";
+	public static final String LIGHT = "LightData";
+	public static final String TEMPERATURE = "TemperatureData";
+	public static final String GYROSCOPE = "GyroscopeData";
+	public static final String LOCATION = "LocationData";
+	public static final String CALL = "CallData";
+	public static final String SMS = "SmsData";
+	public static final String PACKAGE = "PackageData";
+	public static final String CONNECTIVITY = "ConnectivityData";
+	public static final String BATTERY = "BatteryData";
 	
 	//no listeners yet
-	public static final String ORIENTAION = "orientation";
-	public static final String PROXIMITY = "proximity";
+	public static final String ORIENTAION = "OrientationData";
+	public static final String PROXIMITY = "ProximityData";
 
 	public static final String[] sharedPrefKeys = new String[] { ACCELERATION,
-			LIGHT, TEMPERATURE, GYROSCOPE, LOCATION, INCOMING_CALL,
-			OUTGOING_CALL, INCOMING_SMS, OUTGOING_SMS, PACKAGE, CONNECTIVITY, BATTERY};
+			LIGHT, TEMPERATURE, GYROSCOPE, LOCATION, CALL,
+			SMS, PACKAGE, CONNECTIVITY, BATTERY};
 
 	private final ServiceBinder mBinder = new ServiceBinder();
 
@@ -96,14 +92,9 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 		listeners.put(GYROSCOPE, new GyroscopeSensorListener(this,
 				getHelper().getDaoBase(GyroscopeData.class)));
 
-		listeners.put(INCOMING_CALL, new IncomingCallReceiver(this, getHelper()
+		listeners.put(CALL, new CallReceiver(this, getHelper()
 				.getDaoBase(CallData.class)));
-		listeners.put(OUTGOING_CALL, new OutgoingCallReceiver(this, getHelper()
-				.getDaoBase(CallData.class)));
-
-		listeners.put(INCOMING_SMS, new IncomingSmsReceiver(this, getHelper()
-				.getDaoBase(SmsData.class)));
-		listeners.put(OUTGOING_SMS, new OutgoingSmsListener(this, new Handler(),
+		listeners.put(SMS, new SmsListener(this, new Handler(),
 				getHelper().getDaoBase(SmsData.class)));
 		
 		listeners.put(PACKAGE, new PackageReceiver(this, getHelper().getDaoBase(PackageData.class)));

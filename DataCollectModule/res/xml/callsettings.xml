@@ -2,25 +2,15 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     <PreferenceCategory android:title="Hívások figyelése" >
         <CheckBoxPreference
-		  android:title="Bejövő hívások"
-		  android:key="@string/incall"
-		  android:summaryOff="Kikapcsolva"
-		  android:summaryOn="Bekapcsolva"/>
-         <CheckBoxPreference
-		  android:title="Kimenő hívások"
-		  android:key="@string/outcall"
+		  android:title="Hívások"
+		  android:key="@string/call"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Smsek figyelése" >
-        <CheckBoxPreference
-		  android:title="Bejövő sms"
-		  android:key="@string/insms"
-		  android:summaryOff="Kikapcsolva"
-		  android:summaryOn="Bekapcsolva"/>
          <CheckBoxPreference
-		  android:title="Kimenő sms"
-		  android:key="@string/outsms"
+		  android:title="Smsek"
+		  android:key="@string/sms"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
     </PreferenceCategory>

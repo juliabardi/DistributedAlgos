@@ -12,17 +12,20 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
-public class OutgoingSmsListener extends ContentObserver implements IListener {
+public class SmsListener extends ContentObserver implements IListener {
+	
+	private static final String TAG = "DataCollect:SmsReceiver";
 
 	private DaoBase<SmsData> smsDao = null;
 	private Context context = null;
 	
-	private boolean regOutSms = false;
+	private boolean regSms = false;
 	
 	private int lastId = 0;
 		
-	public OutgoingSmsListener(Context context, Handler handler, DaoBase<SmsData> smsDao){
+	public SmsListener(Context context, Handler handler, DaoBase<SmsData> smsDao){
 		super(handler);
 		this.smsDao = smsDao;
 		this.context = context;
@@ -43,11 +46,13 @@ public class OutgoingSmsListener extends ContentObserver implements IListener {
 	
 	        if(protocol == null) {
 	        	//the message is sent out just now  
+				Log.d(TAG, "SmsData: out");
 	    		smsDao.create(new SmsData(Calendar.getInstance().getTimeInMillis(), "out"));
 	        }               
 	        else {
 	             //the message is received just now   
-	        	 //this is handled with IncomingSmsReceiver
+				Log.d(TAG, "SmsData: in");
+				smsDao.create(new SmsData(Calendar.getInstance().getTimeInMillis(), "in"));
 	        }
         }
 	}
@@ -55,21 +60,21 @@ public class OutgoingSmsListener extends ContentObserver implements IListener {
 	@Override
 	public void register() {
 
-		if (!regOutSms) {
+		if (!regSms) {
 			ContentResolver contentResolver = context.getContentResolver();
 			contentResolver.registerContentObserver(
 					Uri.parse("content://sms"), true, this);
-			regOutSms = true;
+			regSms = true;
 		}
 	}
 	
 	@Override
 	public void unregister(){
 		
-		if (regOutSms){
+		if (regSms){
 			ContentResolver contentResolver = context.getContentResolver();
 			contentResolver.unregisterContentObserver(this);
-			regOutSms = false;
+			regSms = false;
 		}
 	}
 	
