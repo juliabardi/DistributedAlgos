@@ -9,8 +9,11 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 public class LightSensorListener extends SensorListener {
+	
+	private static final String TAG = "DataCollect:LightSensorListener";
 
 	private final Sensor lightSensor;
 	private DaoBase<LightData> lightDao = null;
@@ -36,6 +39,7 @@ public class LightSensorListener extends SensorListener {
 			// illuminance in lx
 			float lux = event.values[0];
 			// save into db
+			Log.d(TAG, String.format("LightData: %s lx", lux));
 			lightDao.create(new LightData(Calendar.getInstance()
 					.getTimeInMillis(), lux));
 		}

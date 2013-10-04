@@ -8,9 +8,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.util.Log;
 
 public class PackageReceiver extends BroadcastReceiver implements IListener {
 
+	private static final String TAG = "DataCollect:PackageReceiver";
+	
 	private DaoBase<PackageData> packageDao = null;
 	private Context mContext = null;
 	
@@ -25,7 +28,8 @@ public class PackageReceiver extends BroadcastReceiver implements IListener {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		
-		int uid = intent.getExtras().getInt("EXTRA_UID");		
+		int uid = intent.getExtras().getInt("EXTRA_UID");	
+		Log.d(TAG, String.format("PackageData: action: %s, uid: %s", intent.getAction(), uid));
 		packageDao.create(new PackageData(Calendar.getInstance().getTimeInMillis(), intent.getAction(), uid));
 	}
 	

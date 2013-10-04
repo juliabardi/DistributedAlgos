@@ -16,7 +16,7 @@ import android.util.Log;
 
 public class SmsListener extends ContentObserver implements IListener {
 	
-	private static final String TAG = "DataCollect:SmsReceiver";
+	private static final String TAG = "DataCollect:SmsListener";
 
 	private DaoBase<SmsData> smsDao = null;
 	private Context context = null;

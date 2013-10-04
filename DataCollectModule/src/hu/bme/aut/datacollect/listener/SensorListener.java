@@ -6,8 +6,6 @@ import android.hardware.SensorManager;
 
 public abstract class SensorListener implements SensorEventListener, IListener{
 	
-	public enum Sensors { ACCELEROMETER, LIGHT, TEMPERATURE }
-	
 	protected final SensorManager sensorManager;
 	
 	public SensorListener(Context context) {

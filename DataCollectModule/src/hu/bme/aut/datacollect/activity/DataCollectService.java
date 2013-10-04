@@ -9,6 +9,7 @@ import hu.bme.aut.datacollect.entity.GyroscopeData;
 import hu.bme.aut.datacollect.entity.LightData;
 import hu.bme.aut.datacollect.entity.LocationData;
 import hu.bme.aut.datacollect.entity.PackageData;
+import hu.bme.aut.datacollect.entity.ProximityData;
 import hu.bme.aut.datacollect.entity.SmsData;
 import hu.bme.aut.datacollect.entity.TemperatureData;
 import hu.bme.aut.datacollect.listener.AccelerometerSensorListener;
@@ -20,6 +21,7 @@ import hu.bme.aut.datacollect.listener.IListener;
 import hu.bme.aut.datacollect.listener.LightSensorListener;
 import hu.bme.aut.datacollect.listener.LocationProvider;
 import hu.bme.aut.datacollect.listener.PackageReceiver;
+import hu.bme.aut.datacollect.listener.ProximitySensorListener;
 import hu.bme.aut.datacollect.listener.SmsListener;
 import hu.bme.aut.datacollect.listener.TemperatureSensorListener;
 
@@ -51,14 +53,14 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	public static final String PACKAGE = "PackageData";
 	public static final String CONNECTIVITY = "ConnectivityData";
 	public static final String BATTERY = "BatteryData";
+	public static final String PROXIMITY = "ProximityData";
 	
 	//no listeners yet
 	public static final String ORIENTAION = "OrientationData";
-	public static final String PROXIMITY = "ProximityData";
 
 	public static final String[] sharedPrefKeys = new String[] { ACCELERATION,
 			LIGHT, TEMPERATURE, GYROSCOPE, LOCATION, CALL,
-			SMS, PACKAGE, CONNECTIVITY, BATTERY};
+			SMS, PACKAGE, CONNECTIVITY, BATTERY, PROXIMITY};
 
 	private final ServiceBinder mBinder = new ServiceBinder();
 
@@ -102,6 +104,8 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 		listeners.put(CONNECTIVITY, new ConnectivityReceiver(this, getHelper().getDaoBase(ConnectivityData.class)));
 				
 		listeners.put(BATTERY, new BatteryReceiver(this, getHelper().getDaoBase(BatteryData.class)));
+		
+		listeners.put(PROXIMITY, new ProximitySensorListener(this, getHelper().getDaoBase(ProximityData.class)));
 		
 		// get the current settings
 		SharedPreferences sharedPreferences = PreferenceManager

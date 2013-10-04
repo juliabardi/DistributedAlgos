@@ -40,6 +40,9 @@ public class ActivityFragmentSettings extends PreferenceActivity {
 	        if (!availableListeners.get(DataCollectService.GYROSCOPE)){
 	        	this.findPreference(DataCollectService.GYROSCOPE).setEnabled(false);
 	        } 
+            if (!availableListeners.get(DataCollectService.PROXIMITY)){
+            	this.findPreference(DataCollectService.PROXIMITY).setEnabled(false);
+            }
 	    }
 	    else if (action != null && action.equals(ACTION_PREFS_LOCATION)) {
 	        addPreferencesFromResource(R.xml.locsettings);
@@ -94,6 +97,9 @@ public class ActivityFragmentSettings extends PreferenceActivity {
             }
             if (!availableListeners.get(DataCollectService.GYROSCOPE)){
             	this.findPreference(DataCollectService.GYROSCOPE).setEnabled(false);
+            }
+            if (!availableListeners.get(DataCollectService.PROXIMITY)){
+            	this.findPreference(DataCollectService.PROXIMITY).setEnabled(false);
             }
         }
     }

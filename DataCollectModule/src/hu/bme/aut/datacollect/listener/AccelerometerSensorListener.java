@@ -9,9 +9,12 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 public class AccelerometerSensorListener extends SensorListener {
 
+	private static final String TAG = "DataCollect:AccelerometerSensorListener";
+	
 	private final Sensor accelerometerSensor;
 	private DaoBase<AccelerationData> accelerationDao = null;
 
@@ -48,6 +51,7 @@ public class AccelerometerSensorListener extends SensorListener {
 			if (currentAcc == null || !currentAcc.equalsWithNoise(acc)) {
 				// if (currentAcc == null || !currentAcc.equals(acc)){
 				// save into db
+				Log.d(TAG, String.format("AccelerationData: accX: %s, accY: %s, accZ: %s", accX, accY, accZ));
 				accelerationDao.create(new AccelerationData(Calendar
 						.getInstance().getTimeInMillis(), accX, accY, accZ));
 				currentAcc = acc;

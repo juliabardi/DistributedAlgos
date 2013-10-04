@@ -9,8 +9,11 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 public class TemperatureSensorListener extends SensorListener {
+	
+	private static final String TAG = "DataCollect:TemperatureSensorListener";
 
 	private final Sensor ambientTempSensor;
 	private DaoBase<TemperatureData> temperatureDao = null;
@@ -37,7 +40,7 @@ public class TemperatureSensorListener extends SensorListener {
 
 			// ambient air temperature in C degrees.
 			float temperature = event.values[0];
-			// save into db
+			Log.d(TAG, String.format("TemperatureData: %s°C", temperature));
 			temperatureDao.create(new TemperatureData(Calendar.getInstance()
 					.getTimeInMillis(), temperature));
 		}

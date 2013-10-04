@@ -21,5 +21,10 @@
 		  android:key="@string/gyroscope"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
+        <SwitchPreference
+		  android:title="Közelség szenzor"
+		  android:key="@string/proximity"
+		  android:summaryOff="Kikapcsolva"
+		  android:summaryOn="Bekapcsolva"/>
     </PreferenceCategory>
 </PreferenceScreen>

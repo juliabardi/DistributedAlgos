@@ -9,9 +9,12 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 public class GyroscopeSensorListener extends SensorListener {
 
+	private static final String TAG = "DataCollect:GyroscopeSensorListener";
+	
 	private final Sensor gyroscopeSensor;
 	private DaoBase<GyroscopeData> gyroscopeDao = null;
 	
@@ -26,6 +29,8 @@ public class GyroscopeSensorListener extends SensorListener {
 	public void onSensorChanged(SensorEvent event) {
 
 		if (event.sensor.equals(gyroscopeSensor)) {
+			Log.d(TAG, String.format("GyroscopeData: axisX: %s, axisY: %s, axisZ: %s", 
+					event.values[0], event.values[1], event.values[2]));
 			gyroscopeDao.create(new GyroscopeData(Calendar.getInstance()
 					.getTimeInMillis(), event.values[0], event.values[1],
 					event.values[2]));

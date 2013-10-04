@@ -5,9 +5,7 @@ import hu.bme.aut.datacollect.entity.LocationData;
 
 import java.util.Calendar;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
@@ -16,8 +14,11 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
+import android.util.Log;
 
 public class LocationProvider implements LocationListener, IListener{
+	
+	private static final String TAG = "DataCollect:LocationProvider";
 	
 	private final LocationManager locationManager;	
 	private DaoBase<LocationData> locationDao = null;
@@ -50,6 +51,8 @@ public class LocationProvider implements LocationListener, IListener{
 	@Override
 	public void onLocationChanged(Location location) {
 		// insert new location
+		Log.d(TAG, String.format("LocationData: lat: %s, lon: %s, alt: %s", location.getLatitude(), 
+				location.getLongitude(), location.getAltitude()));
 		locationDao.create(new LocationData(Calendar.getInstance()
 				.getTimeInMillis(), location.getLatitude(), location
 				.getLongitude(), location.getAltitude()));
