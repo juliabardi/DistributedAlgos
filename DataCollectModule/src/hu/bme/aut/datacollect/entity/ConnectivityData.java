@@ -38,14 +38,20 @@ public class ConnectivityData extends IData {
 	private boolean isConnected;
 	@DatabaseField(canBeNull=false)
 	private int type;
+	@DatabaseField(canBeNull=true)
+	private String wifiAddress;
+	@DatabaseField(canBeNull=true)
+	private String gsmAddress;
 	
 	public ConnectivityData(){}
 
-	public ConnectivityData(long timestamp, boolean isConnected, int type) {
+	public ConnectivityData(long timestamp, boolean isConnected, int type, String wifiAddress, String gsmAddress) {
 		super();
 		this.timestamp = timestamp;
 		this.isConnected = isConnected;
 		this.type = type;
+		this.wifiAddress = wifiAddress;
+		this.gsmAddress = gsmAddress;
 	}
 	
 	public long getTimestamp() {
@@ -76,16 +82,32 @@ public class ConnectivityData extends IData {
 		return id;
 	}
 
+	public String getWifiAddress() {
+		return wifiAddress;
+	}
+
+	public void setWifiAddress(String wifiAddress) {
+		this.wifiAddress = wifiAddress;
+	}
+
+	public String getGsmAddress() {
+		return gsmAddress;
+	}
+
+	public void setGsmAddress(String gsmAddress) {
+		this.gsmAddress = gsmAddress;
+	}
+
 	@Override
 	public String toString() {
 		return String
-				.format("ConnectivityData [id=%s, timestamp=%s, isConnected=%s, type=%s]",
-						id, timestamp, isConnected, type);
+				.format("ConnectivityData [id=%s, timestamp=%s, isConnected=%s, type=%s, wifiAddress=%s, gsmAddress=%s]",
+						id, timestamp, isConnected, type, wifiAddress, gsmAddress);
 	}
 
 	@Override
 	public List<String> getParams() {
-		return Arrays.asList("id", "timestamp", "isConnected", "type");
+		return Arrays.asList("id", "timestamp", "isConnected", "type", "wifiAddress", "gsmAddress");
 	}
 
 	@Override
@@ -96,6 +118,8 @@ public class ConnectivityData extends IData {
 		values.put("timestamp", String.valueOf(timestamp));
 		values.put("isConnected", String.valueOf(isConnected));
 		values.put("type", String.valueOf(type));
+		values.put("wifiAddress", wifiAddress);
+		values.put("gsmAddress", gsmAddress);
 		return values;
 	}
 

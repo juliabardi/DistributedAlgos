@@ -3,7 +3,14 @@ package hu.bme.aut.datacollect.listener;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.ConnectivityData;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Calendar;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -35,6 +42,18 @@ public class ConnectivityReceiver extends BroadcastReceiver implements
 	
 	protected void createConnectivityData(){
 		
+		Map<String,String> addresses = this.getLocalIpAddresses();
+		String wifiAddress = null;
+		String gsmAddress = null;
+		for (String key : addresses.keySet()){
+			if ("rmnet0".equals(key)){
+				gsmAddress = addresses.get(key);
+			}
+			if ("wlan0".equals(key)){
+				wifiAddress = addresses.get(key);
+			}
+		}
+				
 		NetworkInfo activeNetwork = connManager.getActiveNetworkInfo();
 		boolean isConnected = false;
 		int type = -1;
@@ -44,8 +63,15 @@ public class ConnectivityReceiver extends BroadcastReceiver implements
 				type = activeNetwork.getType();
 			}
 		}
-		Log.d(TAG, String.format("ConnectivityData: connected: %s, type: %s", isConnected, type));
-		connDao.create(new ConnectivityData(Calendar.getInstance().getTimeInMillis(), isConnected, type));
+		ConnectivityData last = this.connDao.queryLast();
+		if (last != null && isConnected == last.isConnected() && type == last.getType()){
+			//same as the last, dont save
+			return;
+		}
+		
+		Log.d(TAG, String.format("ConnectivityData: connected: %s, type: %s, wifiAddress: %s, gmsAddress: %s", isConnected, type, wifiAddress, gsmAddress));
+		connDao.create(new ConnectivityData(Calendar.getInstance().getTimeInMillis(), isConnected, type,
+				wifiAddress, gsmAddress));
 	}
 	
 	@Override
@@ -78,4 +104,23 @@ public class ConnectivityReceiver extends BroadcastReceiver implements
 		return true;
 	}
 
+	public Map<String,String> getLocalIpAddresses() {
+		
+		Map<String,String> addresses = new HashMap<String,String>();
+	    try {
+	        for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+	            NetworkInterface intf = en.nextElement();
+	            for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+	                InetAddress inetAddress = enumIpAddr.nextElement();
+	                if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+	                    addresses.put(intf.getName(), inetAddress.getHostAddress());
+	                    //Log.d(TAG, String.format("Device local IP address: %s: %s", intf.getName(), inetAddress.getHostAddress()));
+	                }
+	            }
+	        }
+	    } catch (SocketException ex) {
+	        ex.printStackTrace();
+	    }
+	    return addresses;
+	}
 }
