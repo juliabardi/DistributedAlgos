@@ -284,8 +284,17 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	public void uploadImages(View v){				
 		//TODO get permission
 		
-		intent = new Intent(this, CameraActivity.class);
-		this.startActivity(intent);
+//		intent = new Intent(this, CameraActivity.class);
+//		this.startActivity(intent);
+		
+		//if ImageData sharedpref is enabled and DataCollectService is bound, add notification
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		if (settings.getBoolean(DataCollectService.IMAGE, false)){
+			if (this.mBound){
+				this.mService.addNotificationImage();
+			}
+		}
+		
 	}
 	
 	public void sendData(View v){

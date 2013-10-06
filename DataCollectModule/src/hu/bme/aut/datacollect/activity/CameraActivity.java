@@ -15,6 +15,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
@@ -139,6 +141,11 @@ public class CameraActivity extends Activity {
 			mCamera.release();
 			mPreview.removePreview();
 			timerTask.cancel();
+			
+			//images are ready, we can remove the notif and finish the activity
+			this.cancelNotification();
+			this.finish();
+			
 			return;
 		}
 		times++;
@@ -154,6 +161,12 @@ public class CameraActivity extends Activity {
 				}
 			}
 		});
+	}
+	
+	private void cancelNotification(){
+		NotificationManager mNotificationManager =
+			    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.cancel(DataCollectService.IMAGE_NOTIF_ID);
 	}
 
 	/** Check if this device has a camera */

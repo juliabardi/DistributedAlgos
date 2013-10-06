@@ -30,8 +30,10 @@ import hu.bme.aut.datacollect.listener.TemperatureSensorListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
@@ -43,6 +45,8 @@ import android.support.v4.app.NotificationCompat;
 import com.j256.ormlite.android.apptools.OrmLiteBaseService;
 
 public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
+	
+	public static final int IMAGE_NOTIF_ID = 100;
 	
 	//Cannot access the R.string.whatever from static place easily, so I keep here the strings
 	public static final String ACCELERATION = "AccelerationData";
@@ -170,4 +174,23 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 		}
 	}
 
+	//method to call when there is a need for an ImageData -> navigates to CameraActivity
+	//TODO add params: how many image, etc.
+	public void addNotificationImage(){
+		
+		Intent notificationIntent = new Intent(this, CameraActivity.class);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+				notificationIntent, 0);
+
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(
+				this).setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle("Kép kérelem érkezett")
+				.setContentText("Kattintson kép készítéséhez")
+				.setContentIntent(pendingIntent);
+
+		NotificationManager mNotificationManager =
+			    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			// mId allows you to update the notification later on.
+		mNotificationManager.notify(IMAGE_NOTIF_ID, builder.build());
+	}
 }
