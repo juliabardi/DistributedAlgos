@@ -22,22 +22,21 @@ public class MessageHandler {
 	private HashMap<String,Action> cmdList=new HashMap<String, Action>();
 	
 	public MessageHandler() {
-		cmdList.put(Constants.NEED_TO_OFFER,new Action(){public void performAction(String msg) {needToOffer(msg);}});
-		cmdList.put(Constants.OFFER_TO_NEED,new Action(){public void performAction(String msg) {offerToNeed(msg);}});
+		cmdList.put(Constants.OFFER_REQUEST,new Action(){public void performAction(String msg) {offerRequest(msg);}});
 		cmdList.put(Constants.NOT_DEFINED,new Action(){public void performAction(String msg) {notDefined(msg);}});
 		cmdList.put(Constants.JSON_PARSE_ERROR,new Action(){public void performAction(String msg) {parseJsonError(msg);}});
 	}
 
-	private void needToOffer(String msg){
+	private void offerRequest(String msg){
 		// TODO What to do if this offer is unregistered? Send error to node?
 		//TODO send broadcast or call a function of DataCollect module.
 	}
 	
-	private void offerToNeed(String msg){
-		// No need for this so far in this algo.
+	
+	private void notDefined(String msg){
+		
 	}
 	
-	private void notDefined(String msg){}
 	private void parseJsonError(String msg){
 		Log.i(this.getClass().getName(), msg);
 	}

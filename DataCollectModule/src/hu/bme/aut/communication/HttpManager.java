@@ -26,7 +26,7 @@ public class HttpManager {
 	
 	public interface HttpManagerListener {
 		public void responseArrived(String response);
-		public void errorOccuredDuringParse(String error);
+		public void errorOccuredDuringHandleResponse(String error);
 		public void errorOccured(String error);
 	}
 	
@@ -120,10 +120,10 @@ public class HttpManager {
 						listener.responseArrived(bos.toString());
 			        }
 			        else
-			        	listener.errorOccured("HttpEntity is empty"); // Error
+			        	listener.errorOccuredDuringHandleResponse("HttpEntity is empty"); // Error
 		        }
 		    } catch (Exception e) {
-		    	listener.errorOccured(e.getMessage()); // Error
+		    	listener.errorOccuredDuringHandleResponse(e.getMessage()); // Error
 		    } finally {
 		    	if (is != null)
 		    	{

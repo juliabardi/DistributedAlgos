@@ -35,7 +35,7 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 	}
 
 	@Override
-	public void errorOccuredDuringParse(String error) {
+	public void errorOccuredDuringHandleResponse(String error) {
 		Log.e(TAG, error);
 		this.uploadFailed();
 	}

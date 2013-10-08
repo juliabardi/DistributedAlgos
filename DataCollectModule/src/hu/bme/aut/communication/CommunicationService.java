@@ -119,7 +119,7 @@ public class CommunicationService extends Service implements
 	private SharedPreferences settings = null;
 
 	// GCM specific
-	private AsyncTask<Void, Void, Void> mRegisterTask;
+	private AsyncTask<Void, Void, Boolean> mRegisterTask;
 	
 
 	@Override
@@ -179,6 +179,7 @@ public class CommunicationService extends Service implements
 			mRegisterTask.cancel(true);
 		}
 		unregisterReceiver(mGCMHandleMessageReceiver);
+		unregisterReceiver(gcmRegListener);
 		if (GCMRegistrar.isRegisteredOnServer(this)) {
 			GCMRegistrar.unregister(this);
 			GCMRegistrar.onDestroy(getApplicationContext()); // To handle
@@ -345,11 +346,11 @@ public class CommunicationService extends Service implements
 				// It's also necessary to cancel the thread onDestroy(),
 				// hence the use of AsyncTask instead of a raw thread.
 				final Context context = this;
-				mRegisterTask = new AsyncTask<Void, Void, Void>() {
+				mRegisterTask = new AsyncTask<Void, Void, Boolean>() {
 
 					@Override
-					protected Void doInBackground(Void... params) {
-						boolean registered = ServerUtilities.register(context,
+					protected Boolean doInBackground(Void... params) {
+						Boolean registered = ServerUtilities.register(context,
 								regId);
 						// At this point all attempts to register with the app
 						// server failed, so we need to unregister the device
@@ -357,16 +358,18 @@ public class CommunicationService extends Service implements
 						// it is restarted. Note that GCM will send an
 						// unregistered callback upon completion, but
 						// GCMIntentService.onUnregistered() will ignore it.
-						registeredToServer=registered;
+						
 						if (!registered) {
 							GCMRegistrar.unregister(context);
 						}
-						return null;
+						return registered;
 					}
 
 					@Override
-					protected void onPostExecute(Void result) {
+					protected void onPostExecute(Boolean result) {
 						mRegisterTask = null;
+						Log.i(this.getClass().getName(), "Async server reg. result:" + result.toString());
+						registeredToServer=result;
 					}
 
 				};
@@ -447,7 +450,8 @@ public class CommunicationService extends Service implements
 
 	    @Override
 	    protected void onReceiveResult (int resultCode, Bundle resultData) {
-	    	Log.i(Constants.ALGTYPE,"My resultCode for reg: "+ resultCode);
+	    	Log.i(Constants.ALGTYPE,"DistributedAlgos server response processed.");
+	    	registeredToDistributedAlgos = resultData.getBoolean(Constants.DISTRUBUTED_ALGOS_AVAIABLE_VALUE, false);
 	        String messageType = resultData.getString(Constants.MESSAGE_TYPE);
 	        if(messageType.equals(Constants.REGISTER)){
 	        	if(resultData.getBoolean(Constants.ITEM_SYNC_VALUE, false)){
@@ -477,6 +481,7 @@ public class CommunicationService extends Service implements
 			try {
 				Bundle bundle = intent.getExtras();
 				registeredToGCM = bundle.getBoolean(Constants.GCM_REG_MSG,false);
+				registeredToServer = bundle.getBoolean(Constants.GCM_REG_MSG,false); // GCMIntent is called for both.
 				Log.i(this.getClass().getName(), "Received GCM registration update.");
 			} catch (Exception e) {
 				e.printStackTrace();

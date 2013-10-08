@@ -72,7 +72,7 @@ public class GCMIntentService extends GCMBaseIntentService {
     @Override
     protected void onMessage(Context context, Intent intent) {
         Log.i(TAG, "Received message");
-        String message = getString(R.string.gcm_message);
+        String message = intent.getStringExtra("data");
         displayMessage(context, message);
         // notifies user
         generateNotification(context, message);

@@ -1,5 +1,8 @@
 package hu.bme.aut.communication;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import hu.bme.aut.communication.HttpManager.HttpManagerListener;
 import android.app.IntentService;
 import android.content.Intent;
@@ -58,29 +61,45 @@ public class NodeCommunicationIntentService extends IntentService implements Htt
 		
 	}
 
+	/**
+	 * Here we get the JSON from the server. If error occured we could not register our offer.
+	 */
 	@Override
 	public void responseArrived(String response) {
+		boolean result=false;
 		Log.i(this.getClass().getName(), "resArrived: "+ response);
-		sendResponse(true);
+		try {
+			JSONObject jsMessage=new JSONObject(response);
+			jsMessage.getJSONObject("ok");
+			result=true;
+			
+		} catch (JSONException e) { // error from server, not saved...
+			Log.e(this.getClass().getName(), "Could not process msg: " + response);
+			e.printStackTrace();
+			result=false;
+		}
+		
+		sendResponse(true,result);
 	}
 
 	@Override
-	public void errorOccuredDuringParse(String error) {
+	public void errorOccuredDuringHandleResponse(String error) {
 		Log.i(this.getClass().getName(), "error in Parsing: " + error);
-		sendResponse(false);
+		sendResponse(true,false);
 	}
 
 	@Override
 	public void errorOccured(String error) {
 		Log.i(this.getClass().getName(), "error: "+ error);
-		sendResponse(false);
+		sendResponse(false,false);
 	}
 	
-	private void sendResponse(boolean value){
+	private void sendResponse(boolean serverAvaiable,boolean value){
 		Bundle resultBundle = new Bundle();
 		resultBundle.putString(Constants.MESSAGE_TYPE, messageType);
 		resultBundle.putString(Constants.ITEM_NAME, itemName);
 		resultBundle.putBoolean(Constants.ITEM_SYNC_VALUE, value);
+		resultBundle.putBoolean(Constants.DISTRUBUTED_ALGOS_AVAIABLE_VALUE, serverAvaiable);
 		resRec.send(1234, resultBundle);
 	}
 
