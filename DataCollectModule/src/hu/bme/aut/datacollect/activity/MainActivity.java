@@ -2,10 +2,10 @@ package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.communication.CommunicationService;
 import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
+import hu.bme.aut.communication.Constants;
 import hu.bme.aut.datacollect.activity.DataCollectService.ServiceBinder;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
 import hu.bme.aut.datacollect.listener.IListener;
-import hu.bme.aut.datacollect.listener.LocationProvider;
 import hu.bme.aut.datacollect.upload.DataUploadTask;
 import hu.bme.aut.datacollect.upload.UploadTaskQueue;
 import hu.bme.aut.datacollect.utils.FileUtils;
@@ -301,10 +301,10 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		//send here some data
 		
 		Log.d(TAG, "Sending some columns");
-		this.queue.add(new DataUploadTask(this, "AccelerationData", 1, Arrays.asList("id", "timestamp", "accX", "accY")));
+		this.queue.add(new DataUploadTask(this, "AccelerationData", 1, Constants.DataCollectorServerAddress, Arrays.asList("id", "timestamp", "accX", "accY")));
 		
 		Log.d(TAG, "Sending all columns");
-		this.queue.add(new DataUploadTask(this, "LightData", 2));
+		this.queue.add(new DataUploadTask(this, "LightData", 2, Constants.DataCollectorServerAddress));
 		
 		Log.d(TAG, "Sending all columns after date");		
 		Date date = null;
@@ -313,13 +313,13 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		} catch (ParseException e) {
 			Log.e(TAG, e.getMessage());
 		}
-		this.queue.add(new DataUploadTask(this, "AccelerationData", 3, date));
+		this.queue.add(new DataUploadTask(this, "AccelerationData", 3, Constants.DataCollectorServerAddress, date));
 		
 		Log.d(TAG, "Sending buggy name");
-		this.queue.add(new DataUploadTask(this, "NotExists", 4));
+		this.queue.add(new DataUploadTask(this, "NotExists", 4, Constants.DataCollectorServerAddress));
 		
 		Log.d(TAG, "Sending some columns after date");
-		this.queue.add(new DataUploadTask(this, "AccelerationData", 5, date, Arrays.asList("id")));
+		this.queue.add(new DataUploadTask(this, "AccelerationData", 5, Constants.DataCollectorServerAddress, date, Arrays.asList("id")));
 	}
 	
 	public void loadJavascript(View v){

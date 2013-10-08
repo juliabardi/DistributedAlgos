@@ -41,7 +41,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     @SuppressWarnings("hiding")
     private static final String TAG = "GCMIntentService";
-    private MessageHandler msgHandler= new MessageHandler(); 
+    private MessageHandler msgHandler= new MessageHandler(this); 
 
     public GCMIntentService() {
         super(SENDER_ID);

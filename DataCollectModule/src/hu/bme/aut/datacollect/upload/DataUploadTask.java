@@ -1,6 +1,5 @@
 package hu.bme.aut.datacollect.upload;
 
-import hu.bme.aut.communication.Constants;
 import hu.bme.aut.datacollect.db.DataProvider;
 import hu.bme.aut.datacollect.db.IDataProvider;
 
@@ -25,35 +24,40 @@ public class DataUploadTask extends UploadTask {
 	private int reqId;
 	private Date date;
 	private List<String> params;
+	private String address;
 	
 	private IDataProvider dataProvider;
 	
-	public DataUploadTask(Context context, String name, int reqId){		
+	public DataUploadTask(Context context, String name, int reqId, String address){		
 		super();
 		this.name = name;
 		this.dataProvider = new DataProvider(context);
+		this.address = address;
 	}
 	
-	public DataUploadTask(Context context, String name, int reqId, List<String> params) {
+	public DataUploadTask(Context context, String name, int reqId, String address, List<String> params) {
 		super();
 		this.name = name;
 		this.params = params;
 		this.dataProvider = new DataProvider(context);
+		this.address = address;
 	}
 	
-	public DataUploadTask(Context context, String name, int reqId, Date date) {
+	public DataUploadTask(Context context, String name, int reqId, String address, Date date) {
 		super();
 		this.name = name;
 		this.date = date;
 		this.dataProvider = new DataProvider(context);
+		this.address = address;
 	}
 	
-	public DataUploadTask(Context context, String name, int reqId, Date date, List<String> params) {
+	public DataUploadTask(Context context, String name, int reqId, String address, Date date, List<String> params) {
 		super();
 		this.name = name;
 		this.date = date;
 		this.params = params;
 		this.dataProvider = new DataProvider(context);
+		this.address = address;
 	}
 
 	@Override
@@ -78,8 +82,9 @@ public class DataUploadTask extends UploadTask {
 					return;
 				}
 				
-				httpManager.sendPostRequest(Constants.DataCollectorServerAddress, result.toString());
-				
+				//adding http:// and the port number for now
+				String fullAddress = String.format("http://%s:3001", address);
+				httpManager.sendPostRequest(fullAddress, result.toString());				
 				
 			}}).start();
 	}

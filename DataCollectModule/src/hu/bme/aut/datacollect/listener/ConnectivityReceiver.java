@@ -46,10 +46,10 @@ public class ConnectivityReceiver extends BroadcastReceiver implements
 		String wifiAddress = null;
 		String gsmAddress = null;
 		for (String key : addresses.keySet()){
-			if ("rmnet0".equals(key)){
+			if (key.contains("rmnet")){
 				gsmAddress = addresses.get(key);
 			}
-			if ("wlan0".equals(key)){
+			if (key.contains("wlan")){
 				wifiAddress = addresses.get(key);
 			}
 		}

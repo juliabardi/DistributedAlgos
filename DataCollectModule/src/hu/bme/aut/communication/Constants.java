@@ -35,5 +35,7 @@ public class Constants {
 	public static final String NOT_DEFINED="NotDefinedCommand";
 	public static final String JSON_PARSE_ERROR="JsonParseError";
 	
-
+	public static final String JOB_NAME = "JobName";
+	public static final String REQUEST_STARTER_ADDRESS = "RequestStarterAddress";
+	public static final String ALGORITHM_NAME = "AlgorithmName";
 }
