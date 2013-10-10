@@ -8,34 +8,6 @@ import org.json.JSONObject;
 
 public class JsHelper {
 	
-	public static JSONObject registerOfferNeed()
-	{
-		JSONObject main=new JSONObject();
-		JSONObject distAlgo=new JSONObject();
-		JSONArray offerArray = new JSONArray();
-		JSONArray needArray = new JSONArray();
-		JSONObject complex=new JSONObject();
-		
-		try {
-			offerArray.put(new JSONObject().put("name", "GPS"));
-			offerArray.put(new JSONObject().put("name", "telephone"));
-			offerArray.put(new JSONObject().put("name", "thermo"));
-			complex.put("name", "camera");
-			complex.put("params", "front,back");
-			offerArray.put(new JSONObject().put("name", "telephone"));
-			needArray.put(complex);
-			distAlgo.put("offer",offerArray);
-			distAlgo.put("need",needArray);
-			main.put("DistributedAlgos", distAlgo);
-		    
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-	    return main;
-	}
 	
 	/**
 	 * Put the algo containing need and offers into the top level body. Last step before sending to server.
@@ -66,10 +38,10 @@ public class JsHelper {
 		JSONObject algo=new JSONObject();
 		try {
 			if(offerArray!=null){
-				algo.put("offer",offerArray);
+				algo.put(Constants.OFFER,offerArray);
 			}
 			if(needArray!=null){
-				algo.put("need",needArray);
+				algo.put(Constants.NEED,needArray);
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -88,7 +60,7 @@ public class JsHelper {
 		for(String item : items)
 		{
 			try {
-				array.put(new JSONObject().put("name",item));
+				array.put(new JSONObject().put(Constants.PARAM_NAME,item));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

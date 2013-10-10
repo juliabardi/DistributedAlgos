@@ -40,7 +40,10 @@ public class MessageHandler {
 		//TODO send broadcast or call a function of DataCollect module.
 	}
 	
-	
+	/**
+	 * The request type is not supported on this peer.
+	 * @param msg
+	 */
 	private void notDefined(String msg){
 		
 	}
@@ -57,10 +60,10 @@ public class MessageHandler {
 			JSONObject jsMessage=new JSONObject(msg);
 			
 			//Calling the DataCollect module
-			if (Constants.ALGTYPE.equals(jsMessage.getString(Constants.ALGORITHM_NAME))){
+			if (Constants.ALGTYPE_DIST_ALGOS.equals(jsMessage.getString(Constants.ALGTYPE))){
 				//TODO get the request Id from somewhere
-				this.queue.add(new DataUploadTask(this.context, jsMessage.getString(Constants.JOB_NAME), 2, 
-						jsMessage.getString(Constants.REQUEST_STARTER_ADDRESS)));
+				this.queue.add(new DataUploadTask(this.context, jsMessage.getString(Constants.PARAM_NAME), 2, 
+						jsMessage.getString(Constants.REQUEST_ADDRESS)+":3001"+"/"+ Constants.OFFER_REPLY));
 			}
 			
 		} catch (JSONException e) {

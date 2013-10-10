@@ -74,8 +74,6 @@ public class GCMIntentService extends GCMBaseIntentService {
         Log.i(TAG, "Received message");
         String message = intent.getStringExtra("data");
         displayMessage(context, message);
-        // notifies user
-        generateNotification(context, message);
         msgHandler.handleGCMMessage(message);
     }
 
@@ -84,8 +82,6 @@ public class GCMIntentService extends GCMBaseIntentService {
         Log.i(TAG, "Received deleted messages notification");
         String message = getString(R.string.gcm_deleted, total);
         displayMessage(context, message);
-        // notifies user
-        generateNotification(context, message);
     }
 
     @Override
@@ -101,28 +97,6 @@ public class GCMIntentService extends GCMBaseIntentService {
         displayMessage(context, getString(R.string.gcm_recoverable_error,
                 errorId));
         return super.onRecoverableError(context, errorId);
-    }
-
-    /**
-     * Issues a notification to inform the user that server has sent a message.
-     */
-    private static void generateNotification(Context context, String message) {
-        Log.i(TAG, message);
-    	/*int icon = R.drawable.ic_stat_gcm;
-        long when = System.currentTimeMillis();
-        NotificationManager notificationManager = (NotificationManager)
-                context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = new Notification(icon, message, when);
-        String title = context.getString(R.string.app_name);
-        Intent notificationIntent = new Intent(context, DemoActivity.class);
-        // set intent so it does not start a new activity
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent intent =
-                PendingIntent.getActivity(context, 0, notificationIntent, 0);
-        notification.setLatestEventInfo(context, title, message, intent);
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        notificationManager.notify(0, notification);*/
     }
 
     private void sendBroadCast(boolean value){

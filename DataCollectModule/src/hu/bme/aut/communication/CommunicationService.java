@@ -3,7 +3,7 @@ package hu.bme.aut.communication;
 import static hu.bme.aut.communication.GCM.CommonUtilities.DISPLAY_MESSAGE_ACTION;
 import static hu.bme.aut.communication.GCM.CommonUtilities.EXTRA_MESSAGE;
 import static hu.bme.aut.communication.GCM.CommonUtilities.SENDER_ID;
-import static hu.bme.aut.communication.GCM.CommonUtilities.SERVER_URL;
+import static hu.bme.aut.communication.Constants.GCMSeverAddress;
 import hu.bme.aut.communication.GCM.ServerUtilities;
 import hu.bme.aut.datacollect.activity.MainActivity;
 import hu.bme.aut.datacollect.activity.R;
@@ -180,12 +180,14 @@ public class CommunicationService extends Service implements
 		}
 		unregisterReceiver(mGCMHandleMessageReceiver);
 		unregisterReceiver(gcmRegListener);
-		if (GCMRegistrar.isRegisteredOnServer(this)) {
-			GCMRegistrar.unregister(this);
-			GCMRegistrar.onDestroy(getApplicationContext()); // To handle
-																// exception
-																// error.
-		}
+		// Documentation says that an app unistall will take care of unregistering from GCM, also not recommended to register too often.
+		// http://developer.android.com/google/gcm/adv.html
+//		if (GCMRegistrar.isRegisteredOnServer(this)) {
+//			GCMRegistrar.unregister(this);
+//			GCMRegistrar.onDestroy(getApplicationContext()); // To handle
+//																// exception
+//																// error.
+//		}
 		if(isWifiListener){
 			unregisterReceiver(mWifiConnectionChangedReceiver);
 		}
@@ -266,7 +268,7 @@ public class CommunicationService extends Service implements
 			}
 		}
 
-		JSONObject message = JsHelper.createMainBodyWithAlgos(Constants.ALGTYPE, JsHelper
+		JSONObject message = JsHelper.createMainBodyWithAlgos(Constants.ALGTYPE_DIST_ALGOS, JsHelper
 				.createAlgoBody(JsHelper.createSimpleArray(offerList), null));
 
 		sendJobToNodeService(Constants.REGISTER,Constants.REGISTER,Constants.NodeServerAddress + Constants.REGISTER, message.toString());
@@ -283,15 +285,17 @@ public class CommunicationService extends Service implements
 	 */
 	private void handleOffer(String key, boolean value) {
 		if (IsWifiAvaiable()) {
-			String url = "";
+			StringBuilder builder = new StringBuilder();
+			builder.append(Constants.NodeServerAddress);
 			if (value == true) {
-				url = Constants.NodeServerAddress + Constants.OFFER + "?" + "algType=" + Constants.ALGTYPE
-						+ "&" + "name=" + key;
+				builder.append(Constants.OFFER);
 			} else {
-				url = Constants.NodeServerAddress + Constants.UNREGISTER_OFFER + "?" + "algType="
-						+ Constants.ALGTYPE + "&" + "name=" + key;
+				builder.append(Constants.UNREGISTER_OFFER);
 			}
+			builder.append("?" + Constants.ALGTYPE +"=" + Constants.ALGTYPE_DIST_ALGOS
+					+ "&" + Constants.PARAM_NAME+"=" + key);
 
+			String url = builder.toString();
 			sendJobToNodeService(Constants.OFFER,key,url, null);
 			offerSyncronizationInfo.put(key, SyncronizationValues.SENDING);
 		} else {
@@ -321,7 +325,7 @@ public class CommunicationService extends Service implements
 	 * Registering to the GCM push notification service.
 	 */
 	private void registerGCM() {
-		checkNotNull(SERVER_URL, "SERVER_URL");
+		checkNotNull(GCMSeverAddress, "SERVER_URL");
 		checkNotNull(SENDER_ID, "SENDER_ID");
 		// Make sure the device has the proper dependencies.
 		GCMRegistrar.checkDevice(this);
@@ -450,7 +454,7 @@ public class CommunicationService extends Service implements
 
 	    @Override
 	    protected void onReceiveResult (int resultCode, Bundle resultData) {
-	    	Log.i(Constants.ALGTYPE,"DistributedAlgos server response processed.");
+	    	Log.i(Constants.ALGTYPE_DIST_ALGOS,"DistributedAlgos server response processed.");
 	    	registeredToDistributedAlgos = resultData.getBoolean(Constants.DISTRUBUTED_ALGOS_AVAIABLE_VALUE, false);
 	        String messageType = resultData.getString(Constants.MESSAGE_TYPE);
 	        if(messageType.equals(Constants.REGISTER)){

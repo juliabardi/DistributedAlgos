@@ -7,11 +7,14 @@ package hu.bme.aut.communication;
  */
 public class Constants {
 	//Registration specific, only these messages can be sent to the server
-	public static final String ALGTYPE = "DistributedAlgos";
+	public static final String ALGTYPE_DIST_ALGOS = "DistributedAlgos";
 	public static final String REGISTER = "register";
 	public static final String NEED = "need";
 	public static final String OFFER = "offer";
 	public static final String UNREGISTER_OFFER = "unregisterOffer";
+	
+	public static final String ALGTYPE ="algType";
+	public static final String PARAM_NAME ="name";
 	
 	// For syncronization
 	public static final String MESSAGE_TYPE = "messageType";
@@ -27,7 +30,8 @@ public class Constants {
 //	public static final String NodeServerAddress = "http://152.66.183.84:3000/";
 	public static final String NodeServerAddress = "http://192.168.1.113:3000/";
 	public static final String DataCollectorServerAddress = "http://192.168.1.113:3001/";
-	
+    public static final String GCMSeverAddress="http://192.168.1.113:8080/DistributedEnvironmentCoordination";
+
 	//GCM specific
 	public static final String OFFER_REQUEST="offerRequest";
 	public static final String OFFER_REPLY="offerReply";
@@ -35,7 +39,5 @@ public class Constants {
 	public static final String NOT_DEFINED="NotDefinedCommand";
 	public static final String JSON_PARSE_ERROR="JsonParseError";
 	
-	public static final String JOB_NAME = "JobName";
-	public static final String REQUEST_STARTER_ADDRESS = "RequestStarterAddress";
-	public static final String ALGORITHM_NAME = "AlgorithmName";
+	public static final String REQUEST_ADDRESS = "requestAddress";
 }

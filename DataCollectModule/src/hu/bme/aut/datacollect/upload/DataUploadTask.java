@@ -83,7 +83,7 @@ public class DataUploadTask extends UploadTask {
 				}
 				
 				//adding http:// and the port number for now
-				String fullAddress = String.format("http://%s:3001", address);
+				String fullAddress = String.format("http://%s", address);
 				httpManager.sendPostRequest(fullAddress, result.toString());				
 				
 			}}).start();

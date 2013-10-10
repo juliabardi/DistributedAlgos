@@ -18,13 +18,13 @@ package hu.bme.aut.communication.GCM;
 
 import com.google.android.gcm.GCMRegistrar;
 
-import static hu.bme.aut.communication.GCM.CommonUtilities.SERVER_URL;
 import static hu.bme.aut.communication.GCM.CommonUtilities.TAG;
 import static hu.bme.aut.communication.GCM.CommonUtilities.displayMessage;
-
+import static hu.bme.aut.communication.Constants.GCMSeverAddress;
 import android.content.Context;
 import android.util.Log;
 
+import hu.bme.aut.communication.Constants;
 import hu.bme.aut.datacollect.activity.R;
 
 import java.io.IOException;
@@ -54,7 +54,7 @@ public final class ServerUtilities {
      */
     public static boolean register(final Context context, final String regId) {
         Log.i(TAG, "registering device (regId = " + regId + ")");
-        String serverUrl = SERVER_URL + "/register";
+        String serverUrl = GCMSeverAddress + "/register";
         Map<String, String> params = new HashMap<String, String>();
         params.put("regId", regId);
         long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
@@ -103,7 +103,7 @@ public final class ServerUtilities {
      */
    public static void unregister(final Context context, final String regId) {
         Log.i(TAG, "unregistering device (regId = " + regId + ")");
-        String serverUrl = SERVER_URL + "/unregister";
+        String serverUrl = GCMSeverAddress + "/unregister";
         Map<String, String> params = new HashMap<String, String>();
         params.put("regId", regId);
         try {
