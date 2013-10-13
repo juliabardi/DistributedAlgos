@@ -291,7 +291,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		if (settings.getBoolean(DataCollectService.IMAGE, false)){
 			if (this.mBound){
-				this.mService.addNotificationImage();
+				//this.mService.addNotificationImage(Constants.DataCollectorServerAddress);
 			}
 		}
 		

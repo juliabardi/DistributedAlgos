@@ -1,6 +1,9 @@
 package hu.bme.aut.communication.GCM;
 
 import hu.bme.aut.communication.Constants;
+import hu.bme.aut.datacollect.activity.CameraActivity;
+import hu.bme.aut.datacollect.activity.DataCollectService;
+import hu.bme.aut.datacollect.activity.R;
 import hu.bme.aut.datacollect.upload.DataUploadTask;
 import hu.bme.aut.datacollect.upload.UploadTaskQueue;
 
@@ -9,7 +12,11 @@ import java.util.HashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 /**
@@ -62,8 +69,14 @@ public class MessageHandler {
 			//Calling the DataCollect module
 			if (Constants.ALGTYPE_DIST_ALGOS.equals(jsMessage.getString(Constants.ALGTYPE))){
 				//TODO get the request Id from somewhere
-				this.queue.add(new DataUploadTask(this.context, jsMessage.getString(Constants.PARAM_NAME), 2, 
-						jsMessage.getString(Constants.REQUEST_ADDRESS)+":3001"+"/"+ Constants.OFFER_REPLY));
+				
+				String address = "http://"+jsMessage.getString(Constants.REQUEST_ADDRESS)+":3001"+"/"+ Constants.OFFER_REPLY;
+				if ("ImageData".equals(jsMessage.getString(Constants.PARAM_NAME))){
+					this.addNotificationImage(address);
+				}
+				else {
+					this.queue.add(new DataUploadTask(this.context, jsMessage.getString(Constants.PARAM_NAME), 2, address));
+				}
 			}
 			
 		} catch (JSONException e) {
@@ -71,6 +84,25 @@ public class MessageHandler {
 			cmdList.get(Constants.JSON_PARSE_ERROR).performAction("Could not parse JSON");
 			e.printStackTrace();
 		}
+	}
+	
+	public void addNotificationImage(String address){
+		
+		Intent notificationIntent = new Intent(context, CameraActivity.class);
+		notificationIntent.putExtra("address", address);
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
+				notificationIntent, 0);
+
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(
+				context).setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle("Kép kérelem érkezett")
+				.setContentText("Kattintson kép készítéséhez")
+				.setContentIntent(pendingIntent);
+
+		NotificationManager mNotificationManager =
+			    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+			// mId allows you to update the notification later on.
+		mNotificationManager.notify(DataCollectService.IMAGE_NOTIF_ID, builder.build());
 	}
 
 }

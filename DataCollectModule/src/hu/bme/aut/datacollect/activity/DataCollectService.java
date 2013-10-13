@@ -30,10 +30,8 @@ import hu.bme.aut.datacollect.listener.TemperatureSensorListener;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
@@ -172,25 +170,5 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 		DataCollectService getService() {
 			return DataCollectService.this;
 		}
-	}
-
-	//method to call when there is a need for an ImageData -> navigates to CameraActivity
-	//TODO add params: how many image, etc.
-	public void addNotificationImage(){
-		
-		Intent notificationIntent = new Intent(this, CameraActivity.class);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-				notificationIntent, 0);
-
-		NotificationCompat.Builder builder = new NotificationCompat.Builder(
-				this).setSmallIcon(R.drawable.ic_launcher)
-				.setContentTitle("Kép kérelem érkezett")
-				.setContentText("Kattintson kép készítéséhez")
-				.setContentIntent(pendingIntent);
-
-		NotificationManager mNotificationManager =
-			    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-			// mId allows you to update the notification later on.
-		mNotificationManager.notify(IMAGE_NOTIF_ID, builder.build());
 	}
 }

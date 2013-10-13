@@ -53,6 +53,8 @@ public class CameraActivity extends Activity {
 	private boolean imageInProgress = false;
 	
 	private UploadTaskQueue queue = UploadTaskQueue.instance(this);
+	
+	private String address = null;
 
 	private PictureCallback mPicture = new PictureCallback() {
 
@@ -84,7 +86,7 @@ public class CameraActivity extends Activity {
 			}
 			
 			Log.d(TAG, String.format("Image number %d captured", times));
-			CameraActivity.this.queue.add(new ImageUploadTask(pictureFile));
+			CameraActivity.this.queue.add(new ImageUploadTask(pictureFile, address));
 			
 			//need to start preview to make another picture
 			if (times < MAX_TIMES)
@@ -102,6 +104,10 @@ public class CameraActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.camera_layout);
 		//Log.d(TAG, "onCreate called");
+		
+		if (getIntent() != null){
+			this.address = getIntent().getStringExtra("address");
+		}
 
 		if (this.checkCameraHardware()) {
 			mCamera = getCameraInstance();

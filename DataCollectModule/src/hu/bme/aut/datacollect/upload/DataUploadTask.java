@@ -24,19 +24,17 @@ public class DataUploadTask extends UploadTask {
 	private int reqId;
 	private Date date;
 	private List<String> params;
-	private String address;
 	
 	private IDataProvider dataProvider;
 	
 	public DataUploadTask(Context context, String name, int reqId, String address){		
-		super();
+		super(address);
 		this.name = name;
 		this.dataProvider = new DataProvider(context);
-		this.address = address;
 	}
 	
 	public DataUploadTask(Context context, String name, int reqId, String address, List<String> params) {
-		super();
+		super(address);
 		this.name = name;
 		this.params = params;
 		this.dataProvider = new DataProvider(context);
@@ -44,7 +42,7 @@ public class DataUploadTask extends UploadTask {
 	}
 	
 	public DataUploadTask(Context context, String name, int reqId, String address, Date date) {
-		super();
+		super(address);
 		this.name = name;
 		this.date = date;
 		this.dataProvider = new DataProvider(context);
@@ -52,7 +50,7 @@ public class DataUploadTask extends UploadTask {
 	}
 	
 	public DataUploadTask(Context context, String name, int reqId, String address, Date date, List<String> params) {
-		super();
+		super(address);
 		this.name = name;
 		this.date = date;
 		this.params = params;
@@ -82,9 +80,7 @@ public class DataUploadTask extends UploadTask {
 					return;
 				}
 				
-				//adding http:// and the port number for now
-				String fullAddress = String.format("http://%s", address);
-				httpManager.sendPostRequest(fullAddress, result.toString());				
+				httpManager.sendPostRequest(address, result.toString());				
 				
 			}}).start();
 	}

@@ -25,7 +25,8 @@ public class ImageUploadTask extends UploadTask {
 		TAG = "DataCollect:ImageUploadTask";
 	}
 
-	public ImageUploadTask(File file) {
+	public ImageUploadTask(File file, String address) {
+		super(address);
 		this.file = file;
 	}
 
@@ -46,7 +47,7 @@ public class ImageUploadTask extends UploadTask {
 					return;
 				}
 				
-				httpManager.sendPostRequest(Constants.DataCollectorServerAddress, message);
+				httpManager.sendPostRequest(address, message);
 
 				//delete the file in any case
 				file.delete();
