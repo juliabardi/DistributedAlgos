@@ -40,6 +40,10 @@
     <string name="server_register_error">Could not register device on Demo Server after %1$d attempts.</string>
     <string name="server_unregister_error">Could not unregister device on Demo Server (%1$s).</string>
     <string name="communication_details">Kommunikáció részletei</string>
+    <string name="dec_node_ip">decNodeIP</string>
+    <string name="dec_node_port">decNodePort</string>
+    <string name="dec_admin_ip">decAdminIP</string>
+    <string name="dec_admin_port">decAdminPort</string>
     
 
 </resources>

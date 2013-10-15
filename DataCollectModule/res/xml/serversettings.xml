@@ -4,18 +4,18 @@
    	  <EditTextPreference
                 android:title="DEC_Node"
                 android:summary="Node szerver cím"
-                android:key="decNodeIP"/>
+                android:key="@string/dec_node_ip"/>
    	 <EditTextPreference
                 android:title="DEC_Node"
                 android:summary="Node szerver port"
-                android:key="decNodePort"/>
+                android:key="@string/dec_node_port"/>
       <EditTextPreference
                 android:title="DEC_Admin"
                 android:summary="GCM szerver cím"
-                android:key="decAdminIP"/>
+                android:key="@string/dec_admin_ip"/>
       <EditTextPreference
                 android:title="DEC_Admin"
                 android:summary="GCM szerver port"
-                android:key="decAdminPort"/>
+                android:key="@string/dec_admin_port"/>
     </PreferenceCategory>
 </PreferenceScreen>
