@@ -208,20 +208,34 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		
+		if (DataCollectService.DEC_NODE_IP.equals(key)){
+			Constants.NodeServerIP = sharedPreferences.getString(key, Constants.NodeServerIP);
+			//TODO: reregister?
+		}
+		else if (DataCollectService.DEC_ADMIN_IP.equals(key)){
+			Constants.GCMServerIP = sharedPreferences.getString(key, Constants.GCMServerIP);
+			//TODO: reregister?
+		}
+		else if (DataCollectService.DEC_NODE_PORT.equals(key)){
+			Constants.NodeServerPort = sharedPreferences.getString(key, Constants.NodeServerPort);
+		}
+		else if (DataCollectService.DEC_ADMIN_PORT.equals(key)){
+			Constants.GCMServerPort = sharedPreferences.getString(key, Constants.GCMServerPort);
+			//TODO: reregister?
+		}
+		
 		//finding which shared preference was changed, and register/unregister according to the value
-		for (String sharedKey : DataCollectService.sharedPrefKeys){
-			if (sharedKey.equals(key)) {
-				IListener listener = mService.getListener(sharedKey);
-				if (listener != null){
-					//register/unregister listener
-					if (sharedPreferences.getBoolean(sharedKey, false)){
-						if (listener.isAvailable()){ listener.register(); }
-					}					
-					else{
-						if (listener.isAvailable()){ listener.unregister(); }
-					}	
-				}
-				break;
+		
+		else if (DataCollectService.sharedPrefKeys.contains(key)){
+			IListener listener = mService.getListener(key);
+			if (listener != null){
+				//register/unregister listener
+				if (sharedPreferences.getBoolean(key, false)){
+					if (listener.isAvailable()){ listener.register(); }
+				}					
+				else{
+					if (listener.isAvailable()){ listener.unregister(); }
+				}	
 			}
 		}
 	}
@@ -301,10 +315,10 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		//send here some data
 		
 		Log.d(TAG, "Sending some columns");
-		this.queue.add(new DataUploadTask(this, "AccelerationData", 1, Constants.DataCollectorServerAddress, Arrays.asList("id", "timestamp", "accX", "accY")));
+		this.queue.add(new DataUploadTask(this, "AccelerationData", 1, Constants.getDataCollectorServerAddress(), Arrays.asList("id", "timestamp", "accX", "accY")));
 		
 		Log.d(TAG, "Sending all columns");
-		this.queue.add(new DataUploadTask(this, "LightData", 2, Constants.DataCollectorServerAddress));
+		this.queue.add(new DataUploadTask(this, "LightData", 2, Constants.getDataCollectorServerAddress()));
 		
 		Log.d(TAG, "Sending all columns after date");		
 		Date date = null;
@@ -313,13 +327,13 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		} catch (ParseException e) {
 			Log.e(TAG, e.getMessage());
 		}
-		this.queue.add(new DataUploadTask(this, "AccelerationData", 3, Constants.DataCollectorServerAddress, date));
+		this.queue.add(new DataUploadTask(this, "AccelerationData", 3, Constants.getDataCollectorServerAddress(), date));
 		
 		Log.d(TAG, "Sending buggy name");
-		this.queue.add(new DataUploadTask(this, "NotExists", 4, Constants.DataCollectorServerAddress));
+		this.queue.add(new DataUploadTask(this, "NotExists", 4, Constants.getDataCollectorServerAddress()));
 		
 		Log.d(TAG, "Sending some columns after date");
-		this.queue.add(new DataUploadTask(this, "AccelerationData", 5, Constants.DataCollectorServerAddress, date, Arrays.asList("id")));
+		this.queue.add(new DataUploadTask(this, "AccelerationData", 5, Constants.getDataCollectorServerAddress(), date, Arrays.asList("id")));
 	}
 	
 	public void loadJavascript(View v){

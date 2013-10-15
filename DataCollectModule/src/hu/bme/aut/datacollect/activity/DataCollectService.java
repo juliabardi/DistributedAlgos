@@ -27,7 +27,9 @@ import hu.bme.aut.datacollect.listener.ScreenReceiver;
 import hu.bme.aut.datacollect.listener.SmsListener;
 import hu.bme.aut.datacollect.listener.TemperatureSensorListener;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.app.PendingIntent;
@@ -64,9 +66,16 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	//no listeners yet
 	public static final String ORIENTAION = "OrientationData";
 
-	public static final String[] sharedPrefKeys = new String[] { ACCELERATION,
+	public static final List<String> sharedPrefKeys = Arrays.asList(ACCELERATION,
 			LIGHT, TEMPERATURE, GYROSCOPE, LOCATION, CALL,
-			SMS, PACKAGE, CONNECTIVITY, BATTERY, PROXIMITY, SCREEN, IMAGE};
+			SMS, PACKAGE, CONNECTIVITY, BATTERY, PROXIMITY, SCREEN, IMAGE);
+	
+	public static final String DEC_NODE_IP = "decNodeIP";
+	public static final String DEC_ADMIN_IP = "decAdminIP";
+	public static final String DEC_NODE_PORT = "decNodePort";
+	public static final String DEC_ADMIN_PORT = "decAdminPort";
+	
+	public static final List<String> serverKeys = Arrays.asList(DEC_ADMIN_IP, DEC_ADMIN_PORT, DEC_NODE_IP, DEC_NODE_PORT);
 
 	private final ServiceBinder mBinder = new ServiceBinder();
 

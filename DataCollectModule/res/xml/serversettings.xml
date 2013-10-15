@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory android:title="Szerver címek" >
+   	  <EditTextPreference
+                android:title="DEC_Node"
+                android:summary="Node szerver cím"
+                android:key="decNodeIP"/>
+   	 <EditTextPreference
+                android:title="DEC_Node"
+                android:summary="Node szerver port"
+                android:key="decNodePort"/>
+      <EditTextPreference
+                android:title="DEC_Admin"
+                android:summary="GCM szerver cím"
+                android:key="decAdminIP"/>
+      <EditTextPreference
+                android:title="DEC_Admin"
+                android:summary="GCM szerver port"
+                android:key="decAdminPort"/>
+    </PreferenceCategory>
+</PreferenceScreen>

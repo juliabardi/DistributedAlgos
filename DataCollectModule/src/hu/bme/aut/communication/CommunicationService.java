@@ -3,19 +3,17 @@ package hu.bme.aut.communication;
 import static hu.bme.aut.communication.GCM.CommonUtilities.DISPLAY_MESSAGE_ACTION;
 import static hu.bme.aut.communication.GCM.CommonUtilities.EXTRA_MESSAGE;
 import static hu.bme.aut.communication.GCM.CommonUtilities.SENDER_ID;
-import static hu.bme.aut.communication.Constants.GCMSeverAddress;
 import hu.bme.aut.communication.GCM.ServerUtilities;
+import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.activity.MainActivity;
 import hu.bme.aut.datacollect.activity.R;
-import hu.bme.aut.communication.Constants;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 import org.json.JSONObject;
 
-import android.R.string;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -262,16 +260,18 @@ public class CommunicationService extends Service implements
 
 		for (Map.Entry<String, ?> entry : keys.entrySet()) {
 			String key = entry.getKey();
-			Boolean value = (Boolean) entry.getValue();
-			if (value) {
-				offerList.add(key);
+			if (DataCollectService.sharedPrefKeys.contains(key)){
+				Boolean value = (Boolean) entry.getValue();
+				if (value) {
+					offerList.add(key);
+				}
 			}
 		}
 
 		JSONObject message = JsHelper.createMainBodyWithAlgos(Constants.ALGTYPE_DIST_ALGOS, JsHelper
 				.createAlgoBody(JsHelper.createSimpleArray(offerList), null));
 
-		sendJobToNodeService(Constants.REGISTER,Constants.REGISTER,Constants.NodeServerAddress + Constants.REGISTER, message.toString());
+		sendJobToNodeService(Constants.REGISTER,Constants.REGISTER, Constants.getNodeServerAddress() + Constants.REGISTER, message.toString());
 		setupSyncronizationInfo(SyncronizationValues.SENDING);
 	}
 
@@ -286,7 +286,7 @@ public class CommunicationService extends Service implements
 	private void handleOffer(String key, boolean value) {
 		if (IsWifiAvaiable()) {
 			StringBuilder builder = new StringBuilder();
-			builder.append(Constants.NodeServerAddress);
+			builder.append(Constants.getNodeServerAddress());
 			if (value == true) {
 				builder.append(Constants.OFFER);
 			} else {
@@ -325,7 +325,7 @@ public class CommunicationService extends Service implements
 	 * Registering to the GCM push notification service.
 	 */
 	private void registerGCM() {
-		checkNotNull(GCMSeverAddress, "SERVER_URL");
+		checkNotNull(Constants.getGCMServerAddress(), "SERVER_URL");
 		checkNotNull(SENDER_ID, "SENDER_ID");
 		// Make sure the device has the proper dependencies.
 		GCMRegistrar.checkDevice(this);
@@ -398,7 +398,9 @@ public class CommunicationService extends Service implements
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPrefs,
 			String key) {
-		handleOffer(key, sharedPrefs.getBoolean(key, false));
+		if (DataCollectService.sharedPrefKeys.contains(key)){
+			handleOffer(key, sharedPrefs.getBoolean(key, false));
+		}
 	}
 
 	/**

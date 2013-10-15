@@ -26,12 +26,25 @@ public class Constants {
 	
 	
 	// Server specific
-//	public static final String NodeServerAddress = "http://10.0.2.2:3000/"; // Emulator localhost test
-//	public static final String NodeServerAddress = "http://152.66.183.84:3000/";
-	public static final String NodeServerAddress = "http://192.168.1.113:3000/";
-	public static final String DataCollectorServerAddress = "http://192.168.1.113:3001/";
-    public static final String GCMSeverAddress="http://192.168.1.113:8080/DistributedEnvironmentCoordination";
+	public static String NodeServerIP = "152.66.169.209";
+	public static String GCMServerIP = "152.66.169.209";
+	public static String NodeServerPort = "3000";
+	public static String DataCollectorServerPort = "3001";
+	public static String GCMServerPort = "8080";
+//	public static String NodeServerAddress = String.format("http://%s:%s/", NodeServerIP, NodeServerPort);
+//	public static String DataCollectorServerAddress = String.format("http://%s:%s/", NodeServerIP, DataCollectorServerPort);
+//  public static String GCMServerAddress=String.format("http://%s:%s/DistributedEnvironmentCoordination", GCMServerIP, GCMServerPort);
 
+    public static String getNodeServerAddress(){
+    	return String.format("http://%s:%s/", NodeServerIP, NodeServerPort);
+    }
+    public static String getDataCollectorServerAddress(){
+    	return String.format("http://%s:%s/", NodeServerIP, DataCollectorServerPort);
+    }
+    public static String getGCMServerAddress(){
+    	return String.format("http://%s:%s/DistributedEnvironmentCoordination", GCMServerIP, GCMServerPort);
+    }
+    
 	//GCM specific
 	public static final String OFFER_REQUEST="offerRequest";
 	public static final String OFFER_REPLY="offerReply";
