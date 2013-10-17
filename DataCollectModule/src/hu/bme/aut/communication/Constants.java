@@ -16,6 +16,13 @@ public class Constants {
 	public static final String ALGTYPE ="algType";
 	public static final String PARAM_NAME ="name";
 	
+	//For push
+	public static final String REQUEST_PARAMS ="requestParams";
+	public static final String REQUEST_TIME ="time";
+	public static final String REQUEST_COLUMNS ="columns";
+	public static final String REQUEST_ID ="requestId";
+	public static final String REQUEST_PORT ="port";
+	
 	// For syncronization
 	public static final String MESSAGE_TYPE = "messageType";
 	public static final String ITEM_NAME = "itemName";
@@ -26,8 +33,8 @@ public class Constants {
 	
 	
 	// Server specific
-	public static String NodeServerIP = "192.168.1.105";
-	public static String GCMServerIP = "192.168.1.105";
+	public static String NodeServerIP = "192.168.1.113";
+	public static String GCMServerIP = "192.168.1.113";
 	public static String NodeServerPort = "3000";
 	public static String DataCollectorServerPort = "3001";
 	public static String GCMServerPort = "8080";

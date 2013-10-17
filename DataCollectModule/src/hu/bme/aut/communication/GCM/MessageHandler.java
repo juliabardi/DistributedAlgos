@@ -9,6 +9,7 @@ import hu.bme.aut.datacollect.upload.UploadTaskQueue;
 
 import java.util.HashMap;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -68,9 +69,28 @@ public class MessageHandler {
 			
 			//Calling the DataCollect module
 			if (Constants.ALGTYPE_DIST_ALGOS.equals(jsMessage.getString(Constants.ALGTYPE))){
-				//TODO get the request Id from somewhere
-				
-				String address = "http://"+jsMessage.getString(Constants.REQUEST_ADDRESS)+":3001"+"/"+ Constants.OFFER_REPLY;
+				String time="";
+				JSONArray columns;
+				String id="";
+				String port="";
+				try {
+					JSONObject requestParams=jsMessage.getJSONObject(Constants.REQUEST_PARAMS);
+					try {
+						time=requestParams.getString(Constants.REQUEST_TIME);
+					} catch (Exception e) {}
+					try {
+						columns=requestParams.getJSONArray(Constants.REQUEST_COLUMNS);	
+					} catch (Exception e) {}
+					try {
+						id=requestParams.getString(Constants.REQUEST_ID);	
+					} catch (Exception e) {}
+					try {
+						port=":"+requestParams.getString(Constants.REQUEST_PORT);
+					} catch (Exception e) {}
+				} catch (Exception e) {// No params
+					}			
+
+				String address = "http://"+jsMessage.getString(Constants.REQUEST_ADDRESS)+port+"/"+ Constants.OFFER_REPLY;
 				if ("ImageData".equals(jsMessage.getString(Constants.PARAM_NAME))){
 					this.addNotificationImage(address);
 				}
