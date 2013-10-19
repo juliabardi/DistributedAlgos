@@ -13,7 +13,10 @@ import hu.bme.aut.datacollect.utils.StringUtils;
 import hu.bme.aut.datacollect.utils.Utils;
 
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,6 +41,8 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 interface Action {    void performAction(String msg); }
 
 public class MessageHandler {
+	
+	private static final String TAG = MessageHandler.class.getName();
 	
 	private HashMap<String,Action> cmdList=new HashMap<String, Action>();
 	
@@ -77,29 +82,38 @@ public class MessageHandler {
 	
 	public void handleGCMMessage(String msg)
 	{
-		Log.i(this.getClass().getName(), msg);
+		Log.i(TAG, msg);
 		try {
-			JSONObject jsMessage=new JSONObject(msg);
+			JSONObject jsMessage = new JSONObject(msg);
 			
 			//Calling the DataCollect module
 			if (Constants.ALGTYPE_DIST_ALGOS.equals(jsMessage.getString(Constants.ALGTYPE))){
-				String time=null;
+				
+				String time = null;
+				String date = null;
+				String recurrence = null;
 				JSONArray columns = null;
-				String reqId=null;
+				String reqId = null;
 				String port = Constants.DataCollectorServerPort;
-				JSONObject requestParams=jsMessage.optJSONObject(Constants.REQUEST_PARAMS);
+				JSONObject requestParams = jsMessage.optJSONObject(Constants.REQUEST_PARAMS);
+				
 				if (requestParams != null){
-					time=StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_TIME));
-					columns=requestParams.optJSONArray(Constants.REQUEST_COLUMNS);	
+					
+					time = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_TIME));
+					date = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_DATE));
+					recurrence = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_RECURRENCE));
+					columns = requestParams.optJSONArray(Constants.REQUEST_COLUMNS);	
 					reqId = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_ID));
-					String p=StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_PORT));
-					port = (p==null) ? port : p;
+					String p = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_PORT));
+					port = (p == null) ? port : p;
 				}
 
 				String ip = jsMessage.getString(Constants.REQUEST_ADDRESS);
 				String dataType = jsMessage.getString(Constants.PARAM_NAME);
 				String address = "http://"+ip+":"+port+"/"+ Constants.OFFER_REPLY;
+				
 				if ("ImageData".equals(dataType)){
+					
 					this.addNotificationImage(address, reqId);
 				}
 				else {	//dataType comes from SQLite
@@ -109,25 +123,60 @@ public class MessageHandler {
 						params = Utils.convertJSONArrayToList(columns);
 						joinedCols = Utils.convertListToCsv(params);					
 					}
-					this.queue.add(new DataUploadTask(this.context, dataType, reqId, address, params));
+					Date queryDate = null;
+					
+					//only one of date and time should be given (if both are, time will overwrite date)
+					if (date != null){
+						queryDate = this.parseDate(date);
+					}
+					if (time != null){
+						queryDate = this.subtractSeconds(time);
+					}
+					
+					this.queue.add(new DataUploadTask(this.context, dataType, reqId, address, queryDate, params));
 					
 					//deleting previous similar request, not to remain recurring if the new is not that
 					this.deleteRequestIfExists(ip, port, dataType);
 					
-					if (time != null){
+					if (recurrence != null){
 						long millis = Calendar.getInstance().getTimeInMillis();
-						int recurrence = Integer.parseInt(time);
-						RecurringRequest recurringRequest = new RecurringRequest(reqId, ip, port, recurrence, millis, dataType, joinedCols);
-						Log.d(this.getClass().getName(), "Saving recurring request: " + recurringRequest.toString());
+						int recurrenceInt = Integer.parseInt(recurrence);
+						RecurringRequest recurringRequest = new RecurringRequest(reqId, ip, port, recurrenceInt, millis, dataType, joinedCols);
+						Log.d(TAG, "Saving recurring request: " + recurringRequest.toString());
 						this.recurringDao.createOrUpdate(recurringRequest);
 					}
 				}
 			}
 			
 		} catch (JSONException e) {
-			Log.e(this.getClass().getName(), "Could not process msg");
+			Log.e(TAG, "Could not process msg");
 			cmdList.get(Constants.JSON_PARSE_ERROR).performAction("Could not parse JSON");
 			e.printStackTrace();
+		}
+	}
+	
+	//trying to parse param date in yyyy-MM-dd format
+	private Date parseDate(String date){
+		
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			return format.parse(date);
+		} catch (ParseException e) {
+			Log.e(TAG, "Error parsing date in (yyyy-MM-dd) format: " + date);
+			return null;
+		}
+	}
+	
+	private Date subtractSeconds(String time){
+		
+		try {
+			int timeInt = Integer.parseInt(time);
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.SECOND, timeInt*(-1));
+			return cal.getTime();
+		} catch (NumberFormatException e) {
+			Log.e(TAG, "Error parsing time to int: " + time);
+			return null;
 		}
 	}
 	
@@ -140,12 +189,12 @@ public class MessageHandler {
 					.and().eq("dataType", dataType).queryForFirst();
 			
 			if (request != null){
-				Log.d(getClass().getName(), "Deleting previous request: " + request.toString());
+				Log.d(TAG, "Deleting previous request: " + request.toString());
 				this.recurringDao.delete(request);
 				return true;
 			}			
 		} catch (SQLException e) {			
-			Log.e(getClass().getName(), e.getMessage());
+			Log.e(TAG, e.getMessage());
 		}		
 		return false;
 	}

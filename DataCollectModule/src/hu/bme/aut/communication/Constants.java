@@ -22,6 +22,8 @@ public class Constants {
 	public static final String REQUEST_COLUMNS ="columns";
 	public static final String REQUEST_ID ="requestId";
 	public static final String REQUEST_PORT ="port";
+	public static final String REQUEST_DATE = "date";
+	public static final String REQUEST_RECURRENCE = "recurrence";
 	
 	// For syncronization
 	public static final String MESSAGE_TYPE = "messageType";
