@@ -106,7 +106,7 @@ public class MessageHandler {
 					List<String> params = null;
 					if (columns != null){
 						params = Utils.convertJSONArrayToList(columns);
-						joinedCols = columns.join(",");						
+						joinedCols = Utils.convertListToCsv(params);					
 					}
 					this.queue.add(new DataUploadTask(this.context, dataType, reqId, address, params));
 					

@@ -42,10 +42,15 @@ public abstract class IData {
 				json.put("name", data.get(0).getClass().getSimpleName());
 				json.put("type", "simple");
 				JSONArray values = new JSONArray();
-				if (params != null && params.size() != 0){
-					json.put("params", new JSONArray(params));
-					for (T d : data) {
-							values.put(new JSONArray(d.getValues(params)));
+				if (params != null && params.size() != 0){					
+					if (columnsExist(data.get(0), params)){					
+						json.put("params", new JSONArray(params));
+						for (T d : data) {
+								values.put(new JSONArray(d.getValues(params)));
+						}
+					}
+					else {
+						return null; //returning null if any column does not exist
 					}
 				}
 				else {
@@ -61,5 +66,11 @@ public abstract class IData {
 			}
 		}
 		return json;
+	}
+	
+	private static <T extends IData> boolean columnsExist(T data, List<String> params){
+		//columns exist if retaining all columns of data does not modify params 
+		boolean modified = params.retainAll(data.getParams());
+		return !modified;
 	}
 }
