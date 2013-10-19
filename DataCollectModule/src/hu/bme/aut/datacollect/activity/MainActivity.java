@@ -312,10 +312,10 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		//send here some data
 		
 		Log.d(TAG, "Sending some columns");
-		this.queue.add(new DataUploadTask(this, "AccelerationData", 1, Constants.getDataCollectorServerAddress(), Arrays.asList("id", "timestamp", "accX", "accY")));
+		this.queue.add(new DataUploadTask(this, "AccelerationData", "1", Constants.getDataCollectorServerAddress(), Arrays.asList("id", "timestamp", "accX", "accY")));
 		
 		Log.d(TAG, "Sending all columns");
-		this.queue.add(new DataUploadTask(this, "LightData", 2, Constants.getDataCollectorServerAddress()));
+		this.queue.add(new DataUploadTask(this, "LightData", "2", Constants.getDataCollectorServerAddress()));
 		
 		Log.d(TAG, "Sending all columns after date");		
 		Date date = null;
@@ -324,13 +324,13 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		} catch (ParseException e) {
 			Log.e(TAG, e.getMessage());
 		}
-		this.queue.add(new DataUploadTask(this, "AccelerationData", 3, Constants.getDataCollectorServerAddress(), date));
+		this.queue.add(new DataUploadTask(this, "AccelerationData", "3", Constants.getDataCollectorServerAddress(), date));
 		
 		Log.d(TAG, "Sending buggy name");
-		this.queue.add(new DataUploadTask(this, "NotExists", 4, Constants.getDataCollectorServerAddress()));
+		this.queue.add(new DataUploadTask(this, "NotExists", "4", Constants.getDataCollectorServerAddress()));
 		
 		Log.d(TAG, "Sending some columns after date");
-		this.queue.add(new DataUploadTask(this, "AccelerationData", 5, Constants.getDataCollectorServerAddress(), date, Arrays.asList("id")));
+		this.queue.add(new DataUploadTask(this, "AccelerationData", "5", Constants.getDataCollectorServerAddress(), date, Arrays.asList("id")));
 	}
 	
 	public void loadJavascript(View v){

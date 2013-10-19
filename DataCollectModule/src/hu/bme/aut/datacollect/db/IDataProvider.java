@@ -16,17 +16,17 @@ import org.json.JSONObject;
  */
 public interface IDataProvider extends Closeable  {
 	
-	public <T extends IData> JSONObject getAllData(Class<T> clazz, int reqId, List<String> params);
+	public <T extends IData> JSONObject getAllData(Class<T> clazz, String reqId, List<String> params);
 	
-	public <T extends IData> JSONObject getDataAfterTimestamp(Class<T> clazz, int reqId, long timestamp, List<String> params);
+	public <T extends IData> JSONObject getDataAfterTimestamp(Class<T> clazz, String reqId, long timestamp, List<String> params);
 	
-	public JSONObject getAllData(String name, int reqId);
+	public JSONObject getAllData(String name, String reqId);
 	
-	public JSONObject getAllDataParams(String name, int reqId, List<String> params);
+	public JSONObject getAllDataParams(String name, String reqId, List<String> params);
 	
-	public JSONObject getDataAfterDate(String name, int reqId, Date date);
+	public JSONObject getDataAfterDate(String name, String reqId, Date date);
 	
-	public JSONObject getDataAfterDate(String name, int reqId, Date date, List<String> params);
+	public JSONObject getDataAfterDate(String name, String reqId, Date date, List<String> params);
 	
-	public JSONObject getAllDataParamsString(String name, int reqId, String params);
+	public JSONObject getAllDataParamsString(String name, String reqId, String params);
 }

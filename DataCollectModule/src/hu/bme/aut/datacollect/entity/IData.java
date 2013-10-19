@@ -34,7 +34,7 @@ public abstract class IData {
 	}
 
 	// converts the given list to JSONObject, reqId is the id from the server, params is the required column names	
-	public static <T extends IData> JSONObject toJSONObject(List<T> data, int reqId, List<String> params){
+	public static <T extends IData> JSONObject toJSONObject(List<T> data, String reqId, List<String> params){
 		JSONObject json = new JSONObject();
 		if (data != null && data.size() != 0) {
 			try {

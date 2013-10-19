@@ -1,7 +1,5 @@
 package hu.bme.aut.datacollect.upload;
 
-import hu.bme.aut.communication.Constants;
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -26,8 +24,8 @@ public class ImageUploadTask extends UploadTask {
 		TAG = "DataCollect:ImageUploadTask";
 	}
 
-	public ImageUploadTask(File file, String address) {
-		super(address);
+	public ImageUploadTask(File file, String address, String reqId) {
+		super(address, reqId);
 		this.file = file;
 	}
 
@@ -55,6 +53,7 @@ public class ImageUploadTask extends UploadTask {
 					byte[] imageBytes = bos.toByteArray();
 
 					json.put("name", "ImageData");
+					json.put("id", reqId);
 					json.put("type", "binary");
 					json.put("size", imageBytes.length);
 					json.put("binary", new String(Base64.encode(imageBytes, Base64.DEFAULT)));

@@ -21,41 +21,37 @@ public class DataUploadTask extends UploadTask {
 	}
 	
 	private String name;
-	private int reqId;
 	private Date date;
 	private List<String> params;
 	
 	private IDataProvider dataProvider;
 	
-	public DataUploadTask(Context context, String name, int reqId, String address){		
-		super(address);
+	public DataUploadTask(Context context, String name, String reqId, String address){		
+		super(address, reqId);
 		this.name = name;
 		this.dataProvider = new DataProvider(context);
 	}
 	
-	public DataUploadTask(Context context, String name, int reqId, String address, List<String> params) {
-		super(address);
+	public DataUploadTask(Context context, String name, String reqId, String address, List<String> params) {
+		super(address, reqId);
 		this.name = name;
 		this.params = params;
 		this.dataProvider = new DataProvider(context);
-		this.address = address;
 	}
 	
-	public DataUploadTask(Context context, String name, int reqId, String address, Date date) {
-		super(address);
+	public DataUploadTask(Context context, String name, String reqId, String address, Date date) {
+		super(address, reqId);
 		this.name = name;
 		this.date = date;
 		this.dataProvider = new DataProvider(context);
-		this.address = address;
 	}
 	
-	public DataUploadTask(Context context, String name, int reqId, String address, Date date, List<String> params) {
-		super(address);
+	public DataUploadTask(Context context, String name, String reqId, String address, Date date, List<String> params) {
+		super(address, reqId);
 		this.name = name;
 		this.date = date;
 		this.params = params;
 		this.dataProvider = new DataProvider(context);
-		this.address = address;
 	}
 
 	@Override

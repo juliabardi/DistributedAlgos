@@ -27,13 +27,13 @@ public class DataProvider implements IDataProvider{
 	}
 	
 	@Override
-	public <T extends IData> JSONObject getAllData(Class<T> clazz, int reqId, List<String> params) {
+	public <T extends IData> JSONObject getAllData(Class<T> clazz, String reqId, List<String> params) {
 		List<T> list = this.dbHelper.getDaoBase(clazz).queryForAll();
 		return IData.toJSONObject(list, reqId, params);
 	}
 
 	@Override
-	public <T extends IData> JSONObject getDataAfterTimestamp(Class<T> clazz, int reqId, long timestamp, List<String> params) {
+	public <T extends IData> JSONObject getDataAfterTimestamp(Class<T> clazz, String reqId, long timestamp, List<String> params) {
 		List<T> list = this.dbHelper.getDaoBase(clazz).queryAfterTimestamp(timestamp);
 		return IData.toJSONObject(list, reqId, params);
 	}
@@ -47,12 +47,12 @@ public class DataProvider implements IDataProvider{
 	
 	@Override
 	@JavascriptInterface
-	public JSONObject getAllData(String name, int reqId) {		
+	public JSONObject getAllData(String name, String reqId) {		
 		return this.getAllDataParams(name, reqId, null);
 	}
 	
 	@Override
-	public JSONObject getAllDataParams(String name, int reqId, List<String> params) {
+	public JSONObject getAllDataParams(String name, String reqId, List<String> params) {
 		
 		Class clazz;
 		try {
@@ -65,12 +65,12 @@ public class DataProvider implements IDataProvider{
 	}
 	
 	@Override
-	public JSONObject getDataAfterDate(String name, int reqId, Date date){				
+	public JSONObject getDataAfterDate(String name, String reqId, Date date){				
 		return this.getDataAfterDate(name, reqId, date, null);
 	}
 
 	@Override
-	public JSONObject getDataAfterDate(String name, int reqId, Date date,
+	public JSONObject getDataAfterDate(String name, String reqId, Date date,
 			List<String> params) {
 		
 		Class clazz;
@@ -101,7 +101,7 @@ public class DataProvider implements IDataProvider{
 	
 	@Override
 	@JavascriptInterface
-	public JSONObject getAllDataParamsString(String name, int reqId, String params){
+	public JSONObject getAllDataParamsString(String name, String reqId, String params){
 		String[] p = params.split(",");
 		Log.d(TAG, "Javascript params: " + params);
 		return this.getAllDataParams(name, reqId, Arrays.asList(p));		

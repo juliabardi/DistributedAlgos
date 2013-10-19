@@ -7,7 +7,9 @@ import hu.bme.aut.datacollect.activity.R;
 import hu.bme.aut.datacollect.upload.DataUploadTask;
 import hu.bme.aut.datacollect.upload.UploadTaskQueue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,32 +72,30 @@ public class MessageHandler {
 			//Calling the DataCollect module
 			if (Constants.ALGTYPE_DIST_ALGOS.equals(jsMessage.getString(Constants.ALGTYPE))){
 				String time="";
-				JSONArray columns;
-				String id="";
-				String port="";
-				try {
-					JSONObject requestParams=jsMessage.getJSONObject(Constants.REQUEST_PARAMS);
-					try {
-						time=requestParams.getString(Constants.REQUEST_TIME);
-					} catch (Exception e) {}
-					try {
-						columns=requestParams.getJSONArray(Constants.REQUEST_COLUMNS);	
-					} catch (Exception e) {}
-					try {
-						id=requestParams.getString(Constants.REQUEST_ID);	
-					} catch (Exception e) {}
-					try {
-						port=":"+requestParams.getString(Constants.REQUEST_PORT);
-					} catch (Exception e) {}
-				} catch (Exception e) {// No params
-					}			
+				JSONArray columns = null;
+				String reqId="0";
+				String port=":"+Constants.DataCollectorServerPort;
+				JSONObject requestParams=jsMessage.optJSONObject(Constants.REQUEST_PARAMS);
+				if (requestParams != null){
+					time=requestParams.optString(Constants.REQUEST_TIME);
+					columns=requestParams.optJSONArray(Constants.REQUEST_COLUMNS);	
+					reqId = requestParams.optString(Constants.REQUEST_ID);
+					String p=requestParams.optString(Constants.REQUEST_PORT);
+					port = "".equals(p)?port:":"+p;
+				}
 
 				String address = "http://"+jsMessage.getString(Constants.REQUEST_ADDRESS)+port+"/"+ Constants.OFFER_REPLY;
 				if ("ImageData".equals(jsMessage.getString(Constants.PARAM_NAME))){
-					this.addNotificationImage(address);
+					this.addNotificationImage(address, reqId);
 				}
 				else {
-					this.queue.add(new DataUploadTask(this.context, jsMessage.getString(Constants.PARAM_NAME), 2, address));
+					if (columns != null){
+						List<String> params = this.convertJSONArrayToList(columns);
+						this.queue.add(new DataUploadTask(this.context, jsMessage.getString(Constants.PARAM_NAME), reqId, address, params));
+					}
+					else {
+						this.queue.add(new DataUploadTask(this.context, jsMessage.getString(Constants.PARAM_NAME), reqId, address));
+					}
 				}
 			}
 			
@@ -106,10 +106,11 @@ public class MessageHandler {
 		}
 	}
 	
-	public void addNotificationImage(String address){
+	public void addNotificationImage(String address, String reqId){
 		
 		Intent notificationIntent = new Intent(context, CameraActivity.class);
 		notificationIntent.putExtra("address", address);
+		notificationIntent.putExtra("reqId", reqId);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
 				notificationIntent, 0);
 
@@ -125,4 +126,12 @@ public class MessageHandler {
 		mNotificationManager.notify(DataCollectService.IMAGE_NOTIF_ID, builder.build());
 	}
 
+	private List<String> convertJSONArrayToList(JSONArray array){
+		
+		List<String> list = new ArrayList<String>();
+		for (int i=0; i<array.length(); ++i){
+			list.add(array.optString(i));
+		}
+		return list;
+	}
 }

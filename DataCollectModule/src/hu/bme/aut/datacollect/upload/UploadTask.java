@@ -15,6 +15,7 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 	private static final long serialVersionUID = -7039527931471322551L;
 	
 	protected String address;
+	protected String reqId;
 
 	public interface Callback {
 		void onSuccess(String url);
@@ -30,8 +31,9 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 	
 	protected HttpManager httpManager = new HttpManager(this);
 	
-	public UploadTask(String address){
+	public UploadTask(String address, String reqId){
 		this.address = address;
+		this.reqId = reqId;
 	}
 
 	@Override
