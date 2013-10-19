@@ -1,6 +1,7 @@
 package hu.bme.aut.datacollect.listener;
 
 import hu.bme.aut.datacollect.activity.ActivityFragmentSettings;
+import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.LocationData;
 
@@ -19,15 +20,16 @@ import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 
-public class LocationProvider implements LocationListener, IListener{
+public class LocationProvider extends AbstractListener implements LocationListener{
 	
 	private static final String TAG = "DataCollect:LocationProvider";
 	
 	private final LocationManager locationManager;	
 	private DaoBase<LocationData> locationDao = null;
 	
-	public LocationProvider(Context context, DaoBase<LocationData> locationDao){
-			
+	public LocationProvider(DataCollectService context, DaoBase<LocationData> locationDao){
+		super(context);	
+		
 		this.locationDao = locationDao;
 		
 		//request location updates
@@ -59,6 +61,8 @@ public class LocationProvider implements LocationListener, IListener{
 		locationDao.create(new LocationData(Calendar.getInstance()
 				.getTimeInMillis(), location.getLatitude(), location
 				.getLongitude(), location.getAltitude()));
+		
+		this.mContext.sendRecurringRequests(this.getDataType());
 	}
 
 	@Override
@@ -158,5 +162,10 @@ public class LocationProvider implements LocationListener, IListener{
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String getDataType() {
+		return DataCollectService.LOCATION;
 	}
 }

@@ -1,28 +1,27 @@
 package hu.bme.aut.datacollect.listener;
 
-import java.util.Calendar;
-
+import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.PackageData;
-import android.content.BroadcastReceiver;
+
+import java.util.Calendar;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-public class PackageReceiver extends BroadcastReceiver implements IListener {
+public class PackageReceiver extends AbstractReceiver {
 
 	private static final String TAG = "DataCollect:PackageReceiver";
 	
 	private DaoBase<PackageData> packageDao = null;
-	private Context mContext = null;
 	
 	private boolean regPackage = false;
 	
-	public PackageReceiver(Context context, DaoBase<PackageData> packageDao) {
-		super();
+	public PackageReceiver(DataCollectService context, DaoBase<PackageData> packageDao) {
+		super(context);
 		this.packageDao = packageDao;
-		this.mContext = context;
 	}
 
 	@Override
@@ -31,6 +30,8 @@ public class PackageReceiver extends BroadcastReceiver implements IListener {
 		int uid = intent.getExtras().getInt("EXTRA_UID");	
 		Log.d(TAG, String.format("PackageData: action: %s, uid: %s", intent.getAction(), uid));
 		packageDao.create(new PackageData(Calendar.getInstance().getTimeInMillis(), intent.getAction(), uid));
+	
+		this.mContext.sendRecurringRequests(this.getDataType());
 	}
 	
 	@Override
@@ -66,5 +67,10 @@ public class PackageReceiver extends BroadcastReceiver implements IListener {
 	public boolean isAvailable() {
 		//receiving packages is available on every device
 		return true;
+	}
+
+	@Override
+	public String getDataType() {
+		return DataCollectService.PACKAGE;
 	}
 }

@@ -1,5 +1,6 @@
 package hu.bme.aut.datacollect.listener;
 
+import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.ConnectivityData;
 
@@ -12,7 +13,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -20,22 +20,19 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-public class ConnectivityReceiver extends BroadcastReceiver implements
-		IListener {
+public class ConnectivityReceiver extends AbstractReceiver {
 	
 	private static final String TAG = "DataCollect:ConnectivityData";
 	
 	private DaoBase<ConnectivityData> connDao = null;
-	private Context mContext = null;
 	
 	private boolean regConn = false;
 	
 	private ConnectivityManager connManager;
 
-	public ConnectivityReceiver(Context context, DaoBase<ConnectivityData> connDao) {
-		super();
+	public ConnectivityReceiver(DataCollectService context, DaoBase<ConnectivityData> connDao) {
+		super(context);
 		this.connDao = connDao;
-		this.mContext = context;
 		
 		connManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 	}
@@ -72,6 +69,8 @@ public class ConnectivityReceiver extends BroadcastReceiver implements
 		Log.d(TAG, String.format("ConnectivityData: connected: %s, type: %s, wifiAddress: %s, gmsAddress: %s", isConnected, type, wifiAddress, gsmAddress));
 		connDao.create(new ConnectivityData(Calendar.getInstance().getTimeInMillis(), isConnected, type,
 				wifiAddress, gsmAddress));
+		
+		this.mContext.sendRecurringRequests(this.getDataType());
 	}
 	
 	@Override
@@ -122,5 +121,10 @@ public class ConnectivityReceiver extends BroadcastReceiver implements
 	        ex.printStackTrace();
 	    }
 	    return addresses;
+	}
+
+	@Override
+	public String getDataType() {
+		return DataCollectService.CONNECTIVITY;
 	}
 }

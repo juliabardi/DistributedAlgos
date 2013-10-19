@@ -1,6 +1,7 @@
 package hu.bme.aut.datacollect.db;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 import android.util.Log;
@@ -20,9 +21,31 @@ public class DaoBase<T> extends BaseDaoImpl<T, Integer> {
 	@Override
 	public int create(T data) {
 		try {
-			int rowId = super.create(data);
-			Log.d(TAG, "Inserted row into " + dataClass.getSimpleName() + ", modified rows: " + rowId);
-			return rowId;
+			int row = super.create(data);
+			Log.d(TAG, "Inserted row into " + dataClass.getSimpleName() + ", modified rows: " + row);
+			return row;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	
+
+	@Override
+	public CreateOrUpdateStatus createOrUpdate(T data) {
+		try {
+			CreateOrUpdateStatus status =  super.createOrUpdate(data);
+			Log.d(TAG, "Inserted or updated row into " + dataClass.getSimpleName() + ", modified rows: " + status.getNumLinesChanged());
+			return status;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public int update(T data) {
+		try {
+			return super.update(data);
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
@@ -46,6 +69,15 @@ public class DaoBase<T> extends BaseDaoImpl<T, Integer> {
 		}
 	}
 	
+	@Override
+	public List<T> queryForEq(String fieldName, Object value) {
+		try {
+			return super.queryForEq(fieldName, value);
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public List<T> queryAfterTimestamp(long timestamp){
 		
 		try {
@@ -63,5 +95,17 @@ public class DaoBase<T> extends BaseDaoImpl<T, Integer> {
 			throw new RuntimeException(e);
 		}
 	}
+
+	@Override
+	public int delete(Collection<T> datas) {
+		
+		try {
+			return super.delete(datas);
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	
 
 }

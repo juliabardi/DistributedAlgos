@@ -1,29 +1,27 @@
 package hu.bme.aut.datacollect.listener;
 
+import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.ScreenData;
 
 import java.util.Calendar;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-public class ScreenReceiver extends BroadcastReceiver implements IListener {
+public class ScreenReceiver extends AbstractReceiver {
 
 	private static final String TAG = "DataCollect:ScreenReceiver";
 	
 	private DaoBase<ScreenData> dao = null;
-	private Context mContext = null;
 	
 	private boolean regScreen = false;
 	
-	public ScreenReceiver(Context context, DaoBase<ScreenData> packageDao) {
-		super();
+	public ScreenReceiver(DataCollectService context, DaoBase<ScreenData> packageDao) {
+		super(context);
 		this.dao = packageDao;
-		this.mContext = context;
 	}
 
 	@Override
@@ -38,7 +36,9 @@ public class ScreenReceiver extends BroadcastReceiver implements IListener {
 			
 			Log.d(TAG, String.format("ScreenData: off"));
 			dao.create(new ScreenData(Calendar.getInstance().getTimeInMillis(), "off"));
-		}	
+		}
+		
+		this.mContext.sendRecurringRequests(this.getDataType());
 	}
 	
 	@Override
@@ -69,5 +69,10 @@ public class ScreenReceiver extends BroadcastReceiver implements IListener {
 	public boolean isAvailable() {
 		//receiving screen events is available on every device
 		return true;
+	}
+
+	@Override
+	public String getDataType() {
+		return DataCollectService.SCREEN;
 	}
 }

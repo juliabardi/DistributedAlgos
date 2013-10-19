@@ -1,11 +1,11 @@
 package hu.bme.aut.datacollect.listener;
 
+import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.ProximityData;
 
 import java.util.Calendar;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
@@ -18,7 +18,7 @@ public class ProximitySensorListener extends SensorListener {
 	private final Sensor proximitySensor;
 	private DaoBase<ProximityData> proximityDao = null;
 
-	public ProximitySensorListener(Context context, DaoBase<ProximityData> dao) {
+	public ProximitySensorListener(DataCollectService context, DaoBase<ProximityData> dao) {
 		super(context);
 		this.proximityDao = dao;
 
@@ -41,6 +41,8 @@ public class ProximitySensorListener extends SensorListener {
 			Log.d(TAG, String.format("ProximityData: %s cm", distance));
 			proximityDao.create(new ProximityData(Calendar.getInstance()
 					.getTimeInMillis(), distance));
+			
+			this.mContext.sendRecurringRequests(this.getDataType());
 		}
 
 	}
@@ -64,5 +66,10 @@ public class ProximitySensorListener extends SensorListener {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String getDataType() {
+		return DataCollectService.PROXIMITY;
 	}
 }

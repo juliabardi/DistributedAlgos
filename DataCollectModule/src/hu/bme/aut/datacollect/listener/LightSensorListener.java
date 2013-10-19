@@ -1,11 +1,11 @@
 package hu.bme.aut.datacollect.listener;
 
+import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.LightData;
 
 import java.util.Calendar;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
@@ -18,7 +18,7 @@ public class LightSensorListener extends SensorListener {
 	private final Sensor lightSensor;
 	private DaoBase<LightData> lightDao = null;
 
-	public LightSensorListener(Context context, DaoBase<LightData> lDao) {
+	public LightSensorListener(DataCollectService context, DaoBase<LightData> lDao) {
 		super(context);
 		this.lightDao = lDao;
 
@@ -42,6 +42,8 @@ public class LightSensorListener extends SensorListener {
 			Log.d(TAG, String.format("LightData: %s lx", lux));
 			lightDao.create(new LightData(Calendar.getInstance()
 					.getTimeInMillis(), lux));
+			
+			this.mContext.sendRecurringRequests(this.getDataType());
 		}
 
 	}
@@ -65,5 +67,10 @@ public class LightSensorListener extends SensorListener {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String getDataType() {
+		return DataCollectService.LIGHT;
 	}
 }

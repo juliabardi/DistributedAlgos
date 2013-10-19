@@ -1,11 +1,11 @@
 package hu.bme.aut.datacollect.listener;
 
+import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.CallData;
 
 import java.util.Calendar;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,17 +13,16 @@ import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-public class CallReceiver extends BroadcastReceiver implements IListener{
+public class CallReceiver extends AbstractReceiver {
 	
 	private static final String TAG = "DataCollect:CallReceiver";
 
 	private DaoBase<CallData> callDao = null;
-	private Context mContext = null;
 	
 	private boolean regCall = false;
 	
-	public CallReceiver(Context context, DaoBase<CallData> callDao){
-		this.mContext = context;
+	public CallReceiver(DataCollectService mContext, DaoBase<CallData> callDao){
+		super(mContext);
 		this.callDao = callDao;
 	}
 	
@@ -48,6 +47,8 @@ public class CallReceiver extends BroadcastReceiver implements IListener{
 				callDao.create(new CallData(Calendar.getInstance().getTimeInMillis(), "in"));
 			}
 		}
+		
+		this.mContext.sendRecurringRequests(this.getDataType());
 	}
 
 	
@@ -80,6 +81,11 @@ public class CallReceiver extends BroadcastReceiver implements IListener{
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String getDataType() {
+		return DataCollectService.CALL;
 	}
 
 }

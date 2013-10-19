@@ -8,4 +8,6 @@ public interface IListener {
 	
 	//determining if the current feature is available in the current device
 	public boolean isAvailable();
+	
+	public String getDataType();
 }

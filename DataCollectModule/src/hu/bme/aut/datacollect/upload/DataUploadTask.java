@@ -20,35 +20,35 @@ public class DataUploadTask extends UploadTask {
 		TAG = "DataCollect:DataUploadTask";
 	}
 	
-	private String name;
+	private String dataType;
 	private Date date;
 	private List<String> params;
 	
 	private IDataProvider dataProvider;
 	
-	public DataUploadTask(Context context, String name, String reqId, String address){		
+	public DataUploadTask(Context context, String dataType, String reqId, String address){		
 		super(address, reqId);
-		this.name = name;
+		this.dataType = dataType;
 		this.dataProvider = new DataProvider(context);
 	}
 	
-	public DataUploadTask(Context context, String name, String reqId, String address, List<String> params) {
+	public DataUploadTask(Context context, String dataType, String reqId, String address, List<String> params) {
 		super(address, reqId);
-		this.name = name;
+		this.dataType = dataType;
 		this.params = params;
 		this.dataProvider = new DataProvider(context);
 	}
 	
-	public DataUploadTask(Context context, String name, String reqId, String address, Date date) {
+	public DataUploadTask(Context context, String dataType, String reqId, String address, Date date) {
 		super(address, reqId);
-		this.name = name;
+		this.dataType = dataType;
 		this.date = date;
 		this.dataProvider = new DataProvider(context);
 	}
 	
-	public DataUploadTask(Context context, String name, String reqId, String address, Date date, List<String> params) {
+	public DataUploadTask(Context context, String dataType, String reqId, String address, Date date, List<String> params) {
 		super(address, reqId);
-		this.name = name;
+		this.dataType = dataType;
 		this.date = date;
 		this.params = params;
 		this.dataProvider = new DataProvider(context);
@@ -65,10 +65,10 @@ public class DataUploadTask extends UploadTask {
 				JSONObject result;
 				
 				if (date == null){
-					result = dataProvider.getAllDataParams(name, reqId, params);
+					result = dataProvider.getAllDataParams(dataType, reqId, params);
 				}
 				else {
-					result = dataProvider.getDataAfterDate(name, reqId, date, params);
+					result = dataProvider.getDataAfterDate(dataType, reqId, date, params);
 				}
 				
 				if (result == null){

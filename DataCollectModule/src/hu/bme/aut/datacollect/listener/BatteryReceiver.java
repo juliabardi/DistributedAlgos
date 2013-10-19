@@ -1,28 +1,27 @@
 package hu.bme.aut.datacollect.listener;
 
-import java.util.Calendar;
-
+import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.BatteryData;
-import android.content.BroadcastReceiver;
+
+import java.util.Calendar;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.util.Log;
 
-public class BatteryReceiver extends BroadcastReceiver implements IListener {
+public class BatteryReceiver extends AbstractReceiver {
 	
 	private static final String TAG = "DataCollect:BatteryReceiver";
 	
 	private DaoBase<BatteryData> batteryDao = null;
-	private Context mContext = null;
 	
 	private boolean regBattery = false;
 
-	public BatteryReceiver(Context context, DaoBase<BatteryData> batteryDao) {
-		super();
-		this.mContext = context;
+	public BatteryReceiver(DataCollectService context, DaoBase<BatteryData> batteryDao) {
+		super(context);
 		this.batteryDao = batteryDao;
 	}
 	
@@ -48,7 +47,8 @@ public class BatteryReceiver extends BroadcastReceiver implements IListener {
 				batteryPct, status, chargePlug));
 		this.batteryDao.create(new BatteryData(Calendar.getInstance().getTimeInMillis(), 
 				batteryPct, status, chargePlug));
-
+		
+		this.mContext.sendRecurringRequests(this.getDataType());	
 	}
 
 	@Override
@@ -83,6 +83,12 @@ public class BatteryReceiver extends BroadcastReceiver implements IListener {
 	@Override
 	public boolean isAvailable() {
 		return true;
+	}
+
+	@Override
+	public String getDataType() {
+		
+		return DataCollectService.BATTERY;
 	}
 
 }

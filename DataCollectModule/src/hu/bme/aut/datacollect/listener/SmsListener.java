@@ -1,5 +1,6 @@
 package hu.bme.aut.datacollect.listener;
 
+import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.SmsData;
 
@@ -19,23 +20,23 @@ public class SmsListener extends ContentObserver implements IListener {
 	private static final String TAG = "DataCollect:SmsListener";
 
 	private DaoBase<SmsData> smsDao = null;
-	private Context context = null;
+	private DataCollectService mContext = null;
 	
 	private boolean regSms = false;
 	
 	private int lastId = 0;
 		
-	public SmsListener(Context context, Handler handler, DaoBase<SmsData> smsDao){
+	public SmsListener(DataCollectService context, Handler handler, DaoBase<SmsData> smsDao){
 		super(handler);
 		this.smsDao = smsDao;
-		this.context = context;
+		this.mContext = context;
 	}
 	
 	@Override
 	public void onChange(boolean selfChange, Uri uri) {
 		
         Uri uriSMSURI = Uri.parse("content://sms");
-        Cursor cur = context.getContentResolver().query(uriSMSURI, null, null,
+        Cursor cur = mContext.getContentResolver().query(uriSMSURI, null, null,
              null, null);
         cur.moveToNext();
         
@@ -54,6 +55,8 @@ public class SmsListener extends ContentObserver implements IListener {
 				Log.d(TAG, "SmsData: in");
 				smsDao.create(new SmsData(Calendar.getInstance().getTimeInMillis(), "in"));
 	        }
+	        
+	        this.mContext.sendRecurringRequests(this.getDataType());
         }
 	}
 
@@ -61,7 +64,7 @@ public class SmsListener extends ContentObserver implements IListener {
 	public void register() {
 
 		if (!regSms) {
-			ContentResolver contentResolver = context.getContentResolver();
+			ContentResolver contentResolver = mContext.getContentResolver();
 			contentResolver.registerContentObserver(
 					Uri.parse("content://sms"), true, this);
 			regSms = true;
@@ -72,7 +75,7 @@ public class SmsListener extends ContentObserver implements IListener {
 	public void unregister(){
 		
 		if (regSms){
-			ContentResolver contentResolver = context.getContentResolver();
+			ContentResolver contentResolver = mContext.getContentResolver();
 			contentResolver.unregisterContentObserver(this);
 			regSms = false;
 		}
@@ -81,10 +84,15 @@ public class SmsListener extends ContentObserver implements IListener {
 	@Override
 	public boolean isAvailable() {
 		
-		TelephonyManager tm = (TelephonyManager) this.context.getSystemService(Context.TELEPHONY_SERVICE);  //gets the current TelephonyManager
+		TelephonyManager tm = (TelephonyManager) this.mContext.getSystemService(Context.TELEPHONY_SERVICE);  //gets the current TelephonyManager
 		if (tm.getSimState() != TelephonyManager.SIM_STATE_ABSENT){
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String getDataType() {
+		return DataCollectService.SMS;
 	}
 }

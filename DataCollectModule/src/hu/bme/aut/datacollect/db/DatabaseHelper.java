@@ -10,6 +10,7 @@ import hu.bme.aut.datacollect.entity.LocationData;
 import hu.bme.aut.datacollect.entity.OrientationData;
 import hu.bme.aut.datacollect.entity.PackageData;
 import hu.bme.aut.datacollect.entity.ProximityData;
+import hu.bme.aut.datacollect.entity.RecurringRequest;
 import hu.bme.aut.datacollect.entity.ScreenData;
 import hu.bme.aut.datacollect.entity.SmsData;
 import hu.bme.aut.datacollect.entity.TemperatureData;
@@ -31,7 +32,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 	
 	private static final String TAG ="DataCollect:DatabaseHelper";
 
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 	private static final String DATABASE_NAME = "DataCollectDb.db";
 	
 	@SuppressWarnings("rawtypes")
@@ -53,6 +54,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 		map.put(OrientationData.class, null);
 		map.put(ConnectivityData.class, null);
 		map.put(ScreenData.class, null);
+		
+		map.put(RecurringRequest.class, null);
 	}
 	
 	@Override

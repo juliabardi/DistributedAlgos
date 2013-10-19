@@ -1,11 +1,11 @@
 package hu.bme.aut.datacollect.listener;
 
+import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.AccelerationData;
 
 import java.util.Calendar;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
@@ -20,7 +20,7 @@ public class AccelerometerSensorListener extends SensorListener {
 
 	private AccelerationData currentAcc = null;
 
-	public AccelerometerSensorListener(Context context, DaoBase<AccelerationData> aDao) {
+	public AccelerometerSensorListener(DataCollectService context, DaoBase<AccelerationData> aDao) {
 		super(context);
 		this.accelerationDao = aDao;
 
@@ -55,6 +55,8 @@ public class AccelerometerSensorListener extends SensorListener {
 				accelerationDao.create(new AccelerationData(Calendar
 						.getInstance().getTimeInMillis(), accX, accY, accZ));
 				currentAcc = acc;
+				
+				this.mContext.sendRecurringRequests(this.getDataType());
 			}
 		}
 	}
@@ -79,6 +81,12 @@ public class AccelerometerSensorListener extends SensorListener {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String getDataType() {
+		
+		return DataCollectService.ACCELERATION;
 	}
 
 }

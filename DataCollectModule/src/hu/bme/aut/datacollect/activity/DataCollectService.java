@@ -1,5 +1,7 @@
 package hu.bme.aut.datacollect.activity;
 
+import hu.bme.aut.communication.Constants;
+import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
 import hu.bme.aut.datacollect.entity.AccelerationData;
 import hu.bme.aut.datacollect.entity.BatteryData;
@@ -10,6 +12,7 @@ import hu.bme.aut.datacollect.entity.LightData;
 import hu.bme.aut.datacollect.entity.LocationData;
 import hu.bme.aut.datacollect.entity.PackageData;
 import hu.bme.aut.datacollect.entity.ProximityData;
+import hu.bme.aut.datacollect.entity.RecurringRequest;
 import hu.bme.aut.datacollect.entity.ScreenData;
 import hu.bme.aut.datacollect.entity.SmsData;
 import hu.bme.aut.datacollect.entity.TemperatureData;
@@ -26,8 +29,13 @@ import hu.bme.aut.datacollect.listener.ProximitySensorListener;
 import hu.bme.aut.datacollect.listener.ScreenReceiver;
 import hu.bme.aut.datacollect.listener.SmsListener;
 import hu.bme.aut.datacollect.listener.TemperatureSensorListener;
+import hu.bme.aut.datacollect.upload.DataUploadTask;
+import hu.bme.aut.datacollect.upload.UploadTaskQueue;
+import hu.bme.aut.datacollect.utils.Utils;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,12 +49,15 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseService;
 
 public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	
 	public static final int IMAGE_NOTIF_ID = 100;
+	
+	public static final String TAG = "DataCollect:DataCollectService";
 	
 	//Cannot access the R.string.whatever from static place easily, so I keep here the strings
 	public static final String ACCELERATION = "AccelerationData";
@@ -65,6 +76,8 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	public static final String IMAGE = "ImageData";	
 	//no listeners yet
 	public static final String ORIENTAION = "OrientationData";
+	
+	public static final String RECURRING_REQUEST = "RecurringRequest";
 
 	public static final List<String> sharedPrefKeys = Arrays.asList(ACCELERATION,
 			LIGHT, TEMPERATURE, GYROSCOPE, LOCATION, CALL,
@@ -80,6 +93,8 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	private final ServiceBinder mBinder = new ServiceBinder();
 
 	private Map<String, IListener> listeners = new HashMap<String, IListener>();
+	
+	private UploadTaskQueue queue = UploadTaskQueue.instance(this);
 
 	public IListener getListener(String key) {
 		return listeners.get(key);
@@ -93,7 +108,6 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
 
 		// instantiate class, it will register for loc updates
 		listeners.put(LOCATION, new LocationProvider(this, getHelper()
@@ -131,10 +145,11 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 				listeners.get(key).register();
 			}				
 		}
-		
-		
 
 		this.setupForeground();
+		
+		//delete remainings
+		this.deleteAllRecurringRequests();
 	}
 
 	private void setupForeground() {
@@ -154,14 +169,27 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 
 	@Override
 	public void onDestroy() {
+		
+		this.unregisterListeners();
+		
+		this.deleteAllRecurringRequests();
+		
+		super.onDestroy();
+	}
 
-		// unregister stuff if necessary
+	private void unregisterListeners() {
+		
 		for (String key : listeners.keySet()) {
 			if (listeners.get(key).isAvailable()){
 				listeners.get(key).unregister();
 			}
 		}
-		super.onDestroy();
+	}
+	
+	private void deleteAllRecurringRequests(){
+		
+		Log.d(TAG, "Deleting all recurring requests.");
+		this.getRecurringRequestDao().delete(this.getRecurringRequestDao().queryForAll());
 	}
 
 	@Override
@@ -180,4 +208,33 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 			return DataCollectService.this;
 		}
 	}
+	
+	public DaoBase<RecurringRequest> getRecurringRequestDao(){
+		return getHelper().getDaoBase(RecurringRequest.class);
+	}
+	
+	public void sendRecurringRequests(String dataType) {
+		
+		List<RecurringRequest> requests = getRecurringRequestDao().queryForEq("dataType", dataType);
+		long millis = Calendar.getInstance().getTimeInMillis();
+		for (RecurringRequest request : requests){
+			if (millis - request.getLastSent() >= (request.getRecurrence()*1000)){
+				
+				Log.d(TAG, "Time to send data to requestor: " + request.toString());
+				List<String> params = null;
+				if (request.getParams() != null){
+					params = Utils.convertCsvToList(request.getParams());
+				}
+				String address = "http://"+request.getIp()+":"+request.getPort()+"/"+ Constants.OFFER_REPLY;
+				Date date = new Date(request.getLastSent());
+				this.queue.add(new DataUploadTask(this, dataType, request.getReqId(), address, 
+						date, params));
+				
+				request.setLastSent(millis);
+				Log.d(TAG, "Updating request: " + request.toString());
+				getRecurringRequestDao().update(request);
+			}
+		}
+	}
+	
 }

@@ -1,11 +1,11 @@
 package hu.bme.aut.datacollect.listener;
 
+import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.GyroscopeData;
 
 import java.util.Calendar;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
@@ -18,7 +18,7 @@ public class GyroscopeSensorListener extends SensorListener {
 	private final Sensor gyroscopeSensor;
 	private DaoBase<GyroscopeData> gyroscopeDao = null;
 	
-	public GyroscopeSensorListener(Context context, DaoBase<GyroscopeData> gyroscopeDao) {
+	public GyroscopeSensorListener(DataCollectService context, DaoBase<GyroscopeData> gyroscopeDao) {
 		super(context);
 		this.gyroscopeDao = gyroscopeDao;
 		
@@ -34,6 +34,8 @@ public class GyroscopeSensorListener extends SensorListener {
 			gyroscopeDao.create(new GyroscopeData(Calendar.getInstance()
 					.getTimeInMillis(), event.values[0], event.values[1],
 					event.values[2]));
+			
+			this.mContext.sendRecurringRequests(this.getDataType());
 		}
 
 	}
@@ -63,5 +65,10 @@ public class GyroscopeSensorListener extends SensorListener {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String getDataType() {
+		return DataCollectService.GYROSCOPE;
 	}
 }

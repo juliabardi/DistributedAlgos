@@ -1,11 +1,11 @@
 package hu.bme.aut.datacollect.listener;
 
+import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.TemperatureData;
 
 import java.util.Calendar;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
@@ -18,7 +18,7 @@ public class TemperatureSensorListener extends SensorListener {
 	private final Sensor ambientTempSensor;
 	private DaoBase<TemperatureData> temperatureDao = null;
 
-	public TemperatureSensorListener(Context context, DaoBase<TemperatureData> tDao) {
+	public TemperatureSensorListener(DataCollectService context, DaoBase<TemperatureData> tDao) {
 		super(context);
 		this.temperatureDao = tDao;
 
@@ -43,6 +43,8 @@ public class TemperatureSensorListener extends SensorListener {
 			Log.d(TAG, String.format("TemperatureData: %s°C", temperature));
 			temperatureDao.create(new TemperatureData(Calendar.getInstance()
 					.getTimeInMillis(), temperature));
+			
+			this.mContext.sendRecurringRequests(this.getDataType());
 		}
 	}
 
@@ -65,5 +67,10 @@ public class TemperatureSensorListener extends SensorListener {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String getDataType() {
+		return DataCollectService.TEMPERATURE;
 	}
 }

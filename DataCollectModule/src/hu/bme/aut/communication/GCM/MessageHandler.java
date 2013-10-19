@@ -4,10 +4,15 @@ import hu.bme.aut.communication.Constants;
 import hu.bme.aut.datacollect.activity.CameraActivity;
 import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.activity.R;
+import hu.bme.aut.datacollect.db.DaoBase;
+import hu.bme.aut.datacollect.db.DatabaseHelper;
+import hu.bme.aut.datacollect.entity.RecurringRequest;
 import hu.bme.aut.datacollect.upload.DataUploadTask;
 import hu.bme.aut.datacollect.upload.UploadTaskQueue;
+import hu.bme.aut.datacollect.utils.StringUtils;
+import hu.bme.aut.datacollect.utils.Utils;
 
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,6 +27,8 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+
 /**
  * Handle the GCM message.
  * @author Eva Pataji
@@ -35,6 +42,7 @@ public class MessageHandler {
 	
 	private Context context;
 	private UploadTaskQueue queue;
+	private DaoBase<RecurringRequest> recurringDao;
 	
 	public MessageHandler(Context context) {
 		cmdList.put(Constants.OFFER_REQUEST,new Action(){public void performAction(String msg) {offerRequest(msg);}});
@@ -43,6 +51,9 @@ public class MessageHandler {
 	
 		this.context = context;
 		this.queue = UploadTaskQueue.instance(context);
+		
+		DatabaseHelper dbHelper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
+		this.recurringDao = dbHelper.getDaoBase(RecurringRequest.class);
 	}
 
 	private void offerRequest(String msg){
@@ -71,30 +82,40 @@ public class MessageHandler {
 			
 			//Calling the DataCollect module
 			if (Constants.ALGTYPE_DIST_ALGOS.equals(jsMessage.getString(Constants.ALGTYPE))){
-				String time="";
+				String time=null;
 				JSONArray columns = null;
-				String reqId="0";
-				String port=":"+Constants.DataCollectorServerPort;
+				String reqId=null;
+				String port = Constants.DataCollectorServerPort;
 				JSONObject requestParams=jsMessage.optJSONObject(Constants.REQUEST_PARAMS);
 				if (requestParams != null){
-					time=requestParams.optString(Constants.REQUEST_TIME);
+					time=StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_TIME));
 					columns=requestParams.optJSONArray(Constants.REQUEST_COLUMNS);	
-					reqId = requestParams.optString(Constants.REQUEST_ID);
-					String p=requestParams.optString(Constants.REQUEST_PORT);
-					port = "".equals(p)?port:":"+p;
+					reqId = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_ID));
+					String p=StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_PORT));
+					port = (p==null) ? port : p;
 				}
 
-				String address = "http://"+jsMessage.getString(Constants.REQUEST_ADDRESS)+port+"/"+ Constants.OFFER_REPLY;
-				if ("ImageData".equals(jsMessage.getString(Constants.PARAM_NAME))){
+				String ip = jsMessage.getString(Constants.REQUEST_ADDRESS);
+				String dataType = jsMessage.getString(Constants.PARAM_NAME);
+				String address = "http://"+ip+":"+port+"/"+ Constants.OFFER_REPLY;
+				if ("ImageData".equals(dataType)){
 					this.addNotificationImage(address, reqId);
 				}
-				else {
+				else {	//dataType comes from SQLite
+					String joinedCols = null;
+					List<String> params = null;
 					if (columns != null){
-						List<String> params = this.convertJSONArrayToList(columns);
-						this.queue.add(new DataUploadTask(this.context, jsMessage.getString(Constants.PARAM_NAME), reqId, address, params));
+						params = Utils.convertJSONArrayToList(columns);
+						joinedCols = columns.join(",");						
 					}
-					else {
-						this.queue.add(new DataUploadTask(this.context, jsMessage.getString(Constants.PARAM_NAME), reqId, address));
+					this.queue.add(new DataUploadTask(this.context, dataType, reqId, address, params));
+					
+					if (time != null){
+						long millis = Calendar.getInstance().getTimeInMillis();
+						int recurrence = Integer.parseInt(time);
+						RecurringRequest recurringRequest = new RecurringRequest(reqId, ip, port, recurrence, millis, dataType, joinedCols);
+						Log.d(this.getClass().getName(), "Saving recurring request: " + recurringRequest.toString());
+						this.recurringDao.createOrUpdate(recurringRequest);
 					}
 				}
 			}
@@ -124,14 +145,5 @@ public class MessageHandler {
 			    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 			// mId allows you to update the notification later on.
 		mNotificationManager.notify(DataCollectService.IMAGE_NOTIF_ID, builder.build());
-	}
-
-	private List<String> convertJSONArrayToList(JSONArray array){
-		
-		List<String> list = new ArrayList<String>();
-		for (int i=0; i<array.length(); ++i){
-			list.add(array.optString(i));
-		}
-		return list;
 	}
 }
