@@ -35,7 +35,7 @@ public class GyroscopeSensorListener extends SensorListener {
 					.getTimeInMillis(), event.values[0], event.values[1],
 					event.values[2]));
 			
-			this.mContext.sendRecurringRequests(this.getDataType());
+			this.mContext.sendRecurringRequests();
 		}
 
 	}

@@ -56,7 +56,7 @@ public class SmsListener extends ContentObserver implements IListener {
 				smsDao.create(new SmsData(Calendar.getInstance().getTimeInMillis(), "in"));
 	        }
 	        
-	        this.mContext.sendRecurringRequests(this.getDataType());
+	        this.mContext.sendRecurringRequests();
         }
 	}
 

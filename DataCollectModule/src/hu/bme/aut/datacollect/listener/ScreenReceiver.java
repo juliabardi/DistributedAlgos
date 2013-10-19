@@ -38,7 +38,7 @@ public class ScreenReceiver extends AbstractReceiver {
 			dao.create(new ScreenData(Calendar.getInstance().getTimeInMillis(), "off"));
 		}
 		
-		this.mContext.sendRecurringRequests(this.getDataType());
+		this.mContext.sendRecurringRequests();
 	}
 	
 	@Override

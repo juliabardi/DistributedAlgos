@@ -42,7 +42,7 @@ public class ProximitySensorListener extends SensorListener {
 			proximityDao.create(new ProximityData(Calendar.getInstance()
 					.getTimeInMillis(), distance));
 			
-			this.mContext.sendRecurringRequests(this.getDataType());
+			this.mContext.sendRecurringRequests();
 		}
 
 	}

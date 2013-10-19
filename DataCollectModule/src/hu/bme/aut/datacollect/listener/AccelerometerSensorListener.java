@@ -56,7 +56,7 @@ public class AccelerometerSensorListener extends SensorListener {
 						.getInstance().getTimeInMillis(), accX, accY, accZ));
 				currentAcc = acc;
 				
-				this.mContext.sendRecurringRequests(this.getDataType());
+				this.mContext.sendRecurringRequests();
 			}
 		}
 	}

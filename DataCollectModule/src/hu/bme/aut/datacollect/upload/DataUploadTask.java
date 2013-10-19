@@ -72,7 +72,7 @@ public class DataUploadTask extends UploadTask {
 				}
 				
 				if (result == null){
-					mCallback.onFailure();
+					mCallback.onFailure("No data available.");
 					return;
 				}
 				

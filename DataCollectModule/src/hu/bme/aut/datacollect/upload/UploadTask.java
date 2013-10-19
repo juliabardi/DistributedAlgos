@@ -19,7 +19,7 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 
 	public interface Callback {
 		void onSuccess(String url);
-		void onFailure();
+		void onFailure(String message);
 	}
 	
 	protected static String TAG = "DataCollect:UploadTask";
@@ -61,7 +61,7 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 		MAIN_THREAD.post(new Runnable() {
 			@Override
 			public void run() {
-				mCallback.onFailure();
+				mCallback.onFailure("");
 			}
 		});
 		

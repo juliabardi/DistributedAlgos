@@ -48,7 +48,7 @@ public class CallReceiver extends AbstractReceiver {
 			}
 		}
 		
-		this.mContext.sendRecurringRequests(this.getDataType());
+		this.mContext.sendRecurringRequests();
 	}
 
 	

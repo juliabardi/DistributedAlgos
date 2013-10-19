@@ -31,7 +31,7 @@ public class PackageReceiver extends AbstractReceiver {
 		Log.d(TAG, String.format("PackageData: action: %s, uid: %s", intent.getAction(), uid));
 		packageDao.create(new PackageData(Calendar.getInstance().getTimeInMillis(), intent.getAction(), uid));
 	
-		this.mContext.sendRecurringRequests(this.getDataType());
+		this.mContext.sendRecurringRequests();
 	}
 	
 	@Override

@@ -48,7 +48,7 @@ public class BatteryReceiver extends AbstractReceiver {
 		this.batteryDao.create(new BatteryData(Calendar.getInstance().getTimeInMillis(), 
 				batteryPct, status, chargePlug));
 		
-		this.mContext.sendRecurringRequests(this.getDataType());	
+		this.mContext.sendRecurringRequests();	
 	}
 
 	@Override

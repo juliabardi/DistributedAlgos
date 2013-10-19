@@ -70,7 +70,7 @@ public class ConnectivityReceiver extends AbstractReceiver {
 		connDao.create(new ConnectivityData(Calendar.getInstance().getTimeInMillis(), isConnected, type,
 				wifiAddress, gsmAddress));
 		
-		this.mContext.sendRecurringRequests(this.getDataType());
+		this.mContext.sendRecurringRequests();
 	}
 	
 	@Override

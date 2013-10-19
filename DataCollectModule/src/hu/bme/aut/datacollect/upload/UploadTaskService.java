@@ -44,8 +44,8 @@ public class UploadTaskService extends Service implements
 	}
 
 	@Override
-	public void onFailure() {
-		Log.d(TAG, "Failure, executing next.");
+	public void onFailure(String message) {
+		Log.d(TAG, "Failure, executing next. Reason: " + message);
 		//continuing the upload in case of failure for now
 		running = false;
 		queue.remove();

@@ -8,17 +8,17 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName="RecurringRequest", daoClass=DaoBase.class)
 public class RecurringRequest {
 	
-	@DatabaseField(canBeNull=true)
-	private String reqId;
 	@DatabaseField(canBeNull=false, id=true)
+	private String reqId;
+	@DatabaseField(canBeNull=false, uniqueCombo=true)
 	private String ip;
-	@DatabaseField(canBeNull=true)
+	@DatabaseField(canBeNull=true, uniqueCombo=true)
 	private String port;
 	@DatabaseField(canBeNull=false)
 	private int recurrence;
 	@DatabaseField(canBeNull=true)
 	private long lastSent;
-	@DatabaseField(canBeNull=false)
+	@DatabaseField(canBeNull=false, uniqueCombo=true)
 	private String dataType;
 	@DatabaseField(canBeNull=true)
 	private String params;

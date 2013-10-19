@@ -44,7 +44,7 @@ public class TemperatureSensorListener extends SensorListener {
 			temperatureDao.create(new TemperatureData(Calendar.getInstance()
 					.getTimeInMillis(), temperature));
 			
-			this.mContext.sendRecurringRequests(this.getDataType());
+			this.mContext.sendRecurringRequests();
 		}
 	}
 

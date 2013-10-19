@@ -213,9 +213,12 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 		return getHelper().getDaoBase(RecurringRequest.class);
 	}
 	
-	public void sendRecurringRequests(String dataType) {
+	/**
+	 * Check all recurring requests, and send data where the time has come
+	 */
+	public void sendRecurringRequests() {
 		
-		List<RecurringRequest> requests = getRecurringRequestDao().queryForEq("dataType", dataType);
+		List<RecurringRequest> requests = getRecurringRequestDao().queryForAll();
 		long millis = Calendar.getInstance().getTimeInMillis();
 		for (RecurringRequest request : requests){
 			if (millis - request.getLastSent() >= (request.getRecurrence()*1000)){
@@ -227,8 +230,8 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 				}
 				String address = "http://"+request.getIp()+":"+request.getPort()+"/"+ Constants.OFFER_REPLY;
 				Date date = new Date(request.getLastSent());
-				this.queue.add(new DataUploadTask(this, dataType, request.getReqId(), address, 
-						date, params));
+				this.queue.add(new DataUploadTask(this, request.getDataType(), request.getReqId(), 
+						address, date, params));
 				
 				request.setLastSent(millis);
 				Log.d(TAG, "Updating request: " + request.toString());

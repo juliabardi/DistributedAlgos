@@ -62,7 +62,7 @@ public class LocationProvider extends AbstractListener implements LocationListen
 				.getTimeInMillis(), location.getLatitude(), location
 				.getLongitude(), location.getAltitude()));
 		
-		this.mContext.sendRecurringRequests(this.getDataType());
+		this.mContext.sendRecurringRequests();
 	}
 
 	@Override

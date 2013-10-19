@@ -43,7 +43,7 @@ public class LightSensorListener extends SensorListener {
 			lightDao.create(new LightData(Calendar.getInstance()
 					.getTimeInMillis(), lux));
 			
-			this.mContext.sendRecurringRequests(this.getDataType());
+			this.mContext.sendRecurringRequests();
 		}
 
 	}

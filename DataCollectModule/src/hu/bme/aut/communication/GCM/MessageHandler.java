@@ -12,6 +12,7 @@ import hu.bme.aut.datacollect.upload.UploadTaskQueue;
 import hu.bme.aut.datacollect.utils.StringUtils;
 import hu.bme.aut.datacollect.utils.Utils;
 
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -110,6 +111,9 @@ public class MessageHandler {
 					}
 					this.queue.add(new DataUploadTask(this.context, dataType, reqId, address, params));
 					
+					//deleting previous similar request, not to remain recurring if the new is not that
+					this.deleteRequestIfExists(ip, port, dataType);
+					
 					if (time != null){
 						long millis = Calendar.getInstance().getTimeInMillis();
 						int recurrence = Integer.parseInt(time);
@@ -125,6 +129,25 @@ public class MessageHandler {
 			cmdList.get(Constants.JSON_PARSE_ERROR).performAction("Could not parse JSON");
 			e.printStackTrace();
 		}
+	}
+	
+	//identifying by ip, port, dataType
+	private boolean deleteRequestIfExists(String ip, String port, String dataType){
+		
+		try {
+			RecurringRequest request = this.recurringDao.queryBuilder().where().eq("ip", ip)
+					.and().eq("port", port)
+					.and().eq("dataType", dataType).queryForFirst();
+			
+			if (request != null){
+				Log.d(getClass().getName(), "Deleting previous request: " + request.toString());
+				this.recurringDao.delete(request);
+				return true;
+			}			
+		} catch (SQLException e) {			
+			Log.e(getClass().getName(), e.getMessage());
+		}		
+		return false;
 	}
 	
 	public void addNotificationImage(String address, String reqId){
