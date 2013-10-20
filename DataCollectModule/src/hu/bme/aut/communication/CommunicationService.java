@@ -271,7 +271,7 @@ public class CommunicationService extends Service implements
 		JSONObject message = JsHelper.createMainBodyWithAlgos(Constants.ALGTYPE_DIST_ALGOS, JsHelper
 				.createAlgoBody(JsHelper.createSimpleArray(offerList), null));
 
-		sendJobToNodeService(Constants.REGISTER,Constants.REGISTER, Constants.getNodeServerAddress() + Constants.REGISTER, message.toString());
+		sendJobToNodeService(Constants.REGISTER,Constants.REGISTER, Constants.getNodeServerAddress(this) + Constants.REGISTER, message.toString());
 		setupSyncronizationInfo(SyncronizationValues.SENDING);
 	}
 
@@ -286,7 +286,7 @@ public class CommunicationService extends Service implements
 	private void handleOffer(String key, boolean value) {
 		if (IsWifiAvaiable()) {
 			StringBuilder builder = new StringBuilder();
-			builder.append(Constants.getNodeServerAddress());
+			builder.append(Constants.getNodeServerAddress(this));
 			if (value == true) {
 				builder.append(Constants.OFFER);
 			} else {
@@ -325,7 +325,7 @@ public class CommunicationService extends Service implements
 	 * Registering to the GCM push notification service.
 	 */
 	private void registerGCM() {
-		checkNotNull(Constants.getGCMServerAddress(), "SERVER_URL");
+		checkNotNull(Constants.getGCMServerAddress(this), "SERVER_URL");
 		checkNotNull(SENDER_ID, "SENDER_ID");
 		// Make sure the device has the proper dependencies.
 		GCMRegistrar.checkDevice(this);

@@ -1,5 +1,10 @@
 package hu.bme.aut.communication;
 
+import hu.bme.aut.datacollect.activity.DataCollectService;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 /**
  * Constants used for communication.
  * @author Eva Pataji
@@ -41,14 +46,28 @@ public class Constants {
 	public static String DataCollectorServerPort = "3001";
 	public static String GCMServerPort = "8080";
 
-    public static String getNodeServerAddress(){
-    	return String.format("http://%s:%s/", NodeServerIP, NodeServerPort);
+    public static String getNodeServerAddress(Context context){
+    	
+    	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+    	return String.format("http://%s:%s/", 
+    			sharedPrefs.getString(DataCollectService.DEC_NODE_IP, Constants.NodeServerIP), 
+    			sharedPrefs.getString(DataCollectService.DEC_NODE_PORT, Constants.NodeServerPort));
     }
-    public static String getDataCollectorServerAddress(){
-    	return String.format("http://%s:%s/", NodeServerIP, DataCollectorServerPort);
+    
+    public static String getDataCollectorServerAddress(Context context){
+    	
+    	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+    	return String.format("http://%s:%s/", 
+    			sharedPrefs.getString(DataCollectService.DEC_NODE_IP, Constants.NodeServerIP), 
+    			DataCollectorServerPort);
     }
-    public static String getGCMServerAddress(){
-    	return String.format("http://%s:%s/DistributedEnvironmentCoordination", GCMServerIP, GCMServerPort);
+    
+    public static String getGCMServerAddress(Context context){
+    	
+    	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+    	return String.format("http://%s:%s/DistributedEnvironmentCoordination", 
+    			sharedPrefs.getString(DataCollectService.DEC_ADMIN_IP, Constants.GCMServerIP), 
+    			sharedPrefs.getString(DataCollectService.DEC_ADMIN_PORT, Constants.GCMServerPort));
     }
     
 	//GCM specific

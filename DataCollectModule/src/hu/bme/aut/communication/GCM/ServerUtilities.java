@@ -53,7 +53,7 @@ public final class ServerUtilities {
      */
     public static boolean register(final Context context, final String regId) {
         Log.i(TAG, "registering device (regId = " + regId + ")");
-        String serverUrl = Constants.getGCMServerAddress() + "/register";
+        String serverUrl = Constants.getGCMServerAddress(context) + "/register";
         Map<String, String> params = new HashMap<String, String>();
         params.put("regId", regId);
         long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
@@ -102,7 +102,7 @@ public final class ServerUtilities {
      */
    public static void unregister(final Context context, final String regId) {
         Log.i(TAG, "unregistering device (regId = " + regId + ")");
-        String serverUrl = Constants.getGCMServerAddress() + "/unregister";
+        String serverUrl = Constants.getGCMServerAddress(context) + "/unregister";
         Map<String, String> params = new HashMap<String, String>();
         params.put("regId", regId);
         try {
