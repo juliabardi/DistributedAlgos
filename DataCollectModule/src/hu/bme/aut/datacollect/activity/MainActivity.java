@@ -299,8 +299,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		//TODO get permission
 				
 		//if ImageData sharedpref is enabled and DataCollectService is bound, add notification
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		if (settings.getBoolean(DataCollectService.IMAGE, false)){
+		if (DataCollectService.isDataTypeEnabled(this, DataCollectService.IMAGE)){
 			intent = new Intent(this, CameraActivity.class);
 			intent.putExtra("address", Constants.getDataCollectorServerAddress(this));
 			this.startActivity(intent);

@@ -56,9 +56,14 @@ public class ImageUploadTask extends UploadTask {
 					json.put("id", reqId);
 					json.put("type", "binary");
 					json.put("size", imageBytes.length);
+					Log.d(TAG, json.toString()); //log out before adding the binary part
 					json.put("binary", new String(Base64.encode(imageBytes, Base64.DEFAULT)));
-					Log.d(TAG, json.toString());
-							
+										
+					httpManager.sendPostRequest(address, json.toString());
+						
+					//catching outofmemoryerror, dont send anything then
+				} catch (OutOfMemoryError e){
+					Log.e(TAG, "OutofMemoryError: " + e.getMessage());
 				} catch (FileNotFoundException fe) {	
 					Log.e(TAG, fe.getMessage());		
 				} catch (IOException ie) {	
@@ -69,17 +74,17 @@ public class ImageUploadTask extends UploadTask {
 					try {
 						is.close();
 					} catch (IOException ie) {
+						Log.e(TAG, ie.getMessage());
 					}
 					try {
 						bos.close();
 					} catch (IOException ie) {
+						Log.e(TAG, ie.getMessage());
 					}
+					//delete the file in any case
+					file.delete();
 				}
 				
-				httpManager.sendPostRequest(address, json.toString());
-
-				//delete the file in any case
-				file.delete();
 			}
 		}).start();
 	}

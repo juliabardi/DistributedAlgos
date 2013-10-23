@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,9 +18,11 @@ import java.util.TimerTask;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -34,20 +37,75 @@ public class CameraActivity extends Activity {
 	public static final int MEDIA_TYPE_VIDEO = 2;
 	private static final String TAG = "DataCollect:CameraActivity";
 	
-	private static final int MAX_TIMES = 1;
-	private static final int FREQUENCY = 1000;
+//	private static int MAX_TIMES = 1;
+//	private static int FREQUENCY = 1000;
 
 	private CameraPreview mPreview;
 	private Camera mCamera;
 	
-	private Timer timer = new Timer();
+	private Timer timer;
 	private int times = 0;
-	private TimerTask timerTask = new TimerTask() {          
-        @Override
-        public void run() {
-        	TimerMethod();
-        }
-	};
+	
+	private TimerTask timerTask;
+
+	private TimerTask createTimerTask() {
+		return new TimerTask() {
+			@Override
+			public void run() {
+				
+				//if ImageData got disabled, don't make any more pictures
+				if (!DataCollectService.isDataTypeEnabled(CameraActivity.this, DataCollectService.IMAGE)){
+					Log.d(TAG, "ImageData has been disabled by the user!");
+					cancelNotification();
+					finish();
+					return;
+				}
+				
+				// waiting for the other thread to complete the picture if it's
+				// in progress
+				if (imageInProgress) {
+					synchronized (signalObject) {
+						try {
+							signalObject.wait();
+						} catch (InterruptedException e) {
+							Log.e(TAG, e.getMessage());
+						}
+					}
+				}
+
+				if (times >= max_times) {
+					Log.d(TAG, "Reached " + max_times
+							+ " times, cancelling task");
+					if (!released)
+						mCamera.stopPreview();
+					mCamera.release();
+					mPreview.removePreview();
+					timerTask.cancel();
+
+					// images are ready, we can remove the notif and finish the
+					// activity
+					cancelNotification();
+					finish();
+
+					return;
+				}
+				times++;
+				imageInProgress = true;
+				Log.d(TAG, String.format("Running TimerMethod for %d time.",
+						times));
+				// get an image from the camera
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						// mPreview for the first param gives shutter events
+						if (mCamera != null) {
+							mCamera.takePicture(null, null, mPicture);
+						}
+					}
+				});
+			}
+		};
+	}
 	
 	private Object signalObject = new Object();
 	private boolean imageInProgress = false;
@@ -56,6 +114,14 @@ public class CameraActivity extends Activity {
 	
 	private String address = null;
 	private String reqId;
+	private int width = 0;
+	private int height = 0;
+	
+	//seconds
+	private int recurrence = 1;
+	private int max_times = 1;
+	
+	private boolean released = false;
 
 	private PictureCallback mPicture = new PictureCallback() {
 
@@ -90,7 +156,7 @@ public class CameraActivity extends Activity {
 			CameraActivity.this.queue.add(new ImageUploadTask(pictureFile, address, reqId));
 			
 			//need to start preview to make another picture
-			if (times < MAX_TIMES)
+			if (times < max_times)
 				mCamera.startPreview();
 			imageInProgress = false;
 			//notifying the other thread to continue
@@ -104,77 +170,109 @@ public class CameraActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.camera_layout);
-		//Log.d(TAG, "onCreate called");
+		Log.d(TAG, "onCreate called");
+		this.init(getIntent());
+	}
+	
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		Log.d(TAG, "onNewIntent called");
+		if (timerTask != null){
+			timerTask.cancel();
+		}
+		timer.cancel();
+		timer.purge();
+		this.init(intent);
+	}
+
+	private void init(Intent intent){
 		
-		if (getIntent() != null){
-			this.address = getIntent().getStringExtra("address");
-			this.reqId = getIntent().getStringExtra("reqId");
+		if (intent != null){
+			this.address = intent.getStringExtra("address");
+			this.reqId = intent.getStringExtra("reqId");
+			this.width = intent.getIntExtra("width", 0);
+			this.height = intent.getIntExtra("height", 0);
+			this.setRecurrenceMaxTimes(intent);
+			Log.d(TAG, String.format("init called, params: times:%d, recurrence:%d, width: %d, height: %d", max_times, recurrence, width, height));
 		}
 
 		if (this.checkCameraHardware()) {
-			mCamera = getCameraInstance();
-			mPreview = new CameraPreview(this, mCamera);
-			FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-			preview.addView(mPreview);
-
-			Button captureButton = (Button) findViewById(R.id.button_capture);
-			captureButton.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Log.d(TAG, "Scheduling timerTask for every " + FREQUENCY/1000 + " seconds.");
-				    timer.schedule(timerTask, 0, FREQUENCY);
-				}
-			});
+			mCamera = getCameraInstance();			
+			if (mCamera != null){
+				released = false;
+				this.setPictureSize();
+				
+				mPreview = new CameraPreview(this, mCamera);
+				FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+				preview.addView(mPreview);
+	
+				final Button captureButton = (Button) findViewById(R.id.button_capture);
+				captureButton.setEnabled(true);
+				captureButton.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Log.d(TAG, "Scheduling timerTask for every " + recurrence + " seconds.");
+						timer = new Timer();
+						timerTask = createTimerTask();
+					    timer.scheduleAtFixedRate(timerTask, 0, recurrence*1000);
+					    captureButton.setEnabled(false);
+					}
+				});
+			}
 		} else {
 			Log.d(TAG, "No camera.");
 		}
 	}
-	
-	private void TimerMethod() {
 
-		//waiting for the other thread to complete the picture if it's in progress
-		if (imageInProgress){
-			synchronized (signalObject){
-				try {
-					signalObject.wait();
-				} catch (InterruptedException e) {
-					Log.e(TAG, e.getMessage());
-				}
-			}
-		}
+	private void setPictureSize(){
 		
-		if (times >= MAX_TIMES){
-			Log.d(TAG, "Reached " + MAX_TIMES + " times, cancelling task");
-			mCamera.stopPreview();
-			mCamera.release();
-			mPreview.removePreview();
-			timerTask.cancel();
-			
-			//images are ready, we can remove the notif and finish the activity
-			this.cancelNotification();
-			this.finish();
-			
-			return;
+		if (this.pictureSizeExists()){
+			mCamera.getParameters().setPictureSize(width, height);
 		}
-		times++;
-		imageInProgress = true;
-		Log.d(TAG, String.format("Running TimerMethod for %d time.", times));
-		// get an image from the camera
-		this.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				//mPreview for the first param gives shutter events
-				if (mCamera!=null){
-					mCamera.takePicture(null, null, mPicture);
+		else {
+			List<Size> supported = mCamera.getParameters().getSupportedPictureSizes();
+			Size min = supported.get(supported.size()-1);
+			mCamera.getParameters().setPictureSize(min.width, min.height);
+		}
+	}
+	
+	//returning true if the given picture size (width, height) is supported, else false
+	private boolean pictureSizeExists(){
+		
+		if (width != 0 && height != 0){
+			
+			List<Size> sizes = mCamera.getParameters().getSupportedPictureSizes();
+			for (Size size : sizes){
+				if (size.width == width && size.height == height){
+					return true;
 				}
 			}
-		});
+		}
+		return false;
+	}
+	
+	private void setRecurrenceMaxTimes(Intent intent){
+		if (intent != null){
+			
+			if (intent.hasExtra("recurrence") && intent.hasExtra("times")){
+				this.max_times = intent.getIntExtra("times", 1);
+				this.recurrence = intent.getIntExtra("recurrence", 1);
+			}
+			if (intent.hasExtra("recurrence") && !intent.hasExtra("times")){
+				this.recurrence = intent.getIntExtra("recurrence", 1);
+				this.max_times = 10;  //restricting max times to 10 because of performance problems
+			}
+			if (!intent.hasExtra("recurrence") && intent.hasExtra("times")){
+				this.max_times = intent.getIntExtra("times", 1);
+			}
+		}
 	}
 	
 	private void cancelNotification(){
 		NotificationManager mNotificationManager =
 			    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.cancel(DataCollectService.IMAGE_NOTIF_ID);
+		mNotificationManager.cancel(reqId, DataCollectService.IMAGE_NOTIF_ID);
 	}
 
 	/** Check if this device has a camera */
@@ -238,7 +336,11 @@ public class CameraActivity extends Activity {
 		releaseCamera(); // release the camera immediately on pause event
 		mPreview.removePreview();
 		//cancelling the task
-		timerTask.cancel();
+		timer.cancel();
+		if (timerTask != null){
+			timerTask.cancel();
+		}
+		cancelNotification();
 	}
 	
 	@Override
@@ -255,14 +357,18 @@ public class CameraActivity extends Activity {
 		//Log.d(TAG, "onDestroy called");
 		releaseCamera();
 		mPreview.removePreview();
-		
+		if (timerTask != null){
+			timerTask.cancel();
+		}
 		timer.cancel();
+		cancelNotification();
 	}
 	
 	private void openCamera(){
 		if (mCamera == null){
 			mCamera = getCameraInstance();
 			mPreview.setCamera(mCamera);
+			released = false;
 		}
 	}
 
@@ -272,6 +378,7 @@ public class CameraActivity extends Activity {
 			mCamera.release(); // release the camera for other applications
 			mCamera = null;
 			mPreview.setCamera(null);
+			released = true;
 		}
 	}
 }

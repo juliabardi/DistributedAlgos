@@ -8,10 +8,13 @@ import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
 import hu.bme.aut.datacollect.entity.RecurringRequest;
 import hu.bme.aut.datacollect.upload.DataUploadTask;
+import hu.bme.aut.datacollect.upload.TrafficStatsUploadTask;
 import hu.bme.aut.datacollect.upload.UploadTaskQueue;
 import hu.bme.aut.datacollect.utils.StringUtils;
 import hu.bme.aut.datacollect.utils.Utils;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,7 +43,7 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
  */
 interface Action {    void performAction(String msg); }
 
-public class MessageHandler {
+public class MessageHandler implements Closeable {
 	
 	private static final String TAG = MessageHandler.class.getName();
 	
@@ -48,6 +51,8 @@ public class MessageHandler {
 	
 	private Context context;
 	private UploadTaskQueue queue;
+	
+	private DatabaseHelper dbHelper = null;
 	private DaoBase<RecurringRequest> recurringDao;
 	
 	public MessageHandler(Context context) {
@@ -58,8 +63,22 @@ public class MessageHandler {
 		this.context = context;
 		this.queue = UploadTaskQueue.instance(context);
 		
-		DatabaseHelper dbHelper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
-		this.recurringDao = dbHelper.getDaoBase(RecurringRequest.class);
+		this.recurringDao = getHelper().getDaoBase(RecurringRequest.class);
+	}
+	
+    private DatabaseHelper getHelper() {
+        if (dbHelper == null) {
+            dbHelper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
+        }
+        return dbHelper;
+    }
+    
+	@Override
+	public void close() throws IOException {
+        if (dbHelper != null) {
+            OpenHelperManager.releaseHelper();
+            dbHelper = null;
+        }
 	}
 
 	private void offerRequest(String msg){
@@ -97,6 +116,10 @@ public class MessageHandler {
 				String port = Constants.DataCollectorServerPort;
 				JSONObject requestParams = jsMessage.optJSONObject(Constants.REQUEST_PARAMS);
 				
+				String width = null;
+				String height = null;
+				String times = null;				
+				
 				if (requestParams != null){
 					
 					time = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_TIME));
@@ -106,23 +129,38 @@ public class MessageHandler {
 					reqId = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_ID));
 					String p = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_PORT));
 					port = (p == null) ? port : p;
+					
+					width = StringUtils.trimToNull(requestParams.optString("width"));
+					height = StringUtils.trimToNull(requestParams.optString("height"));
+					times = StringUtils.trimToNull(requestParams.optString("times"));
 				}
 
 				String ip = jsMessage.getString(Constants.REQUEST_ADDRESS);
 				String dataType = jsMessage.getString(Constants.PARAM_NAME);
 				String address = "http://"+ip+":"+port+"/"+ Constants.OFFER_REPLY;
 				
-				if ("ImageData".equals(dataType)){
+				if (DataCollectService.IMAGE.equals(dataType) && 
+						DataCollectService.isDataTypeEnabled(context, DataCollectService.IMAGE)){
 					
-					this.addNotificationImage(address, reqId);
+					this.addNotificationImage(address, reqId, width, height, times, recurrence);
+					return;
 				}
-				else {	//dataType comes from SQLite
-					String joinedCols = null;
-					List<String> params = null;
-					if (columns != null){
-						params = Utils.convertJSONArrayToList(columns);
-						joinedCols = Utils.convertListToCsv(params);					
-					}
+				
+				String joinedCols = null;
+				List<String> params = null;
+				if (columns != null){
+					params = Utils.convertJSONArrayToList(columns);
+					joinedCols = Utils.convertListToCsv(params);					
+				}
+				int recurrenceInt = recurrence==null?0:Integer.parseInt(recurrence);
+				int timesInt = times==null?0:Integer.parseInt(times);
+				
+				if (DataCollectService.TRAFFIC.equals(dataType) && 
+						DataCollectService.isDataTypeEnabled(context, DataCollectService.TRAFFIC)){
+					
+					this.queue.add(new TrafficStatsUploadTask(context, address, reqId, timesInt, recurrenceInt, params));
+				}
+				else {	
 					Date queryDate = null;
 					
 					//only one of date and time should be given (if both are, time will overwrite date)
@@ -140,7 +178,6 @@ public class MessageHandler {
 					
 					if (recurrence != null){
 						long millis = Calendar.getInstance().getTimeInMillis();
-						int recurrenceInt = Integer.parseInt(recurrence);
 						RecurringRequest recurringRequest = new RecurringRequest(reqId, ip, port, recurrenceInt, millis, dataType, joinedCols);
 						Log.d(TAG, "Saving recurring request: " + recurringRequest.toString());
 						this.recurringDao.createOrUpdate(recurringRequest);
@@ -199,23 +236,41 @@ public class MessageHandler {
 		return false;
 	}
 	
-	public void addNotificationImage(String address, String reqId){
+	public void addNotificationImage(String address, String reqId, String width, String height, String times, String recurrence){
 		
-		Intent notificationIntent = new Intent(context, CameraActivity.class);
+		Intent notificationIntent = new Intent(context, CameraActivity.class).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		notificationIntent.putExtra("address", address);
 		notificationIntent.putExtra("reqId", reqId);
+		this.putIntIfExists(notificationIntent, "width", width);
+		this.putIntIfExists(notificationIntent, "height", height);
+		this.putIntIfExists(notificationIntent, "times", times);
+		this.putIntIfExists(notificationIntent, "recurrence", recurrence);
+		
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
-				notificationIntent, 0);
+				notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(
 				context).setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle("Kép kérelem érkezett")
-				.setContentText("Kattintson kép készítéséhez")
+				//.setContentText("Kattintson kép készítéséhez")
+				.setContentText("Id: " + reqId + " Hányszor: " + times + " Idõköz: " + recurrence)
 				.setContentIntent(pendingIntent);
 
 		NotificationManager mNotificationManager =
 			    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 			// mId allows you to update the notification later on.
-		mNotificationManager.notify(DataCollectService.IMAGE_NOTIF_ID, builder.build());
+		//mNotificationManager.cancel(DataCollectService.IMAGE_NOTIF_ID);
+		mNotificationManager.notify(reqId, DataCollectService.IMAGE_NOTIF_ID, builder.build());
+	}
+
+	private void putIntIfExists(Intent intent, String name, String input){
+		
+		if (input != null){
+			try {
+				intent.putExtra(name, Integer.parseInt(input));
+			} catch (NumberFormatException e){
+				Log.e(TAG, e.getMessage());
+			}
+		}
 	}
 }

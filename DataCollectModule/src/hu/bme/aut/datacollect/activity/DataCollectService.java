@@ -42,6 +42,7 @@ import java.util.Map;
 
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
@@ -78,10 +79,11 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	public static final String ORIENTAION = "OrientationData";
 	
 	public static final String RECURRING_REQUEST = "RecurringRequest";
+	public static final String TRAFFIC = "TrafficData";
 
 	public static final List<String> sharedPrefKeys = Arrays.asList(ACCELERATION,
 			LIGHT, TEMPERATURE, GYROSCOPE, LOCATION, CALL,
-			SMS, PACKAGE, CONNECTIVITY, BATTERY, PROXIMITY, SCREEN, IMAGE);
+			SMS, PACKAGE, CONNECTIVITY, BATTERY, PROXIMITY, SCREEN, IMAGE, TRAFFIC);
 	
 	public static final String DEC_NODE_IP = "decNodeIP";
 	public static final String DEC_ADMIN_IP = "decAdminIP";
@@ -95,6 +97,11 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	private Map<String, IListener> listeners = new HashMap<String, IListener>();
 	
 	private UploadTaskQueue queue = UploadTaskQueue.instance(this);
+	
+	public static boolean isDataTypeEnabled(Context context, String dataType){
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+		return settings.getBoolean(dataType, false);
+	}
 
 	public IListener getListener(String key) {
 		return listeners.get(key);

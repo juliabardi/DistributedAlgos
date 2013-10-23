@@ -20,13 +20,9 @@ import static hu.bme.aut.communication.GCM.CommonUtilities.displayMessage;
 import hu.bme.aut.communication.Constants;
 import hu.bme.aut.communication.GCM.MessageHandler;
 import hu.bme.aut.communication.GCM.ServerUtilities;
-import hu.bme.aut.datacollect.activity.R;
-import hu.bme.aut.datacollect.activity.R.string;
 
+import java.io.IOException;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -104,5 +100,17 @@ public class GCMIntentService extends GCMBaseIntentService {
     	intent.setAction(Constants.GCM_REG_ACTION);
     	intent.putExtra(Constants.GCM_REG_MSG, value);
     	sendBroadcast(intent);}
+
+	@Override
+	public void onDestroy() {
+		
+		try {
+			this.msgHandler.close();
+		} catch (IOException e) {
+			Log.e(TAG, e.getMessage());
+		}
+		super.onDestroy();
+	}
+    
 }
 
