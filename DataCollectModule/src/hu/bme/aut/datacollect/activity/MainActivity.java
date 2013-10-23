@@ -94,7 +94,6 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 				Log.d(TAG, "Starting CommunicationService");
 				this.startService(commIntent);
 			}else{
-				//communicationButton.setText("Kommunikáció indítása");
 				communicationButton.setChecked(false);
 			}
 		}
