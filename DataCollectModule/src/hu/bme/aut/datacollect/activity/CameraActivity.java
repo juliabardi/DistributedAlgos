@@ -2,7 +2,7 @@ package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.datacollect.upload.CameraPreview;
 import hu.bme.aut.datacollect.upload.ImageUploadTask;
-import hu.bme.aut.datacollect.upload.UploadTaskQueue;
+import hu.bme.aut.datacollect.upload.ImageUploadTaskQueue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -110,7 +110,7 @@ public class CameraActivity extends Activity {
 	private Object signalObject = new Object();
 	private boolean imageInProgress = false;
 	
-	private UploadTaskQueue queue = UploadTaskQueue.instance(this);
+	private ImageUploadTaskQueue imageQueue = ImageUploadTaskQueue.instance(this);
 	
 	private String address = null;
 	private String reqId;
@@ -153,7 +153,7 @@ public class CameraActivity extends Activity {
 			}
 			
 			Log.d(TAG, String.format("Image number %d captured", times));
-			CameraActivity.this.queue.add(new ImageUploadTask(pictureFile, address, reqId));
+			CameraActivity.this.imageQueue.add(new ImageUploadTask(pictureFile, address, reqId));
 			
 			//need to start preview to make another picture
 			if (times < max_times)

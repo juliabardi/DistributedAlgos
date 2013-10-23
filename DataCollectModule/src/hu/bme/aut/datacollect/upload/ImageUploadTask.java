@@ -64,6 +64,7 @@ public class ImageUploadTask extends UploadTask {
 					//catching outofmemoryerror, dont send anything then
 				} catch (OutOfMemoryError e){
 					Log.e(TAG, "OutofMemoryError: " + e.getMessage());
+					callback.onFailure("OutofMemoryError");
 				} catch (FileNotFoundException fe) {	
 					Log.e(TAG, fe.getMessage());		
 				} catch (IOException ie) {	

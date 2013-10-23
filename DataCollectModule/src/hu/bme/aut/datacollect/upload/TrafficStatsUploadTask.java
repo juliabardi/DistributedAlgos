@@ -72,11 +72,10 @@ public class TrafficStatsUploadTask extends UploadTask {
 					return;
 				}
 				
-				httpManager.sendPostRequest(address, result.toString());				
-				--max_times;
+				httpManager.sendPostRequest(address, result.toString());	
+				Log.d(TAG, "Executed Task, " + (max_times-1) + " remained.");
 				
-				if (max_times > 0 && interval != 0){
-					Log.d(TAG, "Executed Task, " + max_times + " remained.");
+				if (max_times > 1 && interval != 0){					
 					try {
 						Thread.sleep(interval * 1000);
 					} catch (InterruptedException e) {

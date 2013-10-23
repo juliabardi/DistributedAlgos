@@ -54,7 +54,7 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 		this.uploadFailed();
 	}
 	
-	private void uploadFailed(){
+	protected void uploadFailed(){
 		Log.i(TAG, "Upload failed :(");
 
 		// Get back to the main thread before invoking a callback.
@@ -68,7 +68,7 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 		this.cleanup();
 	}
 	
-	private void uploadSuccess(){
+	protected void uploadSuccess(){
 		Log.i(TAG, "Upload success!");					
 		
 		MAIN_THREAD.post(new Runnable() {

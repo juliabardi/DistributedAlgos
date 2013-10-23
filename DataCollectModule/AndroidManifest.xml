@@ -86,6 +86,8 @@
         </service>
         <service android:name="hu.bme.aut.datacollect.upload.UploadTaskService" >
         </service>
+        <service android:name="hu.bme.aut.datacollect.upload.ImageUploadTaskService" >
+        </service>
         
             <!--
           BroadcastReceiver that will receive intents from GCM

@@ -5,17 +5,17 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
-public class UploadTaskService extends Service implements
-		UploadTask.Callback {
+public class ImageUploadTaskService extends Service implements
+		ImageUploadTask.Callback {
 
-	private static final String TAG = "DataCollect:UploadTaskService";
+	private static final String TAG = "DataCollect:ImageUploadTaskService";
 
-	private UploadTaskQueue queue = UploadTaskQueue.instance(this);
+	private ImageUploadTaskQueue queue = ImageUploadTaskQueue.instance(this);
 	private boolean running;
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d(TAG, "Starting UploadTaskService, executing next UploadTask.");
+		Log.d(TAG, "Starting ImageUploadTaskService, executing next ImageUploadTask.");
 		this.executeNext();
 		return START_STICKY;
 	}
@@ -25,19 +25,19 @@ public class UploadTaskService extends Service implements
 			return; // Only one task at a time.
 		}
 
-		UploadTask task = queue.peek();
+		ImageUploadTask task = queue.peek();
 		if (task != null) {
 			running = true;
 			task.execute(this);
 		} else {
-			Log.i(TAG, "No more UploadTasks for now, UploadTaskService stopping.");
+			Log.i(TAG, "No more ImageUploadTasks for now, ImageUploadTaskService stopping.");
 			stopSelf(); 
 		}
 	}
 
 	@Override
 	public void onSuccess(final String url) {
-		Log.d(TAG, "Success, executing next UploadTask.");
+		Log.d(TAG, "Success, executing next ImageUploadTask.");
 		running = false;
 		queue.remove();
 		executeNext();
@@ -45,7 +45,7 @@ public class UploadTaskService extends Service implements
 
 	@Override
 	public void onFailure(String message) {
-		Log.d(TAG, "Failure, executing next UploadTask. Reason: " + message);
+		Log.d(TAG, "Failure, executing ImageUploadTask. Reason: " + message);
 		//continuing the upload in case of failure for now
 		running = false;
 		queue.remove();
