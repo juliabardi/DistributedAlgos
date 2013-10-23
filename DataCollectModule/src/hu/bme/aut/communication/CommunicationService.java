@@ -79,20 +79,18 @@ public class CommunicationService extends Service implements
 	private NotificationManager manager;
 	private boolean isWifiListener = false;
 	
-	private Boolean registeredToServer=false; //dec_admin accessed server
-	private Boolean registeredToGCM=false; // got valid ID
 	private Boolean registeredToDistributedAlgos=false; //dec_node
 	private boolean isSyncronized=false; // If all need/offer data could be sent to server.
 	private HashMap<String,SyncronizationValues> offerSyncronizationInfo;
 	private MyResultReceiver theReceiver = null;
-	private GCMRegistrationListener gcmRegListener= new GCMRegistrationListener();
 	
 	public Boolean getRegisteredtoServer(){
-		return registeredToServer;
+		return GCMRegistrar.isRegisteredOnServer(this);
 	}
 	
 	public Boolean getRegisteredtoGCM(){
-		return registeredToGCM;
+		if(GCMRegistrar.getRegistrationId(this).equals("")) return false;
+		else return true;
 	}
 	
 	public Boolean getregisteredToDistributedAlgos(){
@@ -143,10 +141,7 @@ public class CommunicationService extends Service implements
 		super.onCreate();
 		theReceiver = new MyResultReceiver(new Handler());
 	    theReceiver.setParentContext(this);
-	    registeredToGCM=false;
-	    registeredToServer=false;
 	    registeredToDistributedAlgos=false;
-	    registerReceiver(gcmRegListener, new IntentFilter(Constants.GCM_REG_ACTION));
 	    
 		offerSyncronizationInfo = new HashMap<String,SyncronizationValues>();		
 		manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -177,7 +172,12 @@ public class CommunicationService extends Service implements
 			mRegisterTask.cancel(true);
 		}
 		unregisterReceiver(mGCMHandleMessageReceiver);
-		unregisterReceiver(gcmRegListener);
+		if(registeredToDistributedAlgos==true){
+			unregisterFormDistributedAlgos();
+		}
+		if(!GCMRegistrar.getRegistrationId(this).equals("") && GCMRegistrar.isRegisteredOnServer(this)){
+			Log.i(this.getClass().getName(), "Unregistering from dec_admin third party server.");
+			ServerUtilities.unregister(this, GCMRegistrar.getRegistrationId(this));} // In case of server restart connect to the GCM server again, but dont unregister from GCM service.
 		// Documentation says that an app unistall will take care of unregistering from GCM, also not recommended to register too often.
 		// http://developer.android.com/google/gcm/adv.html
 //		if (GCMRegistrar.isRegisteredOnServer(this)) {
@@ -192,6 +192,12 @@ public class CommunicationService extends Service implements
 		super.onDestroy();
 	}
 	
+	private void unregisterFormDistributedAlgos(){
+		registeredToDistributedAlgos=false;
+		String url=Constants.getNodeServerAddress(this) + Constants.UNREGISTER;
+		sendJobToNodeService(Constants.UNREGISTER,Constants.UNREGISTER,url, null);
+	}
+	
 	private void setupSyncronizationInfo(SyncronizationValues syncValue){
 		Map<String, ?> keys = settings.getAll();
 		for (Map.Entry<String, ?> entry : keys.entrySet()) {
@@ -201,6 +207,7 @@ public class CommunicationService extends Service implements
 	}
 
 	private void registerToServers() {
+		Log.i(this.getClass().getName(), "Registering to servers.");
 		registerGCM();
 		registerPeer();
 	}
@@ -336,15 +343,12 @@ public class CommunicationService extends Service implements
 		final String regId = GCMRegistrar.getRegistrationId(this);
 		if (regId.equals("")) {
 			// Automatically registers application on startup.
-			registeredToGCM=false;
 			GCMRegistrar.register(this, SENDER_ID);
 		} else {
-			registeredToGCM=true;
 			// Device is already registered on GCM, check server.
 			if (GCMRegistrar.isRegisteredOnServer(this)) {
 				// Skips registration.
 				Log.i(TAG, "Already registered.");
-				registeredToServer=true;
 			} else {
 				// Try to register again, but not in the UI thread.
 				// It's also necessary to cancel the thread onDestroy(),
@@ -373,7 +377,6 @@ public class CommunicationService extends Service implements
 					protected void onPostExecute(Boolean result) {
 						mRegisterTask = null;
 						Log.i(this.getClass().getName(), "Async server reg. result:" + result.toString());
-						registeredToServer=result;
 					}
 
 				};
@@ -467,6 +470,9 @@ public class CommunicationService extends Service implements
 	        		setupSyncronizationInfo(SyncronizationValues.FALSE);
 	        	}
 	        }
+	        else if (messageType.equals(Constants.UNREGISTER)){
+	        	// Do nothing, but could also set registeredToDistributedAlgos here false...
+	        }
 	        else{
 	        	String itemName = resultData.getString(Constants.ITEM_NAME);
 	        	if(resultData.getBoolean(Constants.ITEM_SYNC_VALUE, false)){
@@ -476,24 +482,5 @@ public class CommunicationService extends Service implements
 	        	}
 	        }
 	    }
-	}
-
-	/**
-	 * Inner Class to listen to result of GCM registration.
-	 */
-	public class GCMRegistrationListener extends BroadcastReceiver {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			try {
-				Bundle bundle = intent.getExtras();
-				registeredToGCM = bundle.getBoolean(Constants.GCM_REG_MSG,false);
-				registeredToServer = bundle.getBoolean(Constants.GCM_REG_MSG,false); // GCMIntent is called for both.
-				Log.i(this.getClass().getName(), "Received GCM registration update.");
-			} catch (Exception e) {
-				e.printStackTrace();
-
-			}
-		}
-
 	}
 }

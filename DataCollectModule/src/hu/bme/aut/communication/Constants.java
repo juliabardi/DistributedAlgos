@@ -14,6 +14,7 @@ public class Constants {
 	//Registration specific, only these messages can be sent to the server
 	public static final String ALGTYPE_DIST_ALGOS = "DistributedAlgos";
 	public static final String REGISTER = "register";
+	public static final String UNREGISTER = "unregister";
 	public static final String NEED = "need";
 	public static final String OFFER = "offer";
 	public static final String UNREGISTER_OFFER = "unregisterOffer";
@@ -34,8 +35,6 @@ public class Constants {
 	public static final String MESSAGE_TYPE = "messageType";
 	public static final String ITEM_NAME = "itemName";
 	public static final String ITEM_SYNC_VALUE = "itemValue";
-	public static final String GCM_REG_ACTION = "GCM_Rec_State";
-	public static final String GCM_REG_MSG = "Gcm_Reg_Msg";
 	public static final String DISTRUBUTED_ALGOS_AVAIABLE_VALUE = "DistributedAlgosAvaiableValue"; // If node server was avaiable at last request
 	
 	

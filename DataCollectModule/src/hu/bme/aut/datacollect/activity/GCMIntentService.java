@@ -48,7 +48,6 @@ public class GCMIntentService extends GCMBaseIntentService {
         Log.i(TAG, "Device registered: regId = " + registrationId);
         displayMessage(context, getString(R.string.gcm_registered));
         ServerUtilities.register(context, registrationId);
-        sendBroadCast(true);
     }
 
     @Override
@@ -62,7 +61,6 @@ public class GCMIntentService extends GCMBaseIntentService {
             // ServerUtilities when the registration to the server failed.
             Log.i(TAG, "Ignoring unregister callback");
         }
-        sendBroadCast(false);
     }
 
     @Override
@@ -94,12 +92,6 @@ public class GCMIntentService extends GCMBaseIntentService {
                 errorId));
         return super.onRecoverableError(context, errorId);
     }
-
-    private void sendBroadCast(boolean value){
-    	Intent intent = new Intent();
-    	intent.setAction(Constants.GCM_REG_ACTION);
-    	intent.putExtra(Constants.GCM_REG_MSG, value);
-    	sendBroadcast(intent);}
 
 	@Override
 	public void onDestroy() {
