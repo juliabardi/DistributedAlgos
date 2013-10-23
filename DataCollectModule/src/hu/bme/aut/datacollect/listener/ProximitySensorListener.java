@@ -58,6 +58,8 @@ public class ProximitySensorListener extends SensorListener {
 	@Override
 	public void unregister() {
 		sensorManager.unregisterListener(this, proximitySensor);
+		
+		mContext.deleteRecurringRequests(getDataType());
 	}
 
 	@Override

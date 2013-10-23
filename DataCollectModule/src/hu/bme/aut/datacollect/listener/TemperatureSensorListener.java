@@ -59,6 +59,7 @@ public class TemperatureSensorListener extends SensorListener {
 	@Override
 	public void unregister() {
 		sensorManager.unregisterListener(this, ambientTempSensor);
+		mContext.deleteRecurringRequests(getDataType());
 	}
 	
 	@Override

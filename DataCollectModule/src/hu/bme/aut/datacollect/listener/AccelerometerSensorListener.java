@@ -73,6 +73,8 @@ public class AccelerometerSensorListener extends SensorListener {
 	@Override
 	public void unregister() {
 		sensorManager.unregisterListener(this, accelerometerSensor);
+		
+		mContext.deleteRecurringRequests(getDataType());
 	}
 
 	@Override

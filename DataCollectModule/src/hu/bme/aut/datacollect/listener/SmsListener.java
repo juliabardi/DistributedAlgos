@@ -79,6 +79,7 @@ public class SmsListener extends ContentObserver implements IListener {
 			contentResolver.unregisterContentObserver(this);
 			regSms = false;
 		}
+		mContext.deleteRecurringRequests(getDataType());
 	}
 	
 	@Override

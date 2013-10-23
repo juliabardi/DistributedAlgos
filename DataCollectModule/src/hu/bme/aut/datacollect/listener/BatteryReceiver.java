@@ -77,7 +77,7 @@ public class BatteryReceiver extends AbstractReceiver {
 			this.mContext.unregisterReceiver(this);			
 			this.regBattery = false;
 		}
-
+		mContext.deleteRecurringRequests(getDataType());
 	}
 
 	@Override

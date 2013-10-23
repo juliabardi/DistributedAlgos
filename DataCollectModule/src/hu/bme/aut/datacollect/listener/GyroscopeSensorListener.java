@@ -57,6 +57,8 @@ public class GyroscopeSensorListener extends SensorListener {
 	@Override
 	public void unregister() {
 		sensorManager.unregisterListener(this, gyroscopeSensor);
+		
+		mContext.deleteRecurringRequests(getDataType());
 	}
 
 	@Override

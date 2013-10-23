@@ -61,6 +61,7 @@ public class PackageReceiver extends AbstractReceiver {
 			this.mContext.unregisterReceiver(this);
 			this.regPackage = false;
 		}
+		mContext.deleteRecurringRequests(getDataType());
 	}
 	
 	@Override

@@ -59,6 +59,7 @@ public class LightSensorListener extends SensorListener {
 	@Override
 	public void unregister() {
 		sensorManager.unregisterListener(this, lightSensor);
+		mContext.deleteRecurringRequests(getDataType());
 	}
 
 	@Override

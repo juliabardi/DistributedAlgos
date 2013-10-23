@@ -63,6 +63,7 @@ public class ScreenReceiver extends AbstractReceiver {
 			this.mContext.unregisterReceiver(this);
 			this.regScreen = false;
 		}
+		mContext.deleteRecurringRequests(getDataType());
 	}
 	
 	@Override

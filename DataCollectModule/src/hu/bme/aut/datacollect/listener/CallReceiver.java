@@ -71,6 +71,7 @@ public class CallReceiver extends AbstractReceiver {
 			mContext.unregisterReceiver(this);
 			regCall = false;
 		}
+		mContext.deleteRecurringRequests(getDataType());
 	}
 
 	@Override

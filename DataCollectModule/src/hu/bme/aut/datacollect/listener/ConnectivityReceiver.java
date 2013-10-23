@@ -96,6 +96,7 @@ public class ConnectivityReceiver extends AbstractReceiver {
 			mContext.unregisterReceiver(this);
 			regConn = false;
 		}
+		mContext.deleteRecurringRequests(getDataType());
 	}
 
 	@Override

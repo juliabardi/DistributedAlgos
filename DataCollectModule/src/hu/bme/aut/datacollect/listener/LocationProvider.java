@@ -147,6 +147,7 @@ public class LocationProvider extends AbstractListener implements LocationListen
 	@Override
 	public void unregister(){
 		locationManager.removeUpdates(this);
+		mContext.deleteRecurringRequests(getDataType());
 	}
 	
 	void enableLocationSettings(Context context) {

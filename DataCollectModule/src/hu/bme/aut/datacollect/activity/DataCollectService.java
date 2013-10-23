@@ -154,9 +154,6 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 		}
 
 		this.setupForeground();
-		
-		//delete remainings
-		this.deleteAllRecurringRequests();
 	}
 
 	private void setupForeground() {
@@ -193,12 +190,6 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 		}
 	}
 	
-	private void deleteAllRecurringRequests(){
-		
-		Log.d(TAG, "Deleting all recurring requests.");
-		this.getRecurringRequestDao().delete(this.getRecurringRequestDao().queryForAll());
-	}
-
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		return Service.START_STICKY;
@@ -214,6 +205,19 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 		DataCollectService getService() {
 			return DataCollectService.this;
 		}
+	}
+	
+	private void deleteAllRecurringRequests(){
+		
+		Log.d(TAG, "Deleting all recurring requests.");
+		this.getRecurringRequestDao().delete(this.getRecurringRequestDao().queryForAll());
+	}
+	
+	public void deleteRecurringRequests(String dataType){
+		
+		Log.d(TAG, "Deleting recurring requests of data type: " + dataType);
+		List<RecurringRequest> requests = this.getRecurringRequestDao().queryForEq("dataType", dataType);
+		this.getRecurringRequestDao().delete(requests);
 	}
 	
 	public DaoBase<RecurringRequest> getRecurringRequestDao(){
