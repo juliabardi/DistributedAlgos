@@ -4,18 +4,22 @@
    	  <EditTextPreference
                 android:title="DEC_Node"
                 android:summary="Node szerver cím"
-                android:key="@string/dec_node_ip"/>
+                android:key="@string/dec_node_ip"
+                android:defaultValue="192.168.1.113"/>
    	 <EditTextPreference
                 android:title="DEC_Node"
                 android:summary="Node szerver port"
-                android:key="@string/dec_node_port"/>
+                android:key="@string/dec_node_port"
+                android:defaultValue="3000"/>
       <EditTextPreference
                 android:title="DEC_Admin"
                 android:summary="GCM szerver cím"
-                android:key="@string/dec_admin_ip"/>
+                android:key="@string/dec_admin_ip"
+                android:defaultValue="192.168.1.113"/>
       <EditTextPreference
                 android:title="DEC_Admin"
                 android:summary="GCM szerver port"
-                android:key="@string/dec_admin_port"/>
+                android:key="@string/dec_admin_port"
+                android:defaultValue="8080"/>
     </PreferenceCategory>
 </PreferenceScreen>
