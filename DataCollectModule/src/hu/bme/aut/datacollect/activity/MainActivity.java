@@ -18,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -49,6 +50,9 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		OnSharedPreferenceChangeListener {
 	
 	private static final String TAG ="DataCollect:MainActivity";
+	private static final int SENDER_COMMUNICATION=0;
+	private static final int SENDER_WIFI=1;
+	private SharedPreferences settings;
 	
 	private DataCollectService mService;
 	private CommunicationService commService;
@@ -68,7 +72,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
         communicationButton = (Button)findViewById(R.id.buttonCommunicationStop);
         measureButton = (Button)findViewById(R.id.buttonStop);
                         
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		settings.registerOnSharedPreferenceChangeListener((OnSharedPreferenceChangeListener) this);
 		
 		intent = new Intent(this, DataCollectService.class);
@@ -79,12 +83,25 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 			this.startService(intent);
 		}
 		if (!isServiceRunning(CommunicationService.class.getName())){
-			this.startService(commIntent);
+			if(checkSetting()){
+				this.startService(commIntent);
+			}else{
+				communicationButton.setText("Kommunikáció indítása");
+			}
 		}
 		
 		checkWifiAvaiable();
 		
 		this.copyHtmlToSd();
+    }
+    
+    private boolean checkSetting(){
+    	Map<String, ?> keys = settings.getAll();
+		for (Map.Entry<String, ?> entry : keys.entrySet()) {
+			if (settings.getBoolean(entry.getKey(),false)) // There is something we collect.
+				return true;
+		}
+		return false;
     }
     
 	private void checkWifiAvaiable() {
@@ -95,20 +112,9 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		if (wifi != null ) {
 			if(!wifi.isAvailable()) // Wifi is disabled, notify user and navigate to settings.
 			{
-				AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
-				alertbox.setTitle("Wi-Fi state");
-				alertbox.setMessage("Wi-Fi kapcsolat nincs engedélyezve. Kívánja engedélyezni? Enélkül a kommunikációs modul nem tudja feladatát elvégezni.");
-				alertbox.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface arg0, int arg1) {
-					startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-					}
-				});
-				alertbox.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface arg0, int arg1) {
-						 // No
-						}
-					});
-				alertbox.show();				
+				setupAlertDialog("Wi-Fi állapot",
+						"Wi-Fi kapcsolat nincs engedélyezve. Kívánja engedélyezni? Enélkül a kommunikációs modul nem tudja feladatát elvégezni.",
+						SENDER_WIFI);				
 			}			
 		}
 		
@@ -191,17 +197,21 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.action_settings) {
-			Intent i = new Intent();
-			i.setClass(this, ActivityFragmentSettings.class);
-			//sending the listener availability in a bundle
-			for (String sharedKey : DataCollectService.sharedPrefKeys){
-				//if listener does not exist, then put true
-				i.putExtra(sharedKey, this.mService.getListener(sharedKey)==null ? true : 
-					this.mService.getListener(sharedKey).isAvailable());
-			}
-			startActivityForResult(i, 0);
+			startSettings();
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void startSettings(){
+		Intent i = new Intent();
+		i.setClass(this, ActivityFragmentSettings.class);
+		//sending the listener availability in a bundle
+		for (String sharedKey : DataCollectService.sharedPrefKeys){
+			//if listener does not exist, then put true
+			i.putExtra(sharedKey, this.mService.getListener(sharedKey)==null ? true : 
+				this.mService.getListener(sharedKey).isAvailable());
+		}
+		startActivityForResult(i, 0);
 	}
 
 	@Override
@@ -280,13 +290,49 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 				communicationButton.setText("Kommunikáció indítása");
 			}
 			else{
-				startService(commIntent);
-				this.bindService(commIntent, commConnection, 0);
-				
-				communicationButton.setText("Kommunikáció leállítása");				
+				if (!isServiceRunning(CommunicationService.class.getName())){
+					if(checkSetting()){
+						startService(commIntent);
+						this.bindService(commIntent, commConnection, 0);
+						
+						communicationButton.setText("Kommunikáció leállítása");
+					}else{
+						setupAlertDialog("Kommunikáció indítása",
+								"A beállításoknál nem adott meg gyûjtendõ adatot, így a modul nem indítható. Kérem, állítson be gyûjtendõ adatot!",
+								SENDER_COMMUNICATION
+								);
+					}
+				}				
 			}
 			break;
 		}
+	}
+	
+	private void setupAlertDialog(String title, String msg, int senderId){
+		final int sender=senderId;
+		AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
+		alertbox.setTitle(title);
+		alertbox.setMessage(msg);
+		alertbox.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface arg0, int arg1) {
+			switch (sender) {
+			case SENDER_COMMUNICATION:
+				startSettings();
+				break;
+			case SENDER_WIFI:
+				startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+				break;
+			default:
+				break;
+			}
+			}
+		});
+		alertbox.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface arg0, int arg1) {
+				 // No
+				}
+			});
+		alertbox.show();
 	}
 	
 	public void communicationDetailsClicked(View view){
