@@ -7,7 +7,7 @@
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="4dp"
+        android:padding="2dp"
         android:stretchColumns="1" >
 
         <TableLayout
@@ -23,8 +23,20 @@
                     android:id="@+id/textView1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/sensors"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
+                    android:text="Szerver címek"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:paddingBottom="10dp" />
+            </TableRow>
+            
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Node szerver:"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
             </TableRow>
 
             <TableRow
@@ -32,61 +44,64 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" >
 
-                <TextView
-                    android:id="@+id/textView2"
+                <EditText android:id="@+id/nodeAddress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/acceleration"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <Button
-                    android:id="@+id/buttonAcceleration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="onClick"
-                    android:text="View" />
+                    android:text=""/>
             </TableRow>
 
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="GCM szerver:"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </TableRow>
+            
             <TableRow
                 android:id="@+id/tableRow3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" >
 
-                <TextView
-                    android:id="@+id/textView3"
+               <EditText android:id="@+id/gcmAddress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/light"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <Button
-                    android:id="@+id/buttonLight"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="onClick"
-                    android:text="View" />
+                    android:text=""/>
             </TableRow>
-
+            
             <TableRow
                 android:id="@+id/tableRow4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" >
 
                 <TextView
-                    android:id="@+id/textView4"
+                    android:id="@+id/textView10"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/temperature"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:text="Adatgyűjtő szolgáltatás"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:paddingTop="10dp" />
 
-                <Button
-                    android:id="@+id/buttonTemperature"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="onClick"
-                    android:text="View" />
             </TableRow>
 
+            <TableRow
+                android:id="@+id/tableRow7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <ToggleButton
+                    android:id="@+id/buttonStop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="stopClicked"
+                    android:checked="true"
+                    />
+
+            </TableRow>
+            
             <TableRow
                 android:id="@+id/tableRow5"
                 android:layout_width="wrap_content"
@@ -96,48 +111,10 @@
                     android:id="@+id/textView5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/fine_location"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
+                    android:text="Kommunikációs szolgáltatás"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:paddingTop="10dp" />
 
-                <Button
-                    android:id="@+id/buttonFineLocation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="onClick"
-                    android:text="View" />
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRow6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-
-                <TextView
-                    android:id="@+id/textView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/calls"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                <Button
-                    android:id="@+id/buttonCalls"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="onClick"
-                    android:text="View" />
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRow7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-
-                <Button
-                    android:id="@+id/buttonStop"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="stopClicked"
-                    android:text="Mérés leállítása" />
             </TableRow>
 
             <TableRow
@@ -145,18 +122,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" >
 
-                <Button
+                <ToggleButton
                     android:id="@+id/buttonCommunicationStop"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="stopClicked"
-                    android:text="@string/communicationStop" />
+                    android:checked="true"/>
+            </TableRow>
+            
+            <TableRow
+                android:id="@+id/tableRow9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+                
                 <Button
                     android:id="@+id/buttonCommunicationDetails"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="communicationDetailsClicked"
-                    android:text="@string/communication_details" />
+                    android:text="Szinkronizáció állapota" />
             </TableRow>
         </TableLayout>
 
@@ -164,40 +148,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-            <TableRow
-                android:id="@+id/tableRow9"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
 
-                <Button
-                    android:id="@+id/btnImageUpload"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:onClick="uploadImages"
-                    android:text="Upload Images" />
-
-                <Button
-                    android:id="@+id/btnSendData"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:onClick="sendData"
-                    android:text="Send Data" />
-            </TableRow>
-            
-            <TableRow
-                android:id="@+id/tableRow10"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-                
-                <Button
-                    android:id="@+id/btnLoadJavascript"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="loadJavascript"
-                    android:text="Load Javascript" />
-            </TableRow>
 
         </TableLayout>
     </TableLayout>

@@ -230,7 +230,7 @@ public class CommunicationService extends Service implements
 
 				NotificationCompat.Builder builder = new NotificationCompat.Builder(
 						this).setSmallIcon(R.drawable.ic_launcher)
-						.setContentTitle("DataCollectModule")
+						.setContentTitle("CommunicationModule")
 						.setContentText("Wifi nincs engedélyezve.")
 						.setOngoing(true).setAutoCancel(true)
 						.setContentIntent(pendingIntent);
@@ -251,7 +251,7 @@ public class CommunicationService extends Service implements
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(
 				this).setSmallIcon(R.drawable.ic_launcher)
-				.setContentTitle("DataCollectModule")
+				.setContentTitle("CommunicationModule")
 				.setContentText("Kommunikációs modul engedélyezve.")
 				.setOngoing(true).setContentIntent(pendingIntent);
 

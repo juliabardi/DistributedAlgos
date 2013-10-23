@@ -18,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -41,7 +42,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ToggleButton;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 
@@ -49,6 +51,11 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		OnSharedPreferenceChangeListener {
 	
 	private static final String TAG ="DataCollect:MainActivity";
+	private static final int SENDER_COMMUNICATION=0;
+	private static final int SENDER_WIFI=1;
+	private SharedPreferences settings;
+	
+	private static final int REQUEST_CODE_OPTIONS = 0;
 	
 	private DataCollectService mService;
 	private CommunicationService commService;
@@ -56,8 +63,8 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	private Intent commIntent=null;
 	private boolean mBound = false;
 	private boolean commBound = false;
-	private Button communicationButton;
-	private Button measureButton;
+	private ToggleButton communicationButton;
+	private ToggleButton measureButton;
 	
 	private UploadTaskQueue queue = UploadTaskQueue.instance(this);
 		
@@ -65,28 +72,48 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        communicationButton = (Button)findViewById(R.id.buttonCommunicationStop);
-        measureButton = (Button)findViewById(R.id.buttonStop);
+        communicationButton = (ToggleButton)findViewById(R.id.buttonCommunicationStop);
+        measureButton = (ToggleButton)findViewById(R.id.buttonStop);
                         
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		settings.registerOnSharedPreferenceChangeListener((OnSharedPreferenceChangeListener) this);
 		
 		intent = new Intent(this, DataCollectService.class);
 		commIntent = new Intent(this,CommunicationService.class); 
 		
-		// Start service if not already started.
-		if (!isServiceRunning(DataCollectService.class.getName())){
-			this.startService(intent);
-		}
-		if (!isServiceRunning(CommunicationService.class.getName())){
-			this.startService(commIntent);
-		}
-		
 		checkWifiAvaiable();
 		
+		// Start service if not already started.
+		if (!isServiceRunning(DataCollectService.class.getName())){
+			Log.d(TAG, "Starting DataCollectService");
+			this.startService(intent);
+		}
+		
+		if (!isServiceRunning(CommunicationService.class.getName())){			
+			if(checkSetting()){
+				Log.d(TAG, "Starting CommunicationService");
+				this.startService(commIntent);
+			}else{
+				//communicationButton.setText("Kommunikáció indítása");
+				communicationButton.setChecked(false);
+			}
+		}
+		
 		this.copyHtmlToSd();
+		
+		this.setAddressesOnGUI();
     }
     
+    private boolean checkSetting(){
+    	Map<String, ?> keys = settings.getAll();
+		for (Map.Entry<String, ?> entry : keys.entrySet()) {
+			if (!DataCollectService.serverKeys.contains(entry.getKey()) &&
+					settings.getBoolean(entry.getKey(),false)) // There is something we collect.
+				return true;
+		}
+		return false;
+    }
+   
 	private void checkWifiAvaiable() {
 		ConnectivityManager connectivityManager = (ConnectivityManager) this
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -95,20 +122,9 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		if (wifi != null ) {
 			if(!wifi.isAvailable()) // Wifi is disabled, notify user and navigate to settings.
 			{
-				AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
-				alertbox.setTitle("Wi-Fi state");
-				alertbox.setMessage("Wi-Fi kapcsolat nincs engedélyezve. Kívánja engedélyezni? Enélkül a kommunikációs modul nem tudja feladatát elvégezni.");
-				alertbox.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface arg0, int arg1) {
-					startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-					}
-				});
-				alertbox.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface arg0, int arg1) {
-						 // No
-						}
-					});
-				alertbox.show();				
+				setupAlertDialog("Wi-Fi állapot",
+						"Wi-Fi kapcsolat nincs engedélyezve. Kívánja engedélyezni? Enélkül a kommunikációs modul nem tudja feladatát elvégezni.",
+						SENDER_WIFI);				
 			}			
 		}
 		
@@ -191,17 +207,47 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.action_settings) {
-			Intent i = new Intent();
-			i.setClass(this, ActivityFragmentSettings.class);
-			//sending the listener availability in a bundle
-			for (String sharedKey : DataCollectService.sharedPrefKeys){
-				//if listener does not exist, then put true
-				i.putExtra(sharedKey, this.mService.getListener(sharedKey)==null ? true : 
-					this.mService.getListener(sharedKey).isAvailable());
-			}
-			startActivityForResult(i, 0);
+			startSettings();
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void startSettings(){
+		Intent i = new Intent();
+		i.setClass(this, ActivityFragmentSettings.class);
+		//sending the listener availability in a bundle
+		for (String sharedKey : DataCollectService.sharedPrefKeys){
+			//if listener does not exist, then put true
+			i.putExtra(sharedKey, this.mService.getListener(sharedKey)==null ? true : 
+				this.mService.getListener(sharedKey).isAvailable());
+		}
+		startActivityForResult(i, REQUEST_CODE_OPTIONS);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		if (requestCode == REQUEST_CODE_OPTIONS){
+			if (!isServiceRunning(CommunicationService.class.getName())){
+				Log.d(TAG, "Starting CommunicationService");
+				this.startService(commIntent);
+				communicationButton.setChecked(true);
+			}
+			this.setAddressesOnGUI();
+			startSettings();
+		}
+	}
+	
+	private void setAddressesOnGUI(){
+		
+		EditText et = (EditText)this.findViewById(R.id.nodeAddress);
+		et.setKeyListener(null);
+		et.setText(Constants.getNodeServerAddress(this));
+		
+		et = (EditText)this.findViewById(R.id.gcmAddress);
+		et.setText(Constants.getGCMServerAddress(this));
+		et.setKeyListener(null);
 	}
 
 	@Override
@@ -210,18 +256,15 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		
 		if (DataCollectService.DEC_NODE_IP.equals(key)){
 			Constants.NodeServerIP = sharedPreferences.getString(key, Constants.NodeServerIP);
-			//TODO: reregister?
 		}
 		else if (DataCollectService.DEC_ADMIN_IP.equals(key)){
 			Constants.GCMServerIP = sharedPreferences.getString(key, Constants.GCMServerIP);
-			//TODO: reregister?
 		}
 		else if (DataCollectService.DEC_NODE_PORT.equals(key)){
 			Constants.NodeServerPort = sharedPreferences.getString(key, Constants.NodeServerPort);
 		}
 		else if (DataCollectService.DEC_ADMIN_PORT.equals(key)){
 			Constants.GCMServerPort = sharedPreferences.getString(key, Constants.GCMServerPort);
-			//TODO: reregister?
 		}
 		
 		//finding which shared preference was changed, and register/unregister according to the value
@@ -251,6 +294,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	}
 	
 	public void stopClicked(View v){
+		
 		switch (v.getId())
 		{
 		case R.id.buttonStop:
@@ -260,33 +304,60 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		            unbindService(mConnection);
 		            mBound = false;
 		        }				
-				measureButton.setText("Mérés indítása");
 			}
 			else{
 				startService(intent);
-				this.bindService(intent, mConnection, 0);
-				
-				measureButton.setText("Mérés leállítása");				
+				this.bindService(intent, mConnection, 0);				
 			}
 			break;
 		case R.id.buttonCommunicationStop:
-			if (isServiceRunning(CommunicationService.class.getName())){
+			if (isServiceRunning(CommunicationService.class.getName())) {
 				stopService(commIntent);
 				if (commBound) {
-		            unbindService(commConnection);
-		            commBound = false;
-		        }
-				
-				communicationButton.setText("Kommunikáció indítása");
-			}
-			else{
-				startService(commIntent);
-				this.bindService(commIntent, commConnection, 0);
-				
-				communicationButton.setText("Kommunikáció leállítása");				
+					unbindService(commConnection);
+					commBound = false;
+				}
+			} else {
+				if (checkSetting()) {
+					startService(commIntent);
+					this.bindService(commIntent, commConnection, 0);
+				} else {
+					communicationButton.setChecked(false);
+					setupAlertDialog(
+							"Kommunikáció indítása",
+							"A beállításoknál nem adott meg gyûjtendõ adatot, így a modul nem indítható. Kérem, állítson be gyûjtendõ adatot!",
+							SENDER_COMMUNICATION);
+				}
 			}
 			break;
 		}
+	}
+	
+	private void setupAlertDialog(String title, String msg, int senderId){
+		final int sender=senderId;
+		AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
+		alertbox.setTitle(title);
+		alertbox.setMessage(msg);
+		alertbox.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface arg0, int arg1) {
+			switch (sender) {
+			case SENDER_COMMUNICATION:
+				startSettings();
+				break;
+			case SENDER_WIFI:
+				startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+				break;
+			default:
+				break;
+			}
+			}
+		});
+		alertbox.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface arg0, int arg1) {
+				 // No
+				}
+			});
+		alertbox.show();
 	}
 	
 	public void communicationDetailsClicked(View view){

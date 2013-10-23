@@ -39,31 +39,31 @@ public class DetailsActivity extends OrmLiteBaseActivity<DatabaseHelper>  {
 		TableLayout table = (TableLayout)findViewById(R.id.table);
 		List<? extends IData> list = null;
 		
-		switch (id) {
-		case R.id.buttonAcceleration:
-			text.setText("Acceleration");		
-			list = getHelper().getDaoBase(AccelerationData.class).queryForAll();
-			break;
-		case R.id.buttonLight:
-			text.setText("Light");		
-			list = getHelper().getDaoBase(LightData.class).queryForAll();
-			break;
-		case R.id.buttonTemperature:
-			text.setText("Temperature");		
-			list = getHelper().getDaoBase(TemperatureData.class).queryForAll();
-			break;
-		case R.id.buttonFineLocation:
-			text.setText("FineLocation");		
-			list = getHelper().getDaoBase(LocationData.class).queryForAll();
-			break;
-		case R.id.buttonCalls:
-			text.setText("Calls");		
-			list = getHelper().getDaoBase(CallData.class).queryForAll();
-			break;
-		default:
-			list = new ArrayList<IData>();
-			break;
-		}
+//		switch (id) {
+//		case R.id.buttonAcceleration:
+//			text.setText("Acceleration");		
+//			list = getHelper().getDaoBase(AccelerationData.class).queryForAll();
+//			break;
+//		case R.id.buttonLight:
+//			text.setText("Light");		
+//			list = getHelper().getDaoBase(LightData.class).queryForAll();
+//			break;
+//		case R.id.buttonTemperature:
+//			text.setText("Temperature");		
+//			list = getHelper().getDaoBase(TemperatureData.class).queryForAll();
+//			break;
+//		case R.id.buttonFineLocation:
+//			text.setText("FineLocation");		
+//			list = getHelper().getDaoBase(LocationData.class).queryForAll();
+//			break;
+//		case R.id.buttonCalls:
+//			text.setText("Calls");		
+//			list = getHelper().getDaoBase(CallData.class).queryForAll();
+//			break;
+//		default:
+//			list = new ArrayList<IData>();
+//			break;
+//		}
 		this.constructRows(table, list);
 		
 	}
