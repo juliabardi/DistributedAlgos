@@ -234,7 +234,6 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 				communicationButton.setChecked(true);
 			}
 			this.setAddressesOnGUI();
-			startSettings();
 		}
 	}
 	
