@@ -18,15 +18,18 @@ public class ImageUploadTask extends UploadTask {
 
 	private static final long serialVersionUID = -8650032781289859212L;
 
-	private File file;
-	
 	static {
 		TAG = "DataCollect:ImageUploadTask";
 	}
+	
+	private File file;
+	
+	private long timestamp;
 
-	public ImageUploadTask(File file, String address, String reqId) {
+	public ImageUploadTask(File file, String address, String reqId, long timestamp) {
 		super(address, reqId);
 		this.file = file;
+		this.timestamp = timestamp;
 	}
 
 	@Override
@@ -56,6 +59,8 @@ public class ImageUploadTask extends UploadTask {
 					json.put("id", reqId);
 					json.put("type", "binary");
 					json.put("size", imageBytes.length);
+					json.put("timestamp", timestamp);
+					json.put("encoding", "base64");
 					Log.d(TAG, json.toString()); //log out before adding the binary part
 					json.put("binary", new String(Base64.encode(imageBytes, Base64.DEFAULT)));
 										

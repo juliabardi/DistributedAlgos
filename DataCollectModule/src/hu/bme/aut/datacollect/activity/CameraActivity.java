@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -127,6 +128,8 @@ public class CameraActivity extends Activity {
 
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
+			
+			long timestamp = Calendar.getInstance().getTimeInMillis();
 
 			File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
 			if (pictureFile != null) {	
@@ -153,7 +156,7 @@ public class CameraActivity extends Activity {
 			}
 			
 			Log.d(TAG, String.format("Image number %d captured", times));
-			CameraActivity.this.imageQueue.add(new ImageUploadTask(pictureFile, address, reqId));
+			CameraActivity.this.imageQueue.add(new ImageUploadTask(pictureFile, address, reqId, timestamp));
 			
 			//need to start preview to make another picture
 			if (times < max_times)
