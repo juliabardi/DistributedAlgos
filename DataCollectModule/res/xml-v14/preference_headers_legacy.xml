@@ -2,6 +2,14 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <Preference
+        android:summary="Szerver beállítások"
+        android:title="Szerver címek" >
+        <intent
+            android:action="hu.bme.aut.datacollect.prefs.PREFS_SERVERS"
+            android:targetClass="hu.bme.aut.datacollect.activity.ActivityFragmentSettings"
+            android:targetPackage="hu.bme.aut.datacollect.activity" />
+    </Preference>
+    <Preference
         android:icon="@drawable/ic_launcher"
         android:summary="Szenzor monitorozás beállítása"
         android:title="Szenzorok" >
@@ -25,15 +33,6 @@
         android:title="Hívások, smsek" >
         <intent
             android:action="hu.bme.aut.datacollect.prefs.PREFS_CALLS"
-            android:targetClass="hu.bme.aut.datacollect.activity.ActivityFragmentSettings"
-            android:targetPackage="hu.bme.aut.datacollect.activity" />
-    </Preference>
-    <Preference
-        android:icon="@drawable/ic_launcher"
-        android:summary="Szerver beállítások"
-        android:title="Szerver címek" >
-        <intent
-            android:action="hu.bme.aut.datacollect.prefs.PREFS_SERVERS"
             android:targetClass="hu.bme.aut.datacollect.activity.ActivityFragmentSettings"
             android:targetPackage="hu.bme.aut.datacollect.activity" />
     </Preference>

@@ -45,6 +45,14 @@
     <string name="dec_node_port">decNodePort</string>
     <string name="dec_admin_ip">decAdminIP</string>
     <string name="dec_admin_port">decAdminPort</string>
+    <string name="welcome_to_distributedalgos">Welcome to DistributedAlgos!</string>
+    <string name="welcome_long">Az alábbiakban megadhatod a szerverek címét, ezután elnavigálunk a főoldalra. Ezután a Beállításokban engedélyezhetsz adatgyűjtéseket.</string>
+    <string name="node_szerver_ip_s_port">Node szerver ip és port:</string>
+    <string name="default_dec_node_ip">192.168.1.113</string>
+    <string name="default_dec_node_port">3000</string>
+    <string name="gcm_szerver_ip_s_port">GCM szerver ip és port:</string>
+    <string name="default_dec_admin_port">8080</string>
+    <string name="save_start">Mentés és indítás</string>
     
 
 </resources>

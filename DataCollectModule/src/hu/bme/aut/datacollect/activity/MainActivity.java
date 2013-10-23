@@ -95,6 +95,10 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 				this.startService(commIntent);
 			}else{
 				communicationButton.setChecked(false);
+				setupAlertDialog(
+						"Adatgyûjtés engedélyezése",
+						"A beállításoknál még nem adott meg gyûjtendõ adatot, szeretne most megadni?",
+						SENDER_COMMUNICATION);
 			}
 		}
 		
@@ -186,15 +190,6 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
             commBound = false;
         }
     };
-
-
-	public void onClick(View v){
-		
-		//navigate to the details
-		intent = new Intent(this, DetailsActivity.class);
-		intent.putExtra("id", v.getId());
-		this.startActivity(intent);		
-	}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
