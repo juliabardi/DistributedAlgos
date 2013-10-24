@@ -4,15 +4,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import hu.bme.aut.communication.HttpManager.HttpManagerListener;
+import hu.bme.aut.datacollect.activity.R;
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
-import android.content.ClipData.Item;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
 /**
- * Manages HTTP communication with the node.js server.
+ * Manages HTTP communication with the dec_node node.js server.
  * Sends GET and POST requests created by the CommunicationService and 
  * calls back with the results.
  * 
@@ -25,7 +27,7 @@ import android.util.Log;
 public class NodeCommunicationIntentService extends IntentService implements HttpManagerListener{
 	
 	public static final String JSOBJ = "jsObj";
-	public static final String URL = "url";
+	public static final String URL = "url";		
 	
 	private HttpManager httpManager= new HttpManager(this);
 	ResultReceiver resRec; // To send back the result of registration;
@@ -55,8 +57,8 @@ public class NodeCommunicationIntentService extends IntentService implements Htt
 				httpManager.sendPostRequest(url, jsObj);
 			}
 		}
-		else { // TODO handle error.
-			
+		else {
+			Log.e(this.getClass().getName(), "Url is empty.");
 		}
 		
 	}

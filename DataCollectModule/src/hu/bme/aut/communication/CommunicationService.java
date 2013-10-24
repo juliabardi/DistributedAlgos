@@ -2,18 +2,13 @@ package hu.bme.aut.communication;
 
 import static hu.bme.aut.communication.GCM.CommonUtilities.DISPLAY_MESSAGE_ACTION;
 import static hu.bme.aut.communication.GCM.CommonUtilities.EXTRA_MESSAGE;
-import static hu.bme.aut.communication.GCM.CommonUtilities.SENDER_ID;
-import hu.bme.aut.communication.GCM.ServerUtilities;
 import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.activity.MainActivity;
 import hu.bme.aut.datacollect.activity.R;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.json.JSONObject;
-
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -26,7 +21,6 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -108,15 +102,9 @@ public class CommunicationService extends Service implements
 		}
 	}
 
-	private static String TAG = CommunicationService.class.getSimpleName();
-
 
 	// SharedPref
 	private SharedPreferences settings = null;
-
-	// GCM specific
-	private AsyncTask<Void, Void, Boolean> mRegisterTask;
-	
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -168,24 +156,16 @@ public class CommunicationService extends Service implements
 	public void onDestroy() {
 		settings.unregisterOnSharedPreferenceChangeListener(this);
 		manager.cancel(3);
-		if (mRegisterTask != null) {
-			mRegisterTask.cancel(true);
-		}
+		
 		unregisterReceiver(mGCMHandleMessageReceiver);
 		if(registeredToDistributedAlgos==true){
 			unregisterFormDistributedAlgos();
 		}
+		
 		if(!GCMRegistrar.getRegistrationId(this).equals("") && GCMRegistrar.isRegisteredOnServer(this)){
-			Log.i(this.getClass().getName(), "Unregistering from dec_admin third party server.");
-			ServerUtilities.unregister(this, GCMRegistrar.getRegistrationId(this));} // In case of server restart connect to the GCM server again, but dont unregister from GCM service.
-		// Documentation says that an app unistall will take care of unregistering from GCM, also not recommended to register too often.
-		// http://developer.android.com/google/gcm/adv.html
-//		if (GCMRegistrar.isRegisteredOnServer(this)) {
-//			GCMRegistrar.unregister(this);
-//			GCMRegistrar.onDestroy(getApplicationContext()); // To handle
-//																// exception
-//																// error.
-//		}
+			unRegisterGCM();
+		}
+		
 		if(isWifiListener){
 			unregisterReceiver(mWifiConnectionChangedReceiver);
 		}
@@ -201,15 +181,18 @@ public class CommunicationService extends Service implements
 	private void setupSyncronizationInfo(SyncronizationValues syncValue){
 		Map<String, ?> keys = settings.getAll();
 		for (Map.Entry<String, ?> entry : keys.entrySet()) {
-			offerSyncronizationInfo.put(entry.getKey(),syncValue);
+			String key = entry.getKey();
+			if (DataCollectService.sharedPrefKeys.contains(key)){
+			offerSyncronizationInfo.put(key,syncValue);
+			}
 		}
 		
 	}
 
 	private void registerToServers() {
 		Log.i(this.getClass().getName(), "Registering to servers.");
-		registerGCM();
 		registerPeer();
+		registerGCM();
 	}
 
 	private boolean IsWifiAvaiable() {
@@ -281,6 +264,14 @@ public class CommunicationService extends Service implements
 		sendJobToNodeService(Constants.REGISTER,Constants.REGISTER, Constants.getNodeServerAddress(this) + Constants.REGISTER, message.toString());
 		setupSyncronizationInfo(SyncronizationValues.SENDING);
 	}
+	
+	private void registerGCM(){
+		sendJobToGcmService(Constants.REGISTER);
+	}
+	
+	private void unRegisterGCM(){
+		sendJobToGcmService(Constants.UNREGISTER);
+	}
 
 	/**
 	 * Register or unregister an offer depending on user Settings.
@@ -307,7 +298,7 @@ public class CommunicationService extends Service implements
 			offerSyncronizationInfo.put(key, SyncronizationValues.SENDING);
 		} else {
 			offerSyncronizationInfo.put(key, SyncronizationValues.FALSE);
-			Log.i(TAG,
+			Log.i(this.getClass().getName(),
 					String.format(
 							"Could not notify server about offer state change: %s, Wi-Fi connection is not avaiable.",
 							key));
@@ -326,71 +317,11 @@ public class CommunicationService extends Service implements
 		}
 		this.startService(intent);
 	}
-
-
-	/**
-	 * Registering to the GCM push notification service.
-	 */
-	private void registerGCM() {
-		checkNotNull(Constants.getGCMServerAddress(this), "SERVER_URL");
-		checkNotNull(SENDER_ID, "SENDER_ID");
-		// Make sure the device has the proper dependencies.
-		GCMRegistrar.checkDevice(this);
-		// Make sure the manifest was properly set - comment out this line
-		// while developing the app, then uncomment it when it's ready.
-		GCMRegistrar.checkManifest(this);
-
-		final String regId = GCMRegistrar.getRegistrationId(this);
-		if (regId.equals("")) {
-			// Automatically registers application on startup.
-			GCMRegistrar.register(this, SENDER_ID);
-		} else {
-			// Device is already registered on GCM, check server.
-			if (GCMRegistrar.isRegisteredOnServer(this)) {
-				// Skips registration.
-				Log.i(TAG, "Already registered.");
-			} else {
-				// Try to register again, but not in the UI thread.
-				// It's also necessary to cancel the thread onDestroy(),
-				// hence the use of AsyncTask instead of a raw thread.
-				final Context context = this;
-				mRegisterTask = new AsyncTask<Void, Void, Boolean>() {
-
-					@Override
-					protected Boolean doInBackground(Void... params) {
-						Boolean registered = ServerUtilities.register(context,
-								regId);
-						// At this point all attempts to register with the app
-						// server failed, so we need to unregister the device
-						// from GCM - the app will try to register again when
-						// it is restarted. Note that GCM will send an
-						// unregistered callback upon completion, but
-						// GCMIntentService.onUnregistered() will ignore it.
-						
-						if (!registered) {
-							GCMRegistrar.unregister(context);
-						}
-						return registered;
-					}
-
-					@Override
-					protected void onPostExecute(Boolean result) {
-						mRegisterTask = null;
-						Log.i(this.getClass().getName(), "Async server reg. result:" + result.toString());
-					}
-
-				};
-				mRegisterTask.execute(null, null, null);
-			}
-		}
-
-	}
-
-	private void checkNotNull(Object reference, String name) {
-		if (reference == null) {
-			throw new NullPointerException(getString(R.string.error_config,
-					name));
-		}
+	
+	private void sendJobToGcmService(String msg){
+		Intent intent = new Intent(this, GCMCommunicationIntentService.class);
+		intent.putExtra(Constants.MESSAGE_TYPE, msg);
+		this.startService(intent);
 	}
 
 	/*******Listeners********/
@@ -414,7 +345,7 @@ public class CommunicationService extends Service implements
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String newMessage = intent.getExtras().getString(EXTRA_MESSAGE);
-			Log.i(TAG, newMessage);
+			Log.i(this.getClass().getName(), newMessage);
 		}
 	};
 
@@ -433,7 +364,7 @@ public class CommunicationService extends Service implements
 					unregisterReceiver(mWifiConnectionChangedReceiver); // Dont listen when unnecessary.
 					isWifiListener=false;
 					manager.cancel(3);	// Cancel Wi-Fi notif if it is still there and was not clicked.
-					Log.i(TAG, "Network connection establisted.");
+					Log.i(this.getClass().getName(), "Network connection establisted.");
 				} else {
 					// Wi-FI connection was lost.
 				}
