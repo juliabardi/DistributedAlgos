@@ -1,12 +1,10 @@
 package hu.bme.aut.datacollect.activity;
 
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-
 import hu.bme.aut.communication.CommunicationService;
 import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
+
+import java.util.Map;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -16,6 +14,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.widget.CheckedTextView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 /**
  * Information for the user about the running service values.
@@ -26,12 +27,11 @@ import android.widget.TextView;
 public class CommunicationActivity extends Activity {
 	private CommunicationService commService;
 	private boolean commBound = false;
-	TextView tv;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		tv = new TextView(this);
+		this.setContentView(R.layout.sync_layout);
 		
 	}
 
@@ -44,6 +44,7 @@ public class CommunicationActivity extends Activity {
 		}
 		else{
 			TextView tv = new TextView(this);
+			tv.setTextAppearance(this, android.R.style.TextAppearance_Large);
 			tv.setText("A kommunikációs modul inaktív.");
 			setContentView(tv);
 		}
@@ -88,19 +89,26 @@ public class CommunicationActivity extends Activity {
             CommServiceBinder binder = (CommServiceBinder) service;
             commService = binder.getService();
             commBound = true;
-            StringBuilder builder = new StringBuilder();
-            builder.append("GCM registration(got ID from service): "+commService.getRegisteredtoGCM().toString()+"\n" +
-            		"GCM server connection: "+commService.getRegisteredtoServer().toString()+"\n" +
-    				"Distributed Algos server connection: "+commService.getregisteredToDistributedAlgos().toString()+"\n");
-    		HashMap<String, CommunicationService.SyncronizationValues> syncInfo=commService.getOfferSyncronizationInfo();
-    		builder.append("\n");
-    		builder.append("Offer Items | Server synced");
-    		for (Map.Entry<String, CommunicationService.SyncronizationValues> entry : syncInfo.entrySet()) {
-    			builder.append("\n"); 
-    			builder.append("Key = " + entry.getKey() + ", Value = " + entry.getValue()); }
-    		builder.append("\n");
-    		tv.setText(builder.toString());
-    		setContentView(tv);
+    		
+    		CheckedTextView chtv = (CheckedTextView)findViewById(R.id.checkedGCMReg);
+    		chtv.setChecked(commService.getRegisteredtoGCM());
+    		chtv = (CheckedTextView)findViewById(R.id.checkedGCMServer);
+    		chtv.setChecked(commService.getRegisteredtoServer());
+    		chtv = (CheckedTextView)findViewById(R.id.checkedDistAlgos);
+    		chtv.setChecked(commService.getregisteredToDistributedAlgos());
+    		TableLayout table = (TableLayout)findViewById(R.id.offerTable);
+    		
+    		for (Map.Entry<String, CommunicationService.SyncronizationValues> entry : commService.getOfferSyncronizationInfo().entrySet()){
+    			TableRow tr = new TableRow(CommunicationActivity.this);
+    			TextView view = new TextView(CommunicationActivity.this);
+    			view.setText(entry.getKey());
+    			tr.addView(view);
+    			view = new TextView(CommunicationActivity.this);
+    			view.setText(entry.getValue().toString());
+    			view.setPadding(20, 0, 0, 0);
+    			tr.addView(view);
+    			table.addView(tr);
+    		}
         }
 
         @Override

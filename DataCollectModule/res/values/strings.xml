@@ -53,6 +53,9 @@
     <string name="gcm_szerver_ip_s_port">GCM szerver ip és port:</string>
     <string name="default_dec_admin_port">8080</string>
     <string name="save_start">Mentés és indítás</string>
+    <string name="settings">Beállítások</string>
+    <string name="take_picture">Képkészítés</string>
+    <string name="sync">Szinkronizáció</string>
     
 
 </resources>

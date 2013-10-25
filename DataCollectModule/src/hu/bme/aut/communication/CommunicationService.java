@@ -91,7 +91,7 @@ public class CommunicationService extends Service implements
 		return registeredToDistributedAlgos;
 	}
 	
-	public HashMap getOfferSyncronizationInfo(){
+	public HashMap<String,SyncronizationValues> getOfferSyncronizationInfo(){
 		return offerSyncronizationInfo;
 	} 
 
@@ -183,7 +183,7 @@ public class CommunicationService extends Service implements
 		for (Map.Entry<String, ?> entry : keys.entrySet()) {
 			String key = entry.getKey();
 			if (DataCollectService.sharedPrefKeys.contains(key)){
-			offerSyncronizationInfo.put(key,syncValue);
+				offerSyncronizationInfo.put(key,syncValue);
 			}
 		}
 		
