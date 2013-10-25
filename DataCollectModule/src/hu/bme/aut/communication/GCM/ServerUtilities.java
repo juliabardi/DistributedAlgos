@@ -42,7 +42,7 @@ import java.util.Random;
  */
 public final class ServerUtilities {
 
-    private static final int MAX_ATTEMPTS = 3;
+    private static final int MAX_ATTEMPTS = 1;
     private static final int BACKOFF_MILLI_SECONDS = 2000;
     private static final Random random = new Random();
 
