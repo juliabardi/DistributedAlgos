@@ -2,6 +2,7 @@ package hu.bme.aut.communication;
 
 import static hu.bme.aut.communication.GCM.CommonUtilities.DISPLAY_MESSAGE_ACTION;
 import static hu.bme.aut.communication.GCM.CommonUtilities.EXTRA_MESSAGE;
+import hu.bme.aut.communication.helpers.JsHelper;
 import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.activity.MainActivity;
 import hu.bme.aut.datacollect.activity.R;

@@ -1,4 +1,6 @@
-package hu.bme.aut.communication;
+package hu.bme.aut.communication.helpers;
+
+import hu.bme.aut.communication.Constants;
 
 import java.util.ArrayList;
 

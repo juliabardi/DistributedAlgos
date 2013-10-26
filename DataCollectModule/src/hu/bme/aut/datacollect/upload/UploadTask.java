@@ -1,7 +1,7 @@
 package hu.bme.aut.datacollect.upload;
 
-import hu.bme.aut.communication.HttpManager;
-import hu.bme.aut.communication.HttpManager.HttpManagerListener;
+import hu.bme.aut.communication.helpers.HttpManager;
+import hu.bme.aut.communication.helpers.HttpManager.HttpManagerListener;
 
 import android.os.Handler;
 import android.os.Looper;

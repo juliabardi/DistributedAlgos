@@ -3,12 +3,10 @@ package hu.bme.aut.communication;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import hu.bme.aut.communication.HttpManager.HttpManagerListener;
-import hu.bme.aut.datacollect.activity.R;
+import hu.bme.aut.communication.helpers.HttpManager;
+import hu.bme.aut.communication.helpers.HttpManager.HttpManagerListener;
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
