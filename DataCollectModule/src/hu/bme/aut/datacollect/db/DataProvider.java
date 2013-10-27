@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -84,19 +85,18 @@ public class DataProvider implements IDataProvider{
 		return this.getDataAfterTimestamp(clazz, reqId, date.getTime(), params);
 	}
 	
-	public void setSum(String sum){
-		Log.d(TAG, "Javascript returned sum: " + sum);
-	}
-	
+	@JavascriptInterface
 	public void setJSON(String json){
 		
-		JSONObject j = null;
+		Log.d(TAG, "Javascript returned string: " + json);
+		JSONArray j = null;
 		try {
-			j = new JSONObject(json);
+			j = new JSONArray(json);
 		} catch (JSONException e) {
 			Log.e(TAG, "Javascript-returned json parse failed.");
+			return;
 		}
-		Log.d(TAG, "Javascript returned json: " + j);
+		Log.d(TAG, "JsonArray processed: " + j);
 	}
 	
 	@Override
