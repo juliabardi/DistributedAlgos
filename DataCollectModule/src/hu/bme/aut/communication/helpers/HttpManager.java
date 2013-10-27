@@ -21,6 +21,8 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.json.JSONObject;
+
 import android.util.Base64;
 import android.util.Log;
 
@@ -50,7 +52,22 @@ public class HttpManager {
 	 * @param url
 	 * @return
 	 */
-	public void sendGetRequest(String url)
+	public void sendGetRequest(String url, String port)
+	{
+	  	if(url!=null && !url.trim().equals("")){
+	  		if(url.startsWith("https")){
+	  			try {
+		  			sendSecureGetRequest(url, Integer.parseInt(port));
+				} catch (NumberFormatException e) {
+					Log.e(this.getClass().getName(), "Port number cast exception at secure GET.");
+				}
+	  		}else{
+	  			sendSimpleGetRequest(url);
+	  		}
+	  	}		
+	}
+	
+	public void sendSimpleGetRequest(String url)
 	{
 	  	HttpClient httpclient = new DefaultHttpClient();
 	  	HttpGet httpget = new HttpGet(url); 
@@ -79,7 +96,23 @@ public class HttpManager {
 	 * Send a POST request to the server.
 	 * @param url
 	 */
-	public void sendPostRequest(String url, String JSobject)
+	public void sendPostRequest(String url, String JSobject, String port)
+	{
+		if(url!=null && !url.trim().equals("")){
+	  		if(url.startsWith("https")){
+	  			try {
+		  			sendSecurePostRequest(url, JSobject, Integer.parseInt(port));
+				} catch (NumberFormatException e) {
+					Log.e(this.getClass().getName(), "Port number cast exception at secure GET.");
+				}
+	  		}else{
+	  			sendSimplePostRequest(url, JSobject);	
+
+	  		}
+	  	}	
+	}
+	
+	public void sendSimplePostRequest(String url, String JSobject)
 	{
 		try {
 			this.sendPostRequest(url, JSobject.getBytes("UTF8"));
@@ -89,7 +122,7 @@ public class HttpManager {
 		}		
 	}
 	
-	public void sendPostRequest(String url, byte[] message)
+	private void sendPostRequest(String url, byte[] message)
 	{
 		HttpClient httpclient = new DefaultHttpClient(this.getHttpParams());
 		HttpPost httppost = new HttpPost(url);

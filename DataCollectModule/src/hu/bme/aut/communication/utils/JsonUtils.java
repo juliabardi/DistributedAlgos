@@ -1,4 +1,4 @@
-package hu.bme.aut.communication.helpers;
+package hu.bme.aut.communication.utils;
 
 import hu.bme.aut.communication.Constants;
 
@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsHelper {
+public class JsonUtils {
 	
 	
 	/**

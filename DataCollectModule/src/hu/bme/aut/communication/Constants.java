@@ -28,6 +28,7 @@ public class Constants {
 	public static final String REQUEST_COLUMNS ="columns";
 	public static final String REQUEST_ID ="requestId";
 	public static final String REQUEST_PORT ="port";
+	public static final String REQUEST_PROTOCOL ="protocol";
 	public static final String REQUEST_DATE = "date";
 	public static final String REQUEST_RECURRENCE = "recurrence";
 	
@@ -42,23 +43,37 @@ public class Constants {
 	public static String NodeServerIP = "192.168.1.113";
 	public static String GCMServerIP = "192.168.1.113";
 	public static String NodeServerPort = "3000";
-	public static String DataCollectorServerPort = "3001";
+	public static String DataCollectorServerPort = "3003";
 	public static String GCMServerPort = "8080";
-
-    public static String getNodeServerAddress(Context context){
+	public static String NodeServerProtocol = "http";
+	public static String DataCollectorServerProtocol = "https";
+	
+	public static String getNodeServerAddress(Context context){
     	
     	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-    	return String.format("http://%s:%s/", 
+    	return String.format("://%s:%s/", 
     			sharedPrefs.getString(DataCollectService.DEC_NODE_IP, Constants.NodeServerIP), 
     			sharedPrefs.getString(DataCollectService.DEC_NODE_PORT, Constants.NodeServerPort));
     }
+	
+	 public static String getNodeServerProtocol(Context context){
+	    	
+	    	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+	    	return  sharedPrefs.getString(DataCollectService.DEC_NODE_PROTOCOL, Constants.NodeServerProtocol); 
+	    }
     
     public static String getDataCollectorServerAddress(Context context){
     	
     	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-    	return String.format("http://%s:%s/", 
+    	return String.format("://%s:%s/", 
     			sharedPrefs.getString(DataCollectService.DEC_NODE_IP, Constants.NodeServerIP), 
     			DataCollectorServerPort);
+    }
+    
+    public static String getDataCollectorServerProtocol(Context context){
+    	
+    	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+    	return  sharedPrefs.getString(DataCollectService.DATA_COLLECTOR_PROTOCOL, Constants.DataCollectorServerProtocol); 
     }
     
     public static String getGCMServerAddress(Context context){
@@ -68,6 +83,16 @@ public class Constants {
     			sharedPrefs.getString(DataCollectService.DEC_ADMIN_IP, Constants.GCMServerIP), 
     			sharedPrefs.getString(DataCollectService.DEC_ADMIN_PORT, Constants.GCMServerPort));
     }
+    
+    public static String getNodeServerPort(Context context){
+       	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+       	return  sharedPrefs.getString(DataCollectService.DEC_NODE_PORT, Constants.NodeServerPort);
+    }
+    
+    public static String getDataCollectorServerPort(Context context){
+       	return Constants.DataCollectorServerPort; 
+    }
+
     
 	//GCM specific
 	public static final String OFFER_REQUEST="offerRequest";

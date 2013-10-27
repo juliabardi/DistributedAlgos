@@ -49,10 +49,10 @@ public class NodeCommunicationIntentService extends IntentService implements Htt
 		
 		if(url!=null) {
 			if(jsObj==null){ // It is a GET.
-				httpManager.sendGetRequest(url);
+				httpManager.sendGetRequest(url,Constants.getNodeServerPort(this));
 			}
 			else{ // It is a POST.
-				httpManager.sendPostRequest(url, jsObj);
+				httpManager.sendPostRequest(url, jsObj, Constants.getNodeServerPort(this));
 			}
 		}
 		else {

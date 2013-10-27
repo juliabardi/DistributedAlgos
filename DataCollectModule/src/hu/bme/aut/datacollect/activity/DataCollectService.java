@@ -89,8 +89,10 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	public static final String DEC_ADMIN_IP = "decAdminIP";
 	public static final String DEC_NODE_PORT = "decNodePort";
 	public static final String DEC_ADMIN_PORT = "decAdminPort";
+	public static final String DEC_NODE_PROTOCOL = "decNodeProtocol";
+	public static final String DATA_COLLECTOR_PROTOCOL = "dataCollectorProtocol";
 	
-	public static final List<String> serverKeys = Arrays.asList(DEC_ADMIN_IP, DEC_ADMIN_PORT, DEC_NODE_IP, DEC_NODE_PORT);
+	public static final List<String> serverKeys = Arrays.asList(DEC_ADMIN_IP, DEC_ADMIN_PORT, DEC_NODE_IP, DEC_NODE_PORT,DEC_NODE_PROTOCOL,DATA_COLLECTOR_PROTOCOL);
 
 	private final ServiceBinder mBinder = new ServiceBinder();
 
@@ -242,7 +244,7 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 				String address = "http://"+request.getIp()+":"+request.getPort()+"/"+ Constants.OFFER_REPLY;
 				Date date = new Date(request.getLastSent());
 				this.queue.add(new DataUploadTask(this, request.getDataType(), request.getReqId(), 
-						address, date, params));
+						address, request.getPort(), date, params));
 				
 				request.setLastSent(millis);
 				Log.d(TAG, "Updating request: " + request.toString());

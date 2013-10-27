@@ -25,11 +25,13 @@ public class ImageUploadTask extends UploadTask {
 	private File file;
 	
 	private long timestamp;
+	private String port;
 
-	public ImageUploadTask(File file, String address, String reqId, long timestamp) {
+	public ImageUploadTask(File file, String address, String port, String reqId, long timestamp) {
 		super(address, reqId);
 		this.file = file;
 		this.timestamp = timestamp;
+		this.port=port;
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public class ImageUploadTask extends UploadTask {
 					Log.d(TAG, json.toString()); //log out before adding the binary part
 					json.put("binary", new String(Base64.encode(imageBytes, Base64.DEFAULT)));
 										
-					httpManager.sendPostRequest(address, json.toString());
+					httpManager.sendPostRequest(address, json.toString(), port);
 						
 					//catching outofmemoryerror, dont send anything then
 				} catch (OutOfMemoryError e){

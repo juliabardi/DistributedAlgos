@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 public class FirstActivity extends Activity {
@@ -37,6 +38,29 @@ public class FirstActivity extends Activity {
 				((TextView)findViewById(R.id.gcmAddress)).getText().toString());
 		editor.putString(DataCollectService.DEC_ADMIN_PORT, 
 				((TextView)findViewById(R.id.gcmPort)).getText().toString());
+		RadioGroup nodeProtocol = (RadioGroup)findViewById(R.id.radioNodeProtocol);
+		String selectedNodeProtocol="http";
+		switch (nodeProtocol.getCheckedRadioButtonId()) {
+		case R.id.radioButtonNodeHTTPS:
+			selectedNodeProtocol="https";
+			break;
+		default:
+			break;
+		}
+		editor.putString(DataCollectService.DEC_NODE_PROTOCOL, selectedNodeProtocol);
+
+		RadioGroup dataCollectorProtocol = (RadioGroup)findViewById(R.id.radioDataCollectorProtocol);
+		String selectedDataCollectorProtocol="https";
+		switch (dataCollectorProtocol.getCheckedRadioButtonId()) {
+		case R.id.radioButtonDataCollectorHTTP:
+			selectedNodeProtocol="http";
+			break;
+		default:
+			break;
+		}
+		
+		editor.putString(DataCollectService.DATA_COLLECTOR_PROTOCOL, selectedDataCollectorProtocol);
+		
 		editor.commit();
 		
 		this.startActivity(new Intent(this, MainActivity.class));

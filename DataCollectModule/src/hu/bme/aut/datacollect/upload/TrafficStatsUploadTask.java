@@ -25,10 +25,12 @@ public class TrafficStatsUploadTask extends UploadTask {
 	private List<String> params;
 	private int max_times;
 	private int interval;
+	private String port;
 	
-	public TrafficStatsUploadTask(Context context, String address, String reqId, int max_times, int interval, List<String> params) {
+	public TrafficStatsUploadTask(Context context, String address, String port, String reqId, int max_times, int interval, List<String> params) {
 		super(address, reqId);
 		this.params = params;
+		this.port=port;
 		
 		this.setTimesAndInterval(max_times, interval);
 		
@@ -72,7 +74,7 @@ public class TrafficStatsUploadTask extends UploadTask {
 					return;
 				}
 				
-				httpManager.sendPostRequest(address, result.toString());	
+				httpManager.sendPostRequest(address, result.toString(),port);	
 				Log.d(TAG, "Executed Task, " + (max_times-1) + " remained.");
 				
 				if (max_times > 1 && interval != 0){					
@@ -82,7 +84,7 @@ public class TrafficStatsUploadTask extends UploadTask {
 						Log.e(TAG, e.getMessage());
 					}
 					//creating another task while max_times is not 0
-					queue.add(new TrafficStatsUploadTask(context, address, reqId, max_times-1, interval, params));
+					queue.add(new TrafficStatsUploadTask(context, address, port, reqId, max_times-1, interval, params));
 				}
 				
 			}}).start();

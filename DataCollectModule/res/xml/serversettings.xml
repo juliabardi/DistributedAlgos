@@ -1,25 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    <PreferenceCategory android:title="Szerver címek" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:title="Szerver beállítások">
+    <PreferenceCategory android:title="DEC_Node" >
    	  <EditTextPreference
-                android:title="DEC_Node"
-                android:summary="Node szerver cím"
+                android:title="Node szerver cím"
                 android:key="@string/dec_node_ip"
                 android:defaultValue="@string/default_dec_node_ip"/>
    	 <EditTextPreference
-                android:title="DEC_Node"
-                android:summary="Node szerver port"
+                android:title="Node szerver port"
                 android:key="@string/dec_node_port"
                 android:defaultValue="@string/default_dec_node_port"/>
-      <EditTextPreference
-                android:title="DEC_Admin"
-                android:summary="GCM szerver cím"
-                android:key="@string/dec_admin_ip"
-                android:defaultValue="@string/default_dec_node_ip"/>
-      <EditTextPreference
-                android:title="DEC_Admin"
-                android:summary="GCM szerver port"
-                android:key="@string/dec_admin_port"
-                android:defaultValue="@string/default_dec_admin_port"/>
+      <ListPreference android:entries="@array/protocolArray" android:entryValues="@array/protocolValues" android:title="Protokoll" android:key="@string/dec_node_protocol" android:defaultValue="@string/default_dec_node_protocol"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="DEC_Admin"><EditTextPreference android:title="GCM szerver cím" android:key="@string/dec_admin_ip" android:defaultValue="@string/default_dec_node_ip" /><EditTextPreference android:title="GCM szerver port" android:key="@string/dec_admin_port" android:defaultValue="@string/default_dec_admin_port" /></PreferenceCategory>
+    <PreferenceCategory android:title="DataCollector">
+      <ListPreference android:entries="@array/protocolArray" android:entryValues="@array/protocolValues" android:title="Protokoll" android:key="@string/data_collector_protocol" android:defaultValue="@string/default_data_collector_protocol"/>
     </PreferenceCategory>
 </PreferenceScreen>

@@ -25,33 +25,38 @@ public class DataUploadTask extends UploadTask {
 	private List<String> params;
 	
 	private IDataProvider dataProvider;
+	private String port;
 	
-	public DataUploadTask(Context context, String dataType, String reqId, String address){		
+	public DataUploadTask(Context context, String dataType, String reqId, String address, String port){		
 		super(address, reqId);
 		this.dataType = dataType;
 		this.dataProvider = new DataProvider(context);
+		this.port=port;
 	}
 	
-	public DataUploadTask(Context context, String dataType, String reqId, String address, List<String> params) {
+	public DataUploadTask(Context context, String dataType, String reqId, String address,  String port, List<String> params) {
 		super(address, reqId);
 		this.dataType = dataType;
 		this.params = params;
 		this.dataProvider = new DataProvider(context);
+		this.port=port;
 	}
 	
-	public DataUploadTask(Context context, String dataType, String reqId, String address, Date date) {
+	public DataUploadTask(Context context, String dataType, String reqId, String address, String port, Date date) {
 		super(address, reqId);
 		this.dataType = dataType;
 		this.date = date;
 		this.dataProvider = new DataProvider(context);
+		this.port=port;
 	}
 	
-	public DataUploadTask(Context context, String dataType, String reqId, String address, Date date, List<String> params) {
+	public DataUploadTask(Context context, String dataType, String reqId, String address, String port, Date date, List<String> params) {
 		super(address, reqId);
 		this.dataType = dataType;
 		this.date = date;
 		this.params = params;
 		this.dataProvider = new DataProvider(context);
+		this.port=port;
 	}
 
 	@Override
@@ -76,7 +81,7 @@ public class DataUploadTask extends UploadTask {
 					return;
 				}
 				
-				httpManager.sendPostRequest(address, result.toString());				
+				httpManager.sendPostRequest(address, result.toString(),port);				
 				
 			}}).start();
 	}

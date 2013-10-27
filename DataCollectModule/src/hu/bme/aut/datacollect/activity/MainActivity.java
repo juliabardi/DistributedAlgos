@@ -110,7 +110,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
     private boolean checkSetting(){
     	Map<String, ?> keys = settings.getAll();
 		for (Map.Entry<String, ?> entry : keys.entrySet()) {
-			if (!DataCollectService.serverKeys.contains(entry.getKey()) &&
+			if (DataCollectService.sharedPrefKeys.contains(entry.getKey()) &&
 					settings.getBoolean(entry.getKey(),false)) // There is something we collect.
 				return true;
 		}
@@ -223,7 +223,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		if (requestCode == REQUEST_CODE_OPTIONS){
-			if (!isServiceRunning(CommunicationService.class.getName())){
+			if (checkSetting() && !isServiceRunning(CommunicationService.class.getName() )){
 				Log.d(TAG, "Starting CommunicationService");
 				this.startService(commIntent);
 				communicationButton.setChecked(true);
@@ -236,7 +236,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		
 		EditText et = (EditText)this.findViewById(R.id.nodeAddress);
 		et.setKeyListener(null);
-		et.setText(Constants.getNodeServerAddress(this));
+		et.setText(Constants.getNodeServerProtocol(this)+ Constants.getNodeServerAddress(this));
 		
 		et = (EditText)this.findViewById(R.id.gcmAddress);
 		et.setText(Constants.getGCMServerAddress(this));
@@ -254,10 +254,16 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 			Constants.GCMServerIP = sharedPreferences.getString(key, Constants.GCMServerIP);
 		}
 		else if (DataCollectService.DEC_NODE_PORT.equals(key)){
-			Constants.NodeServerPort = sharedPreferences.getString(key, Constants.NodeServerPort);
+			Constants.NodeServerPort = sharedPreferences.getString(key, Constants.getNodeServerPort(this));
 		}
 		else if (DataCollectService.DEC_ADMIN_PORT.equals(key)){
 			Constants.GCMServerPort = sharedPreferences.getString(key, Constants.GCMServerPort);
+		}
+		else if (DataCollectService.DEC_NODE_PROTOCOL.equals(key)){
+			Constants.NodeServerProtocol = sharedPreferences.getString(key, Constants.NodeServerProtocol);
+		}
+		else if (DataCollectService.DATA_COLLECTOR_PROTOCOL.equals(key)){
+			Constants.DataCollectorServerProtocol = sharedPreferences.getString(key, Constants.DataCollectorServerProtocol);
 		}
 		
 		//finding which shared preference was changed, and register/unregister according to the value
@@ -361,11 +367,12 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	//starting CameraActivity to take pictures
 	public void uploadImages(View v){				
 		//TODO get permission
-				
+		String fullAddress =  Constants.getDataCollectorServerProtocol(this) + Constants.getDataCollectorServerAddress(this);
+		
 		//if ImageData sharedpref is enabled and DataCollectService is bound, add notification
 		if (DataCollectService.isDataTypeEnabled(this, DataCollectService.IMAGE)){
 			intent = new Intent(this, CameraActivity.class);
-			intent.putExtra("address", Constants.getDataCollectorServerAddress(this));
+			intent.putExtra("address",fullAddress);
 			this.startActivity(intent);
 		}
 		
@@ -373,12 +380,12 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	
 	public void sendData(View v){
 		//send here some data
-		
+		String fullAddress =  Constants.getDataCollectorServerProtocol(this) + Constants.getDataCollectorServerAddress(this);
 		Log.d(TAG, "Sending some columns");
-		this.queue.add(new DataUploadTask(this, "AccelerationData", "1", Constants.getDataCollectorServerAddress(this), Arrays.asList("id", "timestamp", "accX", "accY")));
+		this.queue.add(new DataUploadTask(this, "AccelerationData", "1",fullAddress, Constants.getDataCollectorServerPort(this),Arrays.asList("id", "timestamp", "accX", "accY")));
 		
 		Log.d(TAG, "Sending all columns");
-		this.queue.add(new DataUploadTask(this, "LightData", "2", Constants.getDataCollectorServerAddress(this)));
+		this.queue.add(new DataUploadTask(this, "LightData", "2",fullAddress, Constants.getDataCollectorServerPort(this)));
 		
 		Log.d(TAG, "Sending all columns after date");		
 		Date date = null;
@@ -387,13 +394,13 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		} catch (ParseException e) {
 			Log.e(TAG, e.getMessage());
 		}
-		this.queue.add(new DataUploadTask(this, "AccelerationData", "3", Constants.getDataCollectorServerAddress(this), date));
+		this.queue.add(new DataUploadTask(this, "AccelerationData", "3",fullAddress, Constants.getDataCollectorServerPort(this), date));
 		
 		Log.d(TAG, "Sending buggy name");
-		this.queue.add(new DataUploadTask(this, "NotExists", "4", Constants.getDataCollectorServerAddress(this)));
+		this.queue.add(new DataUploadTask(this, "NotExists", "4",fullAddress, Constants.getDataCollectorServerPort(this)));
 		
 		Log.d(TAG, "Sending some columns after date");
-		this.queue.add(new DataUploadTask(this, "AccelerationData", "5", Constants.getDataCollectorServerAddress(this), date, Arrays.asList("id")));
+		this.queue.add(new DataUploadTask(this, "AccelerationData", "5",fullAddress, Constants.getDataCollectorServerPort(this), date, Arrays.asList("id")));
 	}
 	
 	public void loadJavascript(View v){

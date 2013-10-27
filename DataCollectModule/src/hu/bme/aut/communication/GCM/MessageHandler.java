@@ -113,7 +113,8 @@ public class MessageHandler implements Closeable {
 				String recurrence = null;
 				JSONArray columns = null;
 				String reqId = null;
-				String port = Constants.DataCollectorServerPort;
+				String port = Constants.getDataCollectorServerPort(context);
+				String protocol = Constants.getDataCollectorServerProtocol(context);
 				JSONObject requestParams = jsMessage.optJSONObject(Constants.REQUEST_PARAMS);
 				
 				String width = null;
@@ -129,6 +130,8 @@ public class MessageHandler implements Closeable {
 					reqId = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_ID));
 					String p = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_PORT));
 					port = (p == null) ? port : p;
+					String prot = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_PROTOCOL));
+					protocol = (prot == null) ? protocol : prot;
 					
 					width = StringUtils.trimToNull(requestParams.optString("width"));
 					height = StringUtils.trimToNull(requestParams.optString("height"));
@@ -137,7 +140,7 @@ public class MessageHandler implements Closeable {
 
 				String ip = jsMessage.getString(Constants.REQUEST_ADDRESS);
 				String dataType = jsMessage.getString(Constants.PARAM_NAME);
-				String address = "http://"+ip+":"+port+"/"+ Constants.OFFER_REPLY;
+				String address = protocol + "://"+ip+":"+port+"/"+ Constants.OFFER_REPLY;
 				
 				if (DataCollectService.IMAGE.equals(dataType) && 
 						DataCollectService.isDataTypeEnabled(context, DataCollectService.IMAGE)){
@@ -158,7 +161,7 @@ public class MessageHandler implements Closeable {
 				if (DataCollectService.TRAFFIC.equals(dataType) && 
 						DataCollectService.isDataTypeEnabled(context, DataCollectService.TRAFFIC)){
 					
-					this.queue.add(new TrafficStatsUploadTask(context, address, reqId, timesInt, recurrenceInt, params));
+					this.queue.add(new TrafficStatsUploadTask(context, address, port, reqId, timesInt, recurrenceInt, params));
 				}
 				else {	
 					Date queryDate = null;
@@ -171,7 +174,7 @@ public class MessageHandler implements Closeable {
 						queryDate = this.subtractSeconds(time);
 					}
 					
-					this.queue.add(new DataUploadTask(this.context, dataType, reqId, address, queryDate, params));
+					this.queue.add(new DataUploadTask(this.context, dataType, reqId, address, port, queryDate, params));
 					
 					//deleting previous similar request, not to remain recurring if the new is not that
 					this.deleteRequestIfExists(ip, port, dataType);
