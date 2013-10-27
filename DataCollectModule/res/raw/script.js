@@ -14,8 +14,15 @@ function() {
  
 	var data = dataProvider.getAllDataParamsString('CallData', 1, 'timestamp,direction');
 	//data = '{"id":"1","values":[["1382486400000","out"],["1382601600123","in"],["1382710800000","out"],["1382710800999","in"],["1382792317667","out"],["1382793856916","in"],["1382793861944","out"],["1382796864140","in"],["1382796866262","out"],["1382799847941","in"],["1382801159836","in"],["1382801180587","out"],["1382801246169","in"]],"params":["timestamp","mode"],"type":"simple","name":"CallData"}';
-	var values = JSON.parse(data).values;
 	
+	if (data == undefined || data == null){
+		document.write('no CallData');
+		return;
+	}
+	document.write('From:<br/>');
+	document.write(data + '<br/><br/>');
+	
+	var values = JSON.parse(data).values;
 	var result = [];
 	
 	for (var j in values){
@@ -45,6 +52,7 @@ function() {
 			}
 		}
 	}
+	document.write('To:<br/>');
 	document.write(JSON.stringify(result));
 	dataProvider.setJSON(JSON.stringify(result));
 

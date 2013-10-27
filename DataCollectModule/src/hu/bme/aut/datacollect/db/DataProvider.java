@@ -99,11 +99,11 @@ public class DataProvider implements IDataProvider{
 		Log.d(TAG, "JsonArray processed: " + j);
 	}
 	
-	@Override
 	@JavascriptInterface
-	public JSONObject getAllDataParamsString(String name, String reqId, String params){
+	public String getAllDataParamsString(String name, String reqId, String params){
 		String[] p = params.split(",");
 		Log.d(TAG, "Javascript params: " + params);
-		return this.getAllDataParams(name, reqId, Arrays.asList(p));		
+		JSONObject result = this.getAllDataParams(name, reqId, Arrays.asList(p));	
+		return result==null?null:result.toString();
 	}
 }

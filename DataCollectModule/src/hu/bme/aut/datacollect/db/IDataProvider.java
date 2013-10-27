@@ -27,6 +27,4 @@ public interface IDataProvider extends Closeable  {
 	public JSONObject getDataAfterDate(String name, String reqId, Date date);
 	
 	public JSONObject getDataAfterDate(String name, String reqId, Date date, List<String> params);
-	
-	public JSONObject getAllDataParamsString(String name, String reqId, String params);
 }
