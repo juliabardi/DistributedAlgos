@@ -53,7 +53,7 @@ public class FirstActivity extends Activity {
 		String selectedDataCollectorProtocol="https";
 		switch (dataCollectorProtocol.getCheckedRadioButtonId()) {
 		case R.id.radioButtonDataCollectorHTTP:
-			selectedNodeProtocol="http";
+			selectedDataCollectorProtocol="http";
 			break;
 		default:
 			break;

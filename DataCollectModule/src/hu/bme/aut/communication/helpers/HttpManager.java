@@ -1,5 +1,7 @@
 package hu.bme.aut.communication.helpers;
 
+import hu.bme.aut.communication.Constants;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -187,6 +189,9 @@ public class HttpManager {
 			        }
 			        else
 			        	listener.errorOccuredDuringHandleResponse("HttpEntity is empty"); // Error
+		        }else{
+		        	listener.errorOccuredDuringHandleResponse("Status Code is: " + 
+		        			response.getStatusLine().getStatusCode()); // Error
 		        }
 		    } catch (Exception e) {
 		    	listener.errorOccuredDuringHandleResponse(e.getMessage()); // Error
@@ -203,7 +208,7 @@ public class HttpManager {
 	}
 	
 	private String createBasicAuthHeader(){
-		String credentials = "algos" + ":" + "algos"; // TODO passwd, jelszo...
+		String credentials = Constants.USER + ":" + Constants.PASSWORD; 
 	    String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
 	    return base64EncodedCredentials;
 	}

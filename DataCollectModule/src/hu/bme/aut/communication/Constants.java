@@ -22,6 +22,10 @@ public class Constants {
 	public static final String ALGTYPE ="algType";
 	public static final String PARAM_NAME ="name";
 	
+	// For basic auth test
+	public static final String USER ="algos";
+	public static final String PASSWORD ="algos";
+	
 	//For push
 	public static final String REQUEST_PARAMS ="requestParams";
 	public static final String REQUEST_TIME ="time";

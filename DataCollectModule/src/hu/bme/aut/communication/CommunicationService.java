@@ -175,7 +175,14 @@ public class CommunicationService extends Service implements
 	
 	private void unregisterFormDistributedAlgos(){
 		registeredToDistributedAlgos=false;
-		String url=Constants.getNodeServerProtocol(this) + Constants.getNodeServerAddress(this) + Constants.UNREGISTER;
+		StringBuilder builder = new StringBuilder();
+		builder.append(Constants.getNodeServerProtocol(this));
+		builder.append(Constants.getNodeServerAddress(this));
+		builder.append(Constants.UNREGISTER);
+		builder.append("?" + Constants.ALGTYPE);
+		builder.append("=" + Constants.ALGTYPE_DIST_ALGOS);
+		
+		String url = builder.toString();
 		sendJobToNodeService(Constants.UNREGISTER,Constants.UNREGISTER,url, null);
 	}
 	
