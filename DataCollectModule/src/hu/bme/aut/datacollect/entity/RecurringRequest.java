@@ -15,6 +15,8 @@ public class RecurringRequest {
 	@DatabaseField(canBeNull=true, uniqueCombo=true)
 	private String port;
 	@DatabaseField(canBeNull=false)
+	private String protocol;
+	@DatabaseField(canBeNull=false)
 	private int recurrence;
 	@DatabaseField(canBeNull=true)
 	private long lastSent;
@@ -25,7 +27,7 @@ public class RecurringRequest {
 	
 	public RecurringRequest(){}
 	
-	public RecurringRequest(String reqId, String ip, String port, int recurrence,
+	public RecurringRequest(String reqId, String ip, String port, String protocol, int recurrence,
 			long lastSent, String dataType, String params) {
 		super();
 		this.ip = ip;
@@ -35,9 +37,10 @@ public class RecurringRequest {
 		this.dataType = dataType;
 		this.params = params;
 		this.reqId = reqId;
+		this.protocol = protocol;
 	}
 
-	public RecurringRequest(String reqId, String ip, String port, int recurrence,
+	public RecurringRequest(String reqId, String ip, String port, String protocol, int recurrence,
 			long lastSent, String dataType) {
 		super();
 		this.ip = ip;
@@ -46,6 +49,7 @@ public class RecurringRequest {
 		this.lastSent = lastSent;
 		this.dataType = dataType;
 		this.reqId = reqId;
+		this.protocol = protocol;
 	}
 	
 	public String getReqId() {
@@ -104,6 +108,14 @@ public class RecurringRequest {
 		this.params = params;
 	}
 
+	public String getProtocol() {
+		return protocol;
+	}
+
+	public void setProtocol(String protocol) {
+		this.protocol = protocol;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -114,6 +126,8 @@ public class RecurringRequest {
 		result = prime * result + (int) (lastSent ^ (lastSent >>> 32));
 		result = prime * result + ((params == null) ? 0 : params.hashCode());
 		result = prime * result + ((port == null) ? 0 : port.hashCode());
+		result = prime * result
+				+ ((protocol == null) ? 0 : protocol.hashCode());
 		result = prime * result + recurrence;
 		result = prime * result + ((reqId == null) ? 0 : reqId.hashCode());
 		return result;
@@ -150,6 +164,11 @@ public class RecurringRequest {
 				return false;
 		} else if (!port.equals(other.port))
 			return false;
+		if (protocol == null) {
+			if (other.protocol != null)
+				return false;
+		} else if (!protocol.equals(other.protocol))
+			return false;
 		if (recurrence != other.recurrence)
 			return false;
 		if (reqId == null) {
@@ -163,8 +182,9 @@ public class RecurringRequest {
 	@Override
 	public String toString() {
 		return String
-				.format("RecurringRequest [reqId=%s, ip=%s, port=%s, recurrence=%s, lastSent=%s, dataType=%s, params=%s]",
-						reqId, ip, port, recurrence, lastSent, dataType, params);
+				.format("RecurringRequest [reqId=%s, ip=%s, port=%s, protocol=%s, recurrence=%s, lastSent=%s, dataType=%s, params=%s]",
+						reqId, ip, port, protocol, recurrence, lastSent,
+						dataType, params);
 	}
 	
 }

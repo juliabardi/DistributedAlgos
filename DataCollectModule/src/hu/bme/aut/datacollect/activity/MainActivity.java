@@ -241,34 +241,19 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		et = (EditText)this.findViewById(R.id.gcmAddress);
 		et.setText(Constants.getGCMServerAddress(this));
 		et.setKeyListener(null);
+		
+		et = (EditText)this.findViewById(R.id.dataCollectProtocol);
+		et.setText(Constants.getDataCollectorServerProtocol(this));
+		et.setKeyListener(null);
 	}
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		
-		if (DataCollectService.DEC_NODE_IP.equals(key)){
-			Constants.NodeServerIP = sharedPreferences.getString(key, Constants.NodeServerIP);
-		}
-		else if (DataCollectService.DEC_ADMIN_IP.equals(key)){
-			Constants.GCMServerIP = sharedPreferences.getString(key, Constants.GCMServerIP);
-		}
-		else if (DataCollectService.DEC_NODE_PORT.equals(key)){
-			Constants.NodeServerPort = sharedPreferences.getString(key, Constants.getNodeServerPort(this));
-		}
-		else if (DataCollectService.DEC_ADMIN_PORT.equals(key)){
-			Constants.GCMServerPort = sharedPreferences.getString(key, Constants.GCMServerPort);
-		}
-		else if (DataCollectService.DEC_NODE_PROTOCOL.equals(key)){
-			Constants.NodeServerProtocol = sharedPreferences.getString(key, Constants.NodeServerProtocol);
-		}
-		else if (DataCollectService.DATA_COLLECTOR_PROTOCOL.equals(key)){
-			Constants.DataCollectorServerProtocol = sharedPreferences.getString(key, Constants.DataCollectorServerProtocol);
-		}
-		
 		//finding which shared preference was changed, and register/unregister according to the value
 		
-		else if (DataCollectService.sharedPrefKeys.contains(key)){
+		if (DataCollectService.sharedPrefKeys.contains(key)){
 			IListener listener = mService.getListener(key);
 			if (listener != null){
 				//register/unregister listener

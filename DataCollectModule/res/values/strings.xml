@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">DistributedAlgos</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Beállítások</string>
     <string name="hello_world">Hello world!</string>
     <string name="sensors">Sensors</string>
     <string name="acc">Acceleration</string>

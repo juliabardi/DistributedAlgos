@@ -6,7 +6,7 @@
         android:title="Szerver címek" >
         <intent
             android:action="hu.bme.aut.datacollect.prefs.PREFS_SERVERS"
-            android:targetClass="hu.bme.aut.datacollect.activity.ActivityFragmentSettings"
+            android:targetClass="hu.bme.aut.datacollect.activity.FirstActivity"
             android:targetPackage="hu.bme.aut.datacollect.activity" />
     </Preference>
     <Preference

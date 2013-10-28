@@ -241,7 +241,7 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 				if (request.getParams() != null){
 					params = Utils.convertCsvToList(request.getParams());
 				}
-				String address = "http://"+request.getIp()+":"+request.getPort()+"/"+ Constants.OFFER_REPLY;
+				String address = request.getProtocol() + "://"+request.getIp()+":"+request.getPort()+"/"+ Constants.OFFER_REPLY;
 				Date date = new Date(request.getLastSent());
 				this.queue.add(new DataUploadTask(this, request.getDataType(), request.getReqId(), 
 						address, request.getPort(), date, params));

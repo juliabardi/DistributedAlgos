@@ -181,7 +181,7 @@ public class MessageHandler implements Closeable {
 					
 					if (recurrence != null){
 						long millis = Calendar.getInstance().getTimeInMillis();
-						RecurringRequest recurringRequest = new RecurringRequest(reqId, ip, port, recurrenceInt, millis, dataType, joinedCols);
+						RecurringRequest recurringRequest = new RecurringRequest(reqId, ip, port, Constants.getDataCollectorServerProtocol(context), recurrenceInt, millis, dataType, joinedCols);
 						Log.d(TAG, "Saving recurring request: " + recurringRequest.toString());
 						this.recurringDao.createOrUpdate(recurringRequest);
 					}
