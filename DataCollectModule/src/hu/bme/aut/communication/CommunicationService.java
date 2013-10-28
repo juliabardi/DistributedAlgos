@@ -66,6 +66,20 @@ import com.google.android.gcm.GCMRegistrar;
  */
 public class CommunicationService extends Service implements
 		OnSharedPreferenceChangeListener {
+	
+	public interface CommunicationListener{
+		public void refreshCollectedDataStates();
+		public void refreshGCMConnData();
+	}
+	
+	private CommunicationListener updateListener=null;
+	public void registerListener(CommunicationListener listener) {
+	        updateListener=listener;
+	    }
+	public void unRegisterListener() {
+        updateListener=null;
+    }
+	
 	public static enum SyncronizationValues{
 		TRUE,FALSE,NONE,SENDING
 	}
@@ -90,6 +104,10 @@ public class CommunicationService extends Service implements
 	
 	public Boolean getregisteredToDistributedAlgos(){
 		return registeredToDistributedAlgos;
+	}
+	
+	public void syncCollectedDataStates(){
+		registerPeer();
 	}
 	
 	public HashMap<String,SyncronizationValues> getOfferSyncronizationInfo(){
@@ -253,6 +271,11 @@ public class CommunicationService extends Service implements
 	 * Register peer need and offers when starting this service.
 	 */
 	private void registerPeer() {
+		setupSyncronizationInfo(SyncronizationValues.SENDING);
+		if(updateListener!=null){
+        	updateListener.refreshCollectedDataStates();
+        }
+		
 		ArrayList<String> offerList = new ArrayList<String>();
 		Map<String, ?> keys = settings.getAll();
 
@@ -270,7 +293,7 @@ public class CommunicationService extends Service implements
 				.createAlgoBody(JsonUtils.createSimpleArray(offerList), null));
 
 		sendJobToNodeService(Constants.REGISTER,Constants.REGISTER, Constants.getNodeServerProtocol(this) + Constants.getNodeServerAddress(this) + Constants.REGISTER, message.toString());
-		setupSyncronizationInfo(SyncronizationValues.SENDING);
+		
 	}
 	
 	private void registerGCM(){
@@ -355,6 +378,11 @@ public class CommunicationService extends Service implements
 		public void onReceive(Context context, Intent intent) {
 			String newMessage = intent.getExtras().getString(EXTRA_MESSAGE);
 			Log.i(this.getClass().getName(), newMessage);
+			if(newMessage.equals(getString(R.string.gcm_registered)) || newMessage.equals(getString(R.string.gcm_unregistered)) ){
+				if(updateListener!=null){
+		        	updateListener.refreshGCMConnData();
+		        }
+			}
 		}
 	};
 
@@ -420,6 +448,9 @@ public class CommunicationService extends Service implements
 	        	}else{
 	        		offerSyncronizationInfo.put(itemName, SyncronizationValues.FALSE); // Could not send to server.
 	        	}
+	        }
+	        if(updateListener!=null){
+	        	updateListener.refreshCollectedDataStates();
 	        }
 	    }
 	}

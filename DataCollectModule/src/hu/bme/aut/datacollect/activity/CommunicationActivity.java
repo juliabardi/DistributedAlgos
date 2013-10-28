@@ -2,6 +2,7 @@ package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.communication.CommunicationService;
 import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
+import hu.bme.aut.communication.CommunicationService.CommunicationListener;
 
 import java.util.Map;
 
@@ -14,25 +15,46 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.CheckedTextView;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 /**
  * Information for the user about the running service values.
  * @author Eva Pataji
  *
  */
 // TODO Update data on server events.
-public class CommunicationActivity extends Activity {
+public class CommunicationActivity extends Activity implements CommunicationListener {
 	private CommunicationService commService;
 	private boolean commBound = false;
-
+	private LinearLayout layoutCollectedData;
+	private CheckedTextView chtvGCMReg;
+	private CheckedTextView chtvGCMConn;
+	private CheckedTextView chtvNodeConn;
+	private LinearLayout.LayoutParams paramLayout;
+	private LinearLayout.LayoutParams paramCell;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.sync_layout);
-		
+		layoutCollectedData = (LinearLayout)findViewById(R.id.offerTable);
+    	chtvGCMReg = (CheckedTextView)findViewById(R.id.checkedGCMReg);
+    	chtvGCMConn = (CheckedTextView)findViewById(R.id.checkedGCMServer);
+    	chtvNodeConn = (CheckedTextView)findViewById(R.id.checkedDistAlgos);
+    	paramLayout = new LinearLayout.LayoutParams(
+    			LinearLayout.LayoutParams.MATCH_PARENT,
+    			LinearLayout.LayoutParams.WRAP_CONTENT);
+    	paramCell = new LinearLayout.LayoutParams(
+    			LinearLayout.LayoutParams.MATCH_PARENT,
+    			LinearLayout.LayoutParams.WRAP_CONTENT,1.0f);
+    	paramCell.leftMargin=5;
 	}
 
 	@Override
@@ -53,11 +75,17 @@ public class CommunicationActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		if (commBound) {
+			commService.unRegisterListener();
+		}
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		if (commBound) {
+			commService.registerListener(this);
+		}
 	}
 	
 	@Override
@@ -89,26 +117,8 @@ public class CommunicationActivity extends Activity {
             CommServiceBinder binder = (CommServiceBinder) service;
             commService = binder.getService();
             commBound = true;
-    		
-    		CheckedTextView chtv = (CheckedTextView)findViewById(R.id.checkedGCMReg);
-    		chtv.setChecked(commService.getRegisteredtoGCM());
-    		chtv = (CheckedTextView)findViewById(R.id.checkedGCMServer);
-    		chtv.setChecked(commService.getRegisteredtoServer());
-    		chtv = (CheckedTextView)findViewById(R.id.checkedDistAlgos);
-    		chtv.setChecked(commService.getregisteredToDistributedAlgos());
-    		TableLayout table = (TableLayout)findViewById(R.id.offerTable);
-    		
-    		for (Map.Entry<String, CommunicationService.SyncronizationValues> entry : commService.getOfferSyncronizationInfo().entrySet()){
-    			TableRow tr = new TableRow(CommunicationActivity.this);
-    			TextView view = new TextView(CommunicationActivity.this);
-    			view.setText(entry.getKey());
-    			tr.addView(view);
-    			view = new TextView(CommunicationActivity.this);
-    			view.setText(entry.getValue().toString());
-    			view.setPadding(20, 0, 0, 0);
-    			tr.addView(view);
-    			table.addView(tr);
-    		}
+            commService.registerListener(CommunicationActivity.this);
+    		setupData();
         }
 
         @Override
@@ -116,6 +126,72 @@ public class CommunicationActivity extends Activity {
             commBound = false;
         }
     };
+    
+    private void setupData(){
+ 		updateGCMServerData();
+ 		updateCollectedData();
+    }
+    
+    private void updateGCMServerData(){
+		chtvGCMReg.setChecked(commService.getRegisteredtoGCM());
+		chtvGCMConn.setChecked(commService.getRegisteredtoServer());
+    }
+    
+    private void updateCollectedData(){
+		chtvNodeConn.setChecked(commService.getregisteredToDistributedAlgos());
+
+    	layoutCollectedData.removeAllViews();
+    	
+    	for (Map.Entry<String, CommunicationService.SyncronizationValues> entry : commService.getOfferSyncronizationInfo().entrySet()){
+			LinearLayout tr = new LinearLayout(this);
+			tr.setLayoutParams(paramLayout);
+			tr.setOrientation(LinearLayout.HORIZONTAL);
+			TextView view = new TextView(this);
+			view.setText(entry.getKey());
+			view.setLayoutParams(paramCell);
+			tr.addView(view);
+			view = new TextView(this);
+			view.setText(entry.getValue().toString());
+			view.setLayoutParams(paramCell);
+			tr.addView(view);
+			layoutCollectedData.addView(tr);
+		}
+    }
+    
+    private Boolean needSyncState(){
+    	for (Map.Entry<String, CommunicationService.SyncronizationValues> entry : commService.getOfferSyncronizationInfo().entrySet()){
+    		if(entry.getValue() == CommunicationService.SyncronizationValues.FALSE
+    				|| entry.getValue() == CommunicationService.SyncronizationValues.NONE){
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    
+    public void  navigateToRequests(View v){
+    	Toast.makeText(getApplication(), "Hamarosan jövünk!", Toast.LENGTH_SHORT).show();   	
+    }
+    
+    public void syncCollectedDataStates(View v){
+    	if(commBound){
+    		if(needSyncState()){
+    			commService.syncCollectedDataStates();
+    		}else Toast.makeText(getApplication(), "Nincs mit szinkronizálni.", Toast.LENGTH_SHORT).show();
+    	}
+    }
+
+	@Override
+	public void refreshCollectedDataStates() {
+		Log.i(this.getClass().getName(), "Updating Node Server info and Collected Data States.");
+		updateCollectedData();
+	}
+
+	@Override
+	public void refreshGCMConnData() {
+		Log.i(this.getClass().getName(), "Updating GCM Server info.");
+		updateGCMServerData();
+	}
 	
 
 }
