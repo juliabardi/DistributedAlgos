@@ -65,7 +65,8 @@ public class ImageUploadTask extends UploadTask {
 					json.put("encoding", "base64");
 					Log.d(TAG, json.toString()); //log out before adding the binary part
 					json.put("binary", new String(Base64.encode(imageBytes, Base64.DEFAULT)));
-										
+									
+					Log.d(TAG, "Sending reply to address: " + address + ", port: " + port);
 					httpManager.sendPostRequest(address, json.toString(), port);
 						
 					//catching outofmemoryerror, dont send anything then

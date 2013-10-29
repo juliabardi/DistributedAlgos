@@ -105,7 +105,9 @@ public class HttpManager {
 	  			try {
 		  			sendSecurePostRequest(url, JSobject, Integer.parseInt(port));
 				} catch (NumberFormatException e) {
-					Log.e(this.getClass().getName(), "Port number cast exception at secure GET.");
+					String reason = "Port number cast exception at secure GET.";
+					Log.e(this.getClass().getName(), reason);
+					listener.errorOccured(reason);
 				}
 	  		}else{
 	  			sendSimplePostRequest(url, JSobject);	

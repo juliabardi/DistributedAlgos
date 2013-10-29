@@ -145,7 +145,7 @@ public class MessageHandler implements Closeable {
 				if (DataCollectService.IMAGE.equals(dataType) && 
 						DataCollectService.isDataTypeEnabled(context, DataCollectService.IMAGE)){
 					
-					this.addNotificationImage(address, reqId, width, height, times, recurrence);
+					this.addNotificationImage(address, port, reqId, width, height, times, recurrence);
 					return;
 				}
 				
@@ -239,10 +239,11 @@ public class MessageHandler implements Closeable {
 		return false;
 	}
 	
-	public void addNotificationImage(String address, String reqId, String width, String height, String times, String recurrence){
+	public void addNotificationImage(String address, String port, String reqId, String width, String height, String times, String recurrence){
 		
 		Intent notificationIntent = new Intent(context, CameraActivity.class).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		notificationIntent.putExtra("address", address);
+		notificationIntent.putExtra("port", port);
 		notificationIntent.putExtra("reqId", reqId);
 		this.putIntIfExists(notificationIntent, "width", width);
 		this.putIntIfExists(notificationIntent, "height", height);
@@ -256,7 +257,7 @@ public class MessageHandler implements Closeable {
 				context).setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle("Kép kérelem érkezett")
 				//.setContentText("Kattintson kép készítéséhez")
-				.setContentText("Id: " + reqId + " Hányszor: " + times + " Idõköz: " + recurrence)
+				.setContentText("Id: " + reqId + " Hányszor: " + (times==null?"1":times) + " Idõköz: " + (recurrence==null?"-":recurrence))
 				.setContentIntent(pendingIntent);
 
 		NotificationManager mNotificationManager =

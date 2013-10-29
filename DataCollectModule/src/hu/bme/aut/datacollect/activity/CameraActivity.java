@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
@@ -157,7 +158,7 @@ public class CameraActivity extends Activity {
 			}
 			
 			Log.d(TAG, String.format("Image number %d captured", times));
-			CameraActivity.this.imageQueue.add(new ImageUploadTask(pictureFile, address,port, reqId, timestamp));
+			CameraActivity.this.imageQueue.add(new ImageUploadTask(pictureFile, address, port, reqId, timestamp));
 			
 			//need to start preview to make another picture
 			if (times < max_times)
@@ -185,8 +186,10 @@ public class CameraActivity extends Activity {
 		if (timerTask != null){
 			timerTask.cancel();
 		}
-		timer.cancel();
-		timer.purge();
+		if (timer != null){
+			timer.cancel();
+			timer.purge();
+		}
 		this.init(intent);
 	}
 
@@ -232,14 +235,18 @@ public class CameraActivity extends Activity {
 
 	private void setPictureSize(){
 		
-		if (this.pictureSizeExists()){
-			mCamera.getParameters().setPictureSize(width, height);
+		Parameters parameters = mCamera.getParameters();
+		if (this.pictureSizeExists()){			
+			parameters.setPictureSize(width, height);			
+			Log.d(TAG, String.format("Picture size %dx%d was set.", width, height));
 		}
 		else {
 			List<Size> supported = mCamera.getParameters().getSupportedPictureSizes();
 			Size min = supported.get(supported.size()-1);
-			mCamera.getParameters().setPictureSize(min.width, min.height);
+			parameters.setPictureSize(min.width, min.height);
+			Log.d(TAG, String.format("Picture size %dx%d was set.", min.width, min.height));
 		}
+		mCamera.setParameters(parameters);
 	}
 	
 	//returning true if the given picture size (width, height) is supported, else false
@@ -250,6 +257,7 @@ public class CameraActivity extends Activity {
 			List<Size> sizes = mCamera.getParameters().getSupportedPictureSizes();
 			for (Size size : sizes){
 				if (size.width == width && size.height == height){
+					Log.d(TAG, String.format("Picture size %dx%d exists.", width, height));
 					return true;
 				}
 			}
@@ -341,7 +349,9 @@ public class CameraActivity extends Activity {
 		releaseCamera(); // release the camera immediately on pause event
 		mPreview.removePreview();
 		//cancelling the task
-		timer.cancel();
+		if (timer != null){
+			timer.cancel();
+		}
 		if (timerTask != null){
 			timerTask.cancel();
 		}
@@ -365,7 +375,9 @@ public class CameraActivity extends Activity {
 		if (timerTask != null){
 			timerTask.cancel();
 		}
-		timer.cancel();
+		if (timer != null){
+			timer.cancel();
+		}
 		cancelNotification();
 	}
 	
