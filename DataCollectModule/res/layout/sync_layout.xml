@@ -1,83 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-	<LinearLayout 
-	    android:id="@+id/rootLayout"
-	    android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-	    android:orientation="vertical"
-	    android:paddingLeft="5dp" >
-	        <TextView
-	            android:id="@+id/textView1"
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:text="Szerver kapcsolatok"
-	            android:textAppearance="?android:attr/textAppearanceLarge" />
-	       <LinearLayout
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:orientation="vertical"
-	            android:layout_margin="5dp">
-		        <CheckedTextView
-		            android:id="@+id/checkedGCMReg"
-		            android:layout_width="fill_parent"
-		            android:layout_height="wrap_content"
-		            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-		            android:text="GCM regisztráció" />
-		
-		        <CheckedTextView
-		            android:id="@+id/checkedGCMServer"
-		            android:layout_width="fill_parent"
-		            android:layout_height="wrap_content"
-		            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-		            android:text="GCM szerver kapcsolat" />
-		   
-		 
-		       <CheckedTextView
-		            android:id="@+id/checkedDistAlgos"
-		            android:layout_width="fill_parent"
-		            android:layout_height="wrap_content"
-		            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-		            android:text="DistributedAlgos szerver kapcsolat" />
-	       </LinearLayout>
-	   <Button 
-	       android:layout_width="wrap_content"
-	       android:layout_height="wrap_content"
-	       android:text="Beérkezett kérelmek megtekintése"
-	       android:layout_marginTop="10dp"
-	       android:layout_marginBottom="10dp"
-	       android:onClick="navigateToRequests"/>    
-	   <Button 
-	       android:layout_width="wrap_content"
-	       android:layout_height="wrap_content"
-	       android:text="Adatok szinkronizálása"
-	       android:layout_marginTop="10dp"
-	       android:layout_marginBottom="10dp"
-	       android:onClick="syncCollectedDataStates"/>
-	    <LinearLayout
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal">
-	            <TextView
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:layout_weight="1"
-	                android:text="Ajánlatok"
-	                android:textAppearance="?android:attr/textAppearanceLarge" />
-	            <TextView
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:layout_weight="1"
-	                android:text="Szinkronizáció"
-	                android:textAppearance="?android:attr/textAppearanceLarge" />
-	    </LinearLayout>
-	    <LinearLayout
-	        android:id="@+id/offerTable"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="vertical" >
-	     </LinearLayout>
-	</LinearLayout>
+    android:layout_height="wrap_content" >
+
+    <LinearLayout
+        android:id="@+id/rootLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/skyBlue"
+            android:padding="5dp"
+            android:text="Szerver kapcsolatok"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:orientation="vertical" >
+
+            <CheckedTextView
+                android:id="@+id/checkedGCMReg"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                android:gravity="center_vertical"
+                android:text="GCM regisztráció" />
+
+            <CheckedTextView
+                android:id="@+id/checkedGCMServer"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                android:gravity="center_vertical"
+                android:text="GCM szerver kapcsolat" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:onClick="connectToGCMServer"
+                    android:text="Újracsatlakozás" />
+
+                <TextView
+                    android:id="@+id/checkedGCMSending"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="Csatlakozás folyamatban..."
+                    android:visibility="invisible"
+                    android:layout_gravity="center"  />
+            </LinearLayout>
+
+            <CheckedTextView
+                android:id="@+id/checkedDistAlgos"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                android:gravity="center_vertical"
+                android:text="DistributedAlgos szerver kapcsolat" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:onClick="connectToDistAlgoServer"
+                    android:text="Újracsatlakozás" />
+
+                <TextView
+                    android:id="@+id/checkedGDistAlgosSending"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="Csatlakozás folyamatban..."
+                    android:visibility="invisible"
+                    android:layout_gravity="center"  />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/skyBlue"
+            android:padding="5dp"
+            android:text="Beérkezett kérések"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:onClick="navigateToRequests"
+            android:text="Beérkezett kérések megtekintése" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/skyBlue"
+            android:padding="5dp"
+            android:text="Kiajánlott adatok"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:onClick="syncCollectedDataStates"
+            android:text="Adatok szinkronizálása" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ajánlatok"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Szinkronizáció"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/offerTable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+        </LinearLayout>
+    </LinearLayout>
+
 </ScrollView>

@@ -88,26 +88,45 @@ public class CommunicationService extends Service implements
 	private NotificationManager manager;
 	private boolean isWifiListener = false;
 	
-	private Boolean registeredToDistributedAlgos=false; //dec_node
+	private SyncronizationValues registeredToDistributedAlgos=SyncronizationValues.NONE; //dec_node
+	private SyncronizationValues registeredToGCM=SyncronizationValues.NONE; //dec_admin
+	
 	private boolean isSyncronized=false; // If all need/offer data could be sent to server.
 	private HashMap<String,SyncronizationValues> offerSyncronizationInfo;
 	private MyResultReceiver theReceiver = null;
 	
-	public Boolean getRegisteredtoServer(){
-		return GCMRegistrar.isRegisteredOnServer(this);
+	public SyncronizationValues getRegisteredtoGCMServer(){
+		if(GCMRegistrar.isRegisteredOnServer(this)) registeredToGCM=SyncronizationValues.TRUE;
+		return registeredToGCM;
 	}
 	
-	public Boolean getRegisteredtoGCM(){
+	public Boolean getRegisteredtoGCMService(){
 		if(GCMRegistrar.getRegistrationId(this).equals("")) return false;
 		else return true;
 	}
 	
-	public Boolean getregisteredToDistributedAlgos(){
+	public SyncronizationValues getregisteredToDistributedAlgos(){
 		return registeredToDistributedAlgos;
 	}
 	
 	public void syncCollectedDataStates(){
 		registerPeer();
+	}
+	
+	public boolean reConnectToDistAlgos(){
+		if(! (getregisteredToDistributedAlgos() == SyncronizationValues.TRUE || getregisteredToDistributedAlgos() == SyncronizationValues.SENDING)){
+			registerPeer();
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean reConnectToGCM(){
+		if(!(getRegisteredtoGCMServer() == SyncronizationValues.TRUE || getRegisteredtoGCMServer() == SyncronizationValues.SENDING) ){
+			registerGCM();
+			return true;
+		}
+		return false;
 	}
 	
 	public HashMap<String,SyncronizationValues> getOfferSyncronizationInfo(){
@@ -148,7 +167,8 @@ public class CommunicationService extends Service implements
 		super.onCreate();
 		theReceiver = new MyResultReceiver(new Handler());
 	    theReceiver.setParentContext(this);
-	    registeredToDistributedAlgos=false;
+	    registeredToDistributedAlgos=SyncronizationValues.NONE;
+	    registeredToGCM=SyncronizationValues.NONE;
 	    
 		offerSyncronizationInfo = new HashMap<String,SyncronizationValues>();		
 		manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -177,7 +197,7 @@ public class CommunicationService extends Service implements
 		manager.cancel(3);
 		
 		unregisterReceiver(mGCMHandleMessageReceiver);
-		if(registeredToDistributedAlgos==true){
+		if(registeredToDistributedAlgos==SyncronizationValues.TRUE || registeredToDistributedAlgos==SyncronizationValues.SENDING){
 			unregisterFormDistributedAlgos();
 		}
 		
@@ -192,7 +212,7 @@ public class CommunicationService extends Service implements
 	}
 	
 	private void unregisterFormDistributedAlgos(){
-		registeredToDistributedAlgos=false;
+		registeredToDistributedAlgos=SyncronizationValues.SENDING;
 		StringBuilder builder = new StringBuilder();
 		builder.append(Constants.getNodeServerProtocol(this));
 		builder.append(Constants.getNodeServerAddress(this));
@@ -272,9 +292,6 @@ public class CommunicationService extends Service implements
 	 */
 	private void registerPeer() {
 		setupSyncronizationInfo(SyncronizationValues.SENDING);
-		if(updateListener!=null){
-        	updateListener.refreshCollectedDataStates();
-        }
 		
 		ArrayList<String> offerList = new ArrayList<String>();
 		Map<String, ?> keys = settings.getAll();
@@ -338,6 +355,11 @@ public class CommunicationService extends Service implements
 	}
 
 	private void sendJobToNodeService(String messageType, String itemName,String url, String jsObj) {
+		registeredToDistributedAlgos = SyncronizationValues.SENDING;
+		if(updateListener!=null){
+        	updateListener.refreshCollectedDataStates();
+        }
+		
 		Intent intent = new Intent(this, NodeCommunicationIntentService.class);
 		intent.putExtra(NodeCommunicationIntentService.URL, url);
 		intent.putExtra(Constants.MESSAGE_TYPE, messageType);
@@ -351,6 +373,11 @@ public class CommunicationService extends Service implements
 	}
 	
 	private void sendJobToGcmService(String msg){
+		registeredToGCM = SyncronizationValues.SENDING;
+		if(updateListener!=null){
+        	updateListener.refreshGCMConnData();
+        }
+		
 		Intent intent = new Intent(this, GCMCommunicationIntentService.class);
 		intent.putExtra(Constants.MESSAGE_TYPE, msg);
 		this.startService(intent);
@@ -379,10 +406,14 @@ public class CommunicationService extends Service implements
 			String newMessage = intent.getExtras().getString(EXTRA_MESSAGE);
 			Log.i(this.getClass().getName(), newMessage);
 			if(newMessage.equals(getString(R.string.gcm_registered)) || newMessage.equals(getString(R.string.gcm_unregistered)) ){
-				if(updateListener!=null){
-		        	updateListener.refreshGCMConnData();
-		        }
+				
+				if(GCMRegistrar.isRegisteredOnServer(CommunicationService.this))registeredToGCM = SyncronizationValues.TRUE;
+				else registeredToGCM = SyncronizationValues.FALSE;
 			}
+			
+			if(updateListener!=null){
+	        	updateListener.refreshGCMConnData();
+	        }
 		}
 	};
 
@@ -428,11 +459,12 @@ public class CommunicationService extends Service implements
 	    @Override
 	    protected void onReceiveResult (int resultCode, Bundle resultData) {
 	    	Log.i(Constants.ALGTYPE_DIST_ALGOS,"DistributedAlgos server response processed.");
-	    	registeredToDistributedAlgos = resultData.getBoolean(Constants.DISTRUBUTED_ALGOS_AVAIABLE_VALUE, false);
+	    	boolean resultReg=resultData.getBoolean(Constants.DISTRUBUTED_ALGOS_AVAIABLE_VALUE, false);
+	    	if(resultReg) registeredToDistributedAlgos = SyncronizationValues.TRUE;
+	    	else registeredToDistributedAlgos = SyncronizationValues.FALSE;
 	        String messageType = resultData.getString(Constants.MESSAGE_TYPE);
 	        if(messageType.equals(Constants.REGISTER)){
 	        	if(resultData.getBoolean(Constants.ITEM_SYNC_VALUE, false)){
-	        		registeredToDistributedAlgos=true;
 	        		setupSyncronizationInfo(SyncronizationValues.TRUE);	        		
 	        	}else{
 	        		setupSyncronizationInfo(SyncronizationValues.FALSE);

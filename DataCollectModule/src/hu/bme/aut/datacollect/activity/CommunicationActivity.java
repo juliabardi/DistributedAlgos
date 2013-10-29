@@ -3,6 +3,7 @@ package hu.bme.aut.datacollect.activity;
 import hu.bme.aut.communication.CommunicationService;
 import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
 import hu.bme.aut.communication.CommunicationService.CommunicationListener;
+import hu.bme.aut.communication.CommunicationService.SyncronizationValues;
 
 import java.util.Map;
 
@@ -36,7 +37,9 @@ public class CommunicationActivity extends Activity implements CommunicationList
 	private LinearLayout layoutCollectedData;
 	private CheckedTextView chtvGCMReg;
 	private CheckedTextView chtvGCMConn;
+	private TextView chtvGCMConnSending;
 	private CheckedTextView chtvNodeConn;
+	private TextView chtvNodeConnSending;
 	private LinearLayout.LayoutParams paramLayout;
 	private LinearLayout.LayoutParams paramCell;
 	
@@ -47,7 +50,9 @@ public class CommunicationActivity extends Activity implements CommunicationList
 		layoutCollectedData = (LinearLayout)findViewById(R.id.offerTable);
     	chtvGCMReg = (CheckedTextView)findViewById(R.id.checkedGCMReg);
     	chtvGCMConn = (CheckedTextView)findViewById(R.id.checkedGCMServer);
+    	chtvGCMConnSending = (TextView)findViewById(R.id.checkedGCMSending);
     	chtvNodeConn = (CheckedTextView)findViewById(R.id.checkedDistAlgos);
+    	chtvNodeConnSending = (TextView)findViewById(R.id.checkedGDistAlgosSending);
     	paramLayout = new LinearLayout.LayoutParams(
     			LinearLayout.LayoutParams.MATCH_PARENT,
     			LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -132,14 +137,7 @@ public class CommunicationActivity extends Activity implements CommunicationList
  		updateCollectedData();
     }
     
-    private void updateGCMServerData(){
-		chtvGCMReg.setChecked(commService.getRegisteredtoGCM());
-		chtvGCMConn.setChecked(commService.getRegisteredtoServer());
-    }
-    
     private void updateCollectedData(){
-		chtvNodeConn.setChecked(commService.getregisteredToDistributedAlgos());
-
     	layoutCollectedData.removeAllViews();
     	
     	for (Map.Entry<String, CommunicationService.SyncronizationValues> entry : commService.getOfferSyncronizationInfo().entrySet()){
@@ -157,6 +155,32 @@ public class CommunicationActivity extends Activity implements CommunicationList
 			layoutCollectedData.addView(tr);
 		}
     }
+    
+   private void updateDistAlgosServerData(){
+	   if(commService.getregisteredToDistributedAlgos() == SyncronizationValues.TRUE){	
+	   		chtvNodeConn.setChecked(true);
+		}else{
+			chtvNodeConn.setChecked(false);
+			if(commService.getregisteredToDistributedAlgos() == SyncronizationValues.SENDING){
+				chtvNodeConnSending.setVisibility(View.VISIBLE); return;
+				}
+			
+		}
+  		chtvNodeConnSending.setVisibility(View.INVISIBLE);
+   }
+   
+   private void updateGCMServerData(){
+		chtvGCMReg.setChecked(commService.getRegisteredtoGCMService());
+		if(commService.getRegisteredtoGCMServer() == SyncronizationValues.TRUE){
+			chtvGCMConn.setChecked(true);
+		}else{
+			chtvGCMConn.setChecked(false);
+			if(commService.getRegisteredtoGCMServer() == SyncronizationValues.SENDING){
+				chtvGCMConnSending.setVisibility(View.VISIBLE); return;
+				}
+		}
+		chtvGCMConnSending.setVisibility(View.INVISIBLE);
+   }
     
     private Boolean needSyncState(){
     	for (Map.Entry<String, CommunicationService.SyncronizationValues> entry : commService.getOfferSyncronizationInfo().entrySet()){
@@ -180,10 +204,31 @@ public class CommunicationActivity extends Activity implements CommunicationList
     		}else Toast.makeText(getApplication(), "Nincs mit szinkronizálni.", Toast.LENGTH_SHORT).show();
     	}
     }
+    
+    public void connectToGCMServer(View v){
+    	if(commBound){
+    		if(commService.reConnectToGCM()){
+    			Toast.makeText(getApplicationContext(), "Csatlakozás folyamatban...", Toast.LENGTH_SHORT).show();
+    		}
+    		
+    		updateGCMServerData();
+    	}
+    }
+    
+    public void connectToDistAlgoServer(View v){
+    	if(commBound){
+    		if(commService.reConnectToDistAlgos()){
+    			Toast.makeText(getApplicationContext(), "Csatlakozás folyamatban...", Toast.LENGTH_SHORT).show();
+    		}
+    		
+    		updateDistAlgosServerData();
+    	}
+    }
 
 	@Override
 	public void refreshCollectedDataStates() {
 		Log.i(this.getClass().getName(), "Updating Node Server info and Collected Data States.");
+		updateDistAlgosServerData();
 		updateCollectedData();
 	}
 
