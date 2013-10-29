@@ -6,11 +6,11 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="2dp"
-        android:stretchColumns="1" >
+        android:layout_height="wrap_content" >
 
         <TableLayout
+            android:padding="2dp"
+            android:stretchColumns="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
 
@@ -71,7 +71,13 @@
                     android:layout_height="wrap_content"
                     android:text=""/>
             </TableRow>
+        </TableLayout>
             
+        <TableLayout
+            android:padding="2dp"
+            android:stretchColumns="1" 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
             <TableRow
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" >
@@ -79,18 +85,42 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Adatgyűjtő szerver protokoll:"
+                    android:text="Adatgyűjtő szerver:"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
+                
+                <EditText android:id="@+id/dataCollectProtocol"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="https"/>
+            </TableRow>
+          </TableLayout>
+            
+          <TableLayout
+            android:padding="2dp"
+            android:stretchColumns="1" 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+               <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Eszköz IP címe:"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
             </TableRow>
             
             <TableRow
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" >
 
-               <EditText android:id="@+id/dataCollectProtocol"
+                <EditText android:id="@+id/deviceIP"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="https"/>
+                    android:text=""/>
+
             </TableRow>
             
             <TableRow
@@ -163,19 +193,17 @@
                     android:onClick="communicationDetailsClicked"
                     android:text="Szinkronizáció állapota" />
             </TableRow>
-        </TableLayout>
-
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-			
+            
+	        <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="loadJavascript"
                 android:paddingTop="20dp"
                 android:text="Load javascript" />
-
+			</TableRow>
         </TableLayout>
     </TableLayout>
 

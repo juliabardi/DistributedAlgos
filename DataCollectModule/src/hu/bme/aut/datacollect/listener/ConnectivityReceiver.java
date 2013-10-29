@@ -3,6 +3,7 @@ package hu.bme.aut.datacollect.listener;
 import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.entity.ConnectivityData;
+import hu.bme.aut.datacollect.utils.StringUtils;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -16,8 +17,10 @@ import java.util.Map;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class ConnectivityReceiver extends AbstractReceiver {
@@ -35,6 +38,10 @@ public class ConnectivityReceiver extends AbstractReceiver {
 		this.connDao = connDao;
 		
 		connManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+		
+		registerSelf();
+	
+		this.createConnectivityData();
 	}
 	
 	protected void createConnectivityData(){
@@ -60,27 +67,45 @@ public class ConnectivityReceiver extends AbstractReceiver {
 				type = activeNetwork.getType();
 			}
 		}
-		ConnectivityData last = this.connDao.queryLast();
-		if (last != null && isConnected == last.isConnected() && type == last.getType()){
-			//same as the last, dont save
-			return;
-		}
 		
 		Log.d(TAG, String.format("ConnectivityData: connected: %s, type: %s, wifiAddress: %s, gmsAddress: %s", isConnected, type, wifiAddress, gsmAddress));
-		connDao.create(new ConnectivityData(Calendar.getInstance().getTimeInMillis(), isConnected, type,
-				wifiAddress, gsmAddress));
+		this.updatePreference(wifiAddress);
+		
+		if (DataCollectService.isDataTypeEnabled(mContext, getDataType())){
+			
+			ConnectivityData last = this.connDao.queryLast();
+			if (last != null && isConnected == last.isConnected() && type == last.getType() &&
+					StringUtils.equals(wifiAddress, last.getWifiAddress()) && 
+					StringUtils.equals(gsmAddress, last.getGsmAddress())){
+				Log.d(TAG, "No change, returning. Last: " + last.toString());
+				return;
+			}
+			//saving to the DB only if collecting is enabled
+			connDao.create(new ConnectivityData(Calendar.getInstance().getTimeInMillis(), isConnected, type,
+					wifiAddress, gsmAddress));
+		}
 		
 		this.mContext.sendRecurringRequests();
 	}
 	
+	private void updatePreference(String ip){
+		
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext());
+		
+		if (!StringUtils.equals(settings.getString(DataCollectService.DEVICE_IP_WIFI, null), ip)){
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString(DataCollectService.DEVICE_IP_WIFI, ip);
+			editor.commit();
+		}
+	}
+	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		
+				
 		this.createConnectivityData();
 	}
-
-	@Override
-	public void register() {
+	
+	private void registerSelf(){
 		
 		if (!regConn){
 			IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -88,14 +113,24 @@ public class ConnectivityReceiver extends AbstractReceiver {
 			regConn = true;
 		}
 	}
-
-	@Override
-	public void unregister() {
+	
+	public void unregisterSelf(){
 		
 		if (regConn){
 			mContext.unregisterReceiver(this);
 			regConn = false;
 		}
+		mContext.deleteRecurringRequests(getDataType());
+	}
+
+	@Override
+	public void register() {
+		//leaving it blank, because ConnectivityReceiver should run in the background all the time
+	}
+
+	@Override
+	public void unregister() {
+		
 		mContext.deleteRecurringRequests(getDataType());
 	}
 

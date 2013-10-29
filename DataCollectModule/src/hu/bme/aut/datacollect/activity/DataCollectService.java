@@ -91,6 +91,7 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	public static final String DEC_ADMIN_PORT = "decAdminPort";
 	public static final String DEC_NODE_PROTOCOL = "decNodeProtocol";
 	public static final String DATA_COLLECTOR_PROTOCOL = "dataCollectorProtocol";
+	public static final String DEVICE_IP_WIFI = "deviceIP";
 	
 	public static final List<String> serverKeys = Arrays.asList(DEC_ADMIN_IP, DEC_ADMIN_PORT, DEC_NODE_IP, DEC_NODE_PORT,DEC_NODE_PROTOCOL,DATA_COLLECTOR_PROTOCOL);
 
@@ -189,6 +190,12 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 			if (listeners.get(key).isAvailable()){
 				listeners.get(key).unregister();
 			}
+		}
+		
+		//unregistering Connectivity separately, because it ran in the background
+		ConnectivityReceiver conn = (ConnectivityReceiver) listeners.get(CONNECTIVITY);
+		if (conn != null){
+			conn.unregisterSelf();
 		}
 	}
 	

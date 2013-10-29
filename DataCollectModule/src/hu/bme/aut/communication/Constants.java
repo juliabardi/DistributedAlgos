@@ -96,6 +96,11 @@ public class Constants {
     public static String getDataCollectorServerPort(Context context){
        	return Constants.DataCollectorServerPort; 
     }
+    
+    public static String getDeviceIP(Context context){
+    	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+       	return  sharedPrefs.getString(DataCollectService.DEVICE_IP_WIFI, "");
+    }
 
     
 	//GCM specific

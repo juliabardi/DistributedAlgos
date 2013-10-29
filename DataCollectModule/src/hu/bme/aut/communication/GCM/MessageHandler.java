@@ -163,7 +163,10 @@ public class MessageHandler implements Closeable {
 					
 					this.queue.add(new TrafficStatsUploadTask(context, address, port, reqId, timesInt, recurrenceInt, params));
 				}
-				else {	
+				//send only if enabled
+				else if (DataCollectService.sharedPrefKeys.contains(dataType) && 
+						DataCollectService.isDataTypeEnabled(context, dataType)){
+					
 					Date queryDate = null;
 					
 					//only one of date and time should be given (if both are, time will overwrite date)
@@ -181,7 +184,7 @@ public class MessageHandler implements Closeable {
 					
 					if (recurrence != null){
 						long millis = Calendar.getInstance().getTimeInMillis();
-						RecurringRequest recurringRequest = new RecurringRequest(reqId, ip, port, Constants.getDataCollectorServerProtocol(context), recurrenceInt, millis, dataType, joinedCols);
+						RecurringRequest recurringRequest = new RecurringRequest(reqId, ip, port, protocol, recurrenceInt, millis, dataType, joinedCols);
 						Log.d(TAG, "Saving recurring request: " + recurringRequest.toString());
 						this.recurringDao.createOrUpdate(recurringRequest);
 					}

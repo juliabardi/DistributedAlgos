@@ -64,7 +64,6 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	private boolean mBound = false;
 	private boolean commBound = false;
 	private ToggleButton communicationButton;
-	private ToggleButton measureButton;
 	
 	private UploadTaskQueue queue = UploadTaskQueue.instance(this);
 		
@@ -73,7 +72,6 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         communicationButton = (ToggleButton)findViewById(R.id.buttonCommunicationStop);
-        measureButton = (ToggleButton)findViewById(R.id.buttonStop);
                         
 		settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		settings.registerOnSharedPreferenceChangeListener((OnSharedPreferenceChangeListener) this);
@@ -245,6 +243,10 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		et = (EditText)this.findViewById(R.id.dataCollectProtocol);
 		et.setText(Constants.getDataCollectorServerProtocol(this));
 		et.setKeyListener(null);
+		
+		et = (EditText)this.findViewById(R.id.deviceIP);
+		et.setText(Constants.getDeviceIP(this));
+		et.setKeyListener(null);
 	}
 
 	@Override
@@ -347,45 +349,6 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	public void communicationDetailsClicked(View view){
 		Intent i = new Intent(this, CommunicationActivity.class);
 		this.startActivity(i);
-	}
-	
-	//starting CameraActivity to take pictures
-	public void uploadImages(View v){				
-		//TODO get permission
-		String fullAddress =  Constants.getDataCollectorServerProtocol(this) + Constants.getDataCollectorServerAddress(this);
-		
-		//if ImageData sharedpref is enabled and DataCollectService is bound, add notification
-		if (DataCollectService.isDataTypeEnabled(this, DataCollectService.IMAGE)){
-			intent = new Intent(this, CameraActivity.class);
-			intent.putExtra("address",fullAddress);
-			this.startActivity(intent);
-		}
-		
-	}
-	
-	public void sendData(View v){
-		//send here some data
-		String fullAddress =  Constants.getDataCollectorServerProtocol(this) + Constants.getDataCollectorServerAddress(this);
-		Log.d(TAG, "Sending some columns");
-		this.queue.add(new DataUploadTask(this, "AccelerationData", "1",fullAddress, Constants.getDataCollectorServerPort(this),Arrays.asList("id", "timestamp", "accX", "accY")));
-		
-		Log.d(TAG, "Sending all columns");
-		this.queue.add(new DataUploadTask(this, "LightData", "2",fullAddress, Constants.getDataCollectorServerPort(this)));
-		
-		Log.d(TAG, "Sending all columns after date");		
-		Date date = null;
-		try {
-			date = new SimpleDateFormat("yyyy/MM/dd").parse("2013/09/01");
-		} catch (ParseException e) {
-			Log.e(TAG, e.getMessage());
-		}
-		this.queue.add(new DataUploadTask(this, "AccelerationData", "3",fullAddress, Constants.getDataCollectorServerPort(this), date));
-		
-		Log.d(TAG, "Sending buggy name");
-		this.queue.add(new DataUploadTask(this, "NotExists", "4",fullAddress, Constants.getDataCollectorServerPort(this)));
-		
-		Log.d(TAG, "Sending some columns after date");
-		this.queue.add(new DataUploadTask(this, "AccelerationData", "5",fullAddress, Constants.getDataCollectorServerPort(this), date, Arrays.asList("id")));
 	}
 	
 	public void loadJavascript(View v){
