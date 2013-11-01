@@ -34,8 +34,11 @@ public class FirstActivity extends Activity {
 			((EditText)findViewById(R.id.nodePortHTTP)).setText(settings.getString(DataCollectService.DEC_NODE_PORT, Constants.NodeServerPort));
 			((EditText)findViewById(R.id.nodePortHTTPS)).setText(settings.getString(DataCollectService.DEC_NODE_PORT_HTTPS, Constants.NodeServerPortHttps));
 			
-			//default http
-			if (!Constants.NodeServerProtocol.equals(settings.getString(DataCollectService.DEC_NODE_PROTOCOL, Constants.NodeServerProtocol))){
+			if (Constants.HTTP.equals(settings.getString(DataCollectService.DEC_NODE_PROTOCOL, Constants.NodeServerProtocol))){
+				((RadioButton)findViewById(R.id.radioButtonNodeHTTP)).setChecked(true);
+				((RadioButton)findViewById(R.id.radioButtonNodeHTTPS)).setChecked(false);
+			}else{
+				((RadioButton)findViewById(R.id.radioButtonNodeHTTP)).setChecked(false);
 				((RadioButton)findViewById(R.id.radioButtonNodeHTTPS)).setChecked(true);
 			}
 
@@ -43,8 +46,11 @@ public class FirstActivity extends Activity {
 			((EditText)findViewById(R.id.gcmPortHTTP)).setText(settings.getString(DataCollectService.DEC_ADMIN_PORT, Constants.GCMServerPort));
 			((EditText)findViewById(R.id.gcmPortHTTPS)).setText(settings.getString(DataCollectService.DEC_ADMIN_PORT_HTTPS, Constants.GCMServerPortHttps));
 			
-			//default http
-			if (!Constants.GCMServerProtocol.equals(settings.getString(DataCollectService.DEC_ADMIN_PROTOCOL, Constants.GCMServerProtocol))){
+			if (Constants.HTTP.equals(settings.getString(DataCollectService.DEC_ADMIN_PROTOCOL, Constants.GCMServerProtocol))){
+				((RadioButton)findViewById(R.id.radioButtonGCMHTTP)).setChecked(true);
+				((RadioButton)findViewById(R.id.radioButtonGCMHTTPS)).setChecked(false);
+			}else{
+				((RadioButton)findViewById(R.id.radioButtonGCMHTTP)).setChecked(false);
 				((RadioButton)findViewById(R.id.radioButtonGCMHTTPS)).setChecked(true);
 			}
 			
@@ -53,8 +59,12 @@ public class FirstActivity extends Activity {
 			((EditText)findViewById(R.id.dataCollectorPortHTTPS)).setText(settings.getString(DataCollectService.DATA_COLLECTOR_PORT_HTTPS, Constants.DataCollectorServerPortHttps));			
 			
 			//default https
-			if (!Constants.DataCollectorServerProtocol.equals(settings.getString(DataCollectService.DATA_COLLECTOR_PROTOCOL, Constants.DataCollectorServerProtocol))){
+			if (Constants.HTTP.equals(settings.getString(DataCollectService.DATA_COLLECTOR_PROTOCOL, Constants.DataCollectorServerProtocol))){
 				((RadioButton)findViewById(R.id.radioButtonDataCollectorHTTP)).setChecked(true);
+				((RadioButton)findViewById(R.id.radioButtonDataCollectorHTTPS)).setChecked(false);
+			}else{
+				((RadioButton)findViewById(R.id.radioButtonDataCollectorHTTP)).setChecked(false);
+				((RadioButton)findViewById(R.id.radioButtonDataCollectorHTTPS)).setChecked(true);
 			}
 			
 		} else {
