@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -28,22 +30,68 @@ public class FirstActivity extends Activity {
 			this.setContentView(R.layout.first_view);
 			
 			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-			((TextView)findViewById(R.id.nodeAddress)).setText(settings.getString(DataCollectService.DEC_NODE_IP, Constants.NodeServerIP));
-			((TextView)findViewById(R.id.nodePort)).setText(settings.getString(DataCollectService.DEC_NODE_PORT, Constants.NodeServerPort));
-			((TextView)findViewById(R.id.gcmAddress)).setText(settings.getString(DataCollectService.DEC_ADMIN_IP, Constants.GCMServerIP));
-			((TextView)findViewById(R.id.gcmPort)).setText(settings.getString(DataCollectService.DEC_ADMIN_PORT, Constants.GCMServerPort));
+			((EditText)findViewById(R.id.nodeAddress)).setText(settings.getString(DataCollectService.DEC_NODE_IP, Constants.NodeServerIP));
+			((EditText)findViewById(R.id.nodePortHTTP)).setText(settings.getString(DataCollectService.DEC_NODE_PORT, Constants.NodeServerPort));
+			((EditText)findViewById(R.id.nodePortHTTPS)).setText(settings.getString(DataCollectService.DEC_NODE_PORT_HTTPS, Constants.NodeServerPortHttps));
 			
 			//default http
 			if (!Constants.NodeServerProtocol.equals(settings.getString(DataCollectService.DEC_NODE_PROTOCOL, Constants.NodeServerProtocol))){
-				((RadioGroup)findViewById(R.id.radioNodeProtocol)).check(R.id.radioButtonNodeHTTPS);
+				((RadioButton)findViewById(R.id.radioButtonNodeHTTPS)).setChecked(true);
 			}
+
+			((EditText)findViewById(R.id.gcmAddress)).setText(settings.getString(DataCollectService.DEC_ADMIN_IP, Constants.GCMServerIP));
+			((EditText)findViewById(R.id.gcmPortHTTP)).setText(settings.getString(DataCollectService.DEC_ADMIN_PORT, Constants.GCMServerPort));
+			((EditText)findViewById(R.id.gcmPortHTTPS)).setText(settings.getString(DataCollectService.DEC_ADMIN_PORT_HTTPS, Constants.GCMServerPortHttps));
+			
+			//default http
+			if (!Constants.GCMServerProtocol.equals(settings.getString(DataCollectService.DEC_ADMIN_PROTOCOL, Constants.GCMServerProtocol))){
+				((RadioButton)findViewById(R.id.radioButtonGCMHTTPS)).setChecked(true);
+			}
+			
+			((EditText)findViewById(R.id.dataCollectorAddress)).setText(settings.getString(DataCollectService.DATA_COLLECTOR_IP, Constants.DataCollectorServerIP));
+			((EditText)findViewById(R.id.dataCollectorPortHTTP)).setText(settings.getString(DataCollectService.DATA_COLLECTOR_PORT, Constants.DataCollectorServerPort));
+			((EditText)findViewById(R.id.dataCollectorPortHTTPS)).setText(settings.getString(DataCollectService.DATA_COLLECTOR_PORT_HTTPS, Constants.DataCollectorServerPortHttps));			
+			
 			//default https
 			if (!Constants.DataCollectorServerProtocol.equals(settings.getString(DataCollectService.DATA_COLLECTOR_PROTOCOL, Constants.DataCollectorServerProtocol))){
-				((RadioGroup)findViewById(R.id.radioDataCollectorProtocol)).check(R.id.radioButtonDataCollectorHTTP);
+				((RadioButton)findViewById(R.id.radioButtonDataCollectorHTTP)).setChecked(true);
 			}
 			
 		} else {
 			this.startActivity(new Intent(this, MainActivity.class));
+		}
+	}
+	
+	public void changeProtocol(View view){
+		switch (view.getId()) {
+		case R.id.radioButtonNodeHTTP:
+			setupButton(R.id.radioButtonNodeHTTP, R.id.radioButtonNodeHTTPS);
+			break;
+		case R.id.radioButtonNodeHTTPS:
+			setupButton(R.id.radioButtonNodeHTTPS, R.id.radioButtonNodeHTTP);
+			break;
+		case R.id.radioButtonGCMHTTP:
+			setupButton(R.id.radioButtonGCMHTTP, R.id.radioButtonGCMHTTPS);
+			break;
+		case R.id.radioButtonGCMHTTPS:
+			setupButton(R.id.radioButtonGCMHTTPS, R.id.radioButtonGCMHTTP);
+			break;
+		case R.id.radioButtonDataCollectorHTTP:
+			setupButton(R.id.radioButtonDataCollectorHTTP, R.id.radioButtonDataCollectorHTTPS);
+			break;
+		case R.id.radioButtonDataCollectorHTTPS:
+			setupButton(R.id.radioButtonDataCollectorHTTPS, R.id.radioButtonDataCollectorHTTP);
+			break;
+		default:
+			break;
+		}
+	}
+	
+	private void setupButton(int buttonClick,int buttonStatePartner ){
+		if(((RadioButton)findViewById(buttonClick)).isChecked()){
+			((RadioButton)findViewById(buttonStatePartner)).setChecked(false);
+		}else{
+			((RadioButton)findViewById(buttonStatePartner)).setChecked(true);
 		}
 	}
 	
@@ -54,33 +102,25 @@ public class FirstActivity extends Activity {
 		editor.putString(DataCollectService.DEC_NODE_IP, 
 				((TextView)findViewById(R.id.nodeAddress)).getText().toString());
 		editor.putString(DataCollectService.DEC_NODE_PORT, 
-				((TextView)findViewById(R.id.nodePort)).getText().toString());
+				((TextView)findViewById(R.id.nodePortHTTP)).getText().toString());
+		editor.putString(DataCollectService.DEC_NODE_PORT_HTTPS, 
+				((TextView)findViewById(R.id.nodePortHTTPS)).getText().toString());
 		editor.putString(DataCollectService.DEC_ADMIN_IP, 
 				((TextView)findViewById(R.id.gcmAddress)).getText().toString());
 		editor.putString(DataCollectService.DEC_ADMIN_PORT, 
-				((TextView)findViewById(R.id.gcmPort)).getText().toString());
-		RadioGroup nodeProtocol = (RadioGroup)findViewById(R.id.radioNodeProtocol);
-		String selectedNodeProtocol="http";
-		switch (nodeProtocol.getCheckedRadioButtonId()) {
-		case R.id.radioButtonNodeHTTPS:
-			selectedNodeProtocol="https";
-			break;
-		default:
-			break;
-		}
-		editor.putString(DataCollectService.DEC_NODE_PROTOCOL, selectedNodeProtocol);
-
-		RadioGroup dataCollectorProtocol = (RadioGroup)findViewById(R.id.radioDataCollectorProtocol);
-		String selectedDataCollectorProtocol="https";
-		switch (dataCollectorProtocol.getCheckedRadioButtonId()) {
-		case R.id.radioButtonDataCollectorHTTP:
-			selectedDataCollectorProtocol="http";
-			break;
-		default:
-			break;
-		}
-		
-		editor.putString(DataCollectService.DATA_COLLECTOR_PROTOCOL, selectedDataCollectorProtocol);
+				((TextView)findViewById(R.id.gcmPortHTTP)).getText().toString());
+		editor.putString(DataCollectService.DEC_ADMIN_PORT_HTTPS, 
+				((TextView)findViewById(R.id.gcmPortHTTPS)).getText().toString());
+		editor.putString(DataCollectService.DATA_COLLECTOR_IP, 
+				((TextView)findViewById(R.id.dataCollectorAddress)).getText().toString());
+		editor.putString(DataCollectService.DATA_COLLECTOR_PORT, 
+				((TextView)findViewById(R.id.dataCollectorPortHTTP)).getText().toString());
+		editor.putString(DataCollectService.DATA_COLLECTOR_PORT_HTTPS, 
+				((TextView)findViewById(R.id.dataCollectorPortHTTPS)).getText().toString());
+	
+		editor.putString(DataCollectService.DEC_NODE_PROTOCOL, ((RadioButton)findViewById(R.id.radioButtonNodeHTTP)).isChecked()? Constants.HTTP:Constants.HTTPS);
+		editor.putString(DataCollectService.DEC_ADMIN_PROTOCOL, ((RadioButton)findViewById(R.id.radioButtonGCMHTTP)).isChecked()? Constants.HTTP:Constants.HTTPS);
+		editor.putString(DataCollectService.DATA_COLLECTOR_PROTOCOL, ((RadioButton)findViewById(R.id.radioButtonDataCollectorHTTP)).isChecked()? Constants.HTTP:Constants.HTTPS);
 		
 		editor.commit();
 		

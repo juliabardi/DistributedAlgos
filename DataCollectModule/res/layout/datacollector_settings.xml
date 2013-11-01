@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/skyBlue"
+        android:padding="5dp"
+        android:text="@string/data_collector_szerver_settings"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp" />
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp" >
+
+        <TableRow>
+
+            <EditText
+                android:id="@+id/dataCollectorAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_span="2"
+                android:hint="@string/ip"
+                android:text="@string/default_dec_node_ip" />
+        </TableRow>
+
+        <TableRow>
+
+            <RadioButton
+                android:id="@+id/radioButtonDataCollectorHTTP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/protocolHTTP"
+                android:onClick="changeProtocol" />
+
+            <EditText
+                android:id="@+id/dataCollectorPortHTTP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:hint="@string/port"
+                android:text="@string/default_data_collector_port" />
+        </TableRow>
+
+        <TableRow>
+
+            <RadioButton
+                android:checked="true"
+                android:id="@+id/radioButtonDataCollectorHTTPS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/protocolHTTPS"
+                android:onClick="changeProtocol" />
+
+            <EditText
+                android:id="@+id/dataCollectorPortHTTPS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:hint="@string/port"
+                android:text="@string/default_data_collector_port_https" />
+        </TableRow>
+    </TableLayout>
+
+</LinearLayout>

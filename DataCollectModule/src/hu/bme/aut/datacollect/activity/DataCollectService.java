@@ -87,13 +87,22 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	
 	public static final String DEC_NODE_IP = "decNodeIP";
 	public static final String DEC_ADMIN_IP = "decAdminIP";
+	public static final String DATA_COLLECTOR_IP = "dataCollectorIP";
 	public static final String DEC_NODE_PORT = "decNodePort";
+	public static final String DEC_NODE_PORT_HTTPS = "decNodePortHttps";
 	public static final String DEC_ADMIN_PORT = "decAdminPort";
+	public static final String DEC_ADMIN_PORT_HTTPS = "decAdminPortHttps";
+	public static final String DATA_COLLECTOR_PORT = "dataCollectorPort";
+	public static final String DATA_COLLECTOR_PORT_HTTPS = "dataCollectorPortHttps";
+	public static final String DEC_ADMIN_PROTOCOL = "decAdminProtocol";
 	public static final String DEC_NODE_PROTOCOL = "decNodeProtocol";
 	public static final String DATA_COLLECTOR_PROTOCOL = "dataCollectorProtocol";
 	public static final String DEVICE_IP_WIFI = "deviceIP";
 	
-	public static final List<String> serverKeys = Arrays.asList(DEC_ADMIN_IP, DEC_ADMIN_PORT, DEC_NODE_IP, DEC_NODE_PORT,DEC_NODE_PROTOCOL,DATA_COLLECTOR_PROTOCOL);
+	public static final List<String> serverKeys = Arrays.asList(
+			DEC_ADMIN_IP, DEC_ADMIN_PORT,DEC_ADMIN_PORT_HTTPS,DEC_ADMIN_PROTOCOL,
+			DEC_NODE_IP, DEC_NODE_PORT,DEC_NODE_PORT_HTTPS,DEC_NODE_PROTOCOL,
+			DATA_COLLECTOR_IP,DATA_COLLECTOR_PORT,DATA_COLLECTOR_PORT_HTTPS,DATA_COLLECTOR_PROTOCOL);
 
 	private final ServiceBinder mBinder = new ServiceBinder();
 

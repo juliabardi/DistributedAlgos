@@ -2,144 +2,41 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="match_parent" >
-        
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="10dp" >
-
+        android:orientation="vertical" >
         <TextView
             android:id="@+id/tableName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:text="@string/welcome_to_distributedalgos"
-            android:textAppearance="?android:attr/textAppearanceLarge"                    
-            android:focusableInTouchMode="true" 
-            android:focusable="true" >
-            <requestFocus/>
+            android:textAppearance="?android:attr/textAppearanceLarge" >
+            <requestFocus />
         </TextView>
-        
-         <TextView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:lines="4"
             android:text="@string/welcome_long"
-            android:lines="4"/>
+            android:layout_marginLeft="5dp" />
 
-        <LinearLayout
-            android:id="@+id/table"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/node_szerver_settings"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp" />
- 
-            <LinearLayout
-                android:layout_width="fill_parent"
+			<include layout="@layout/node_settings"/>
+			<include layout="@layout/gcm_settings"/>
+			<include layout="@layout/datacollector_settings"/>            
+            
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">"
-
-                <EditText android:id="@+id/nodeAddress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/default_dec_node_ip"
-                    android:hint="@string/ip"
-                    android:layout_weight="3"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginLeft="5dp"/>
-                
-                <EditText android:id="@+id/nodePort"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/default_dec_node_port"
-                    android:hint="@string/port"
-                    android:layout_weight="1"/>
-            </LinearLayout>
-       		
- 			 <RadioGroup
-			        android:id="@+id/radioNodeProtocol"
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-			        android:checkedButton="@+id/radioButtonNodeHTTP" >
-	       			<RadioButton
-	       			    android:id="@id/radioButtonNodeHTTP"
-	       			    android:layout_width="wrap_content"
-	       			    android:layout_height="wrap_content"
-	       			    android:text="@string/protocolHTTP" />
-	       			<RadioButton
-	       			    android:id="@+id/radioButtonNodeHTTPS"
-	       			    android:layout_width="wrap_content"
-	       			    android:layout_height="wrap_content"
-	       			    android:text="@string/protocolHTTPS" />
- 			</RadioGroup>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/gcm_szerver_settings"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp" />
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="5dp"
+                android:onClick="onSave"
+                android:text="@string/save_start" />
             
-      		<LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-               <EditText android:id="@+id/gcmAddress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/default_dec_node_ip"
-                    android:hint="@string/ip"
-                    android:layout_weight="3"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginLeft="5dp"/>
-               
-               <EditText android:id="@+id/gcmPort"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/default_dec_admin_port"
-                    android:hint="@string/port"
-                    android:layout_weight="1"/>
-            </LinearLayout>
-                   <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/data_collector_szerver_settings"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp" />
-            
-			 	<RadioGroup
-			        android:id="@+id/radioDataCollectorProtocol"
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-			        android:checkedButton="@+id/radioButtonDataCollectorHTTPS" >
-	       			<RadioButton
-	       			    android:id="@+id/radioButtonDataCollectorHTTP"
-	       			    android:layout_width="wrap_content"
-	       			    android:layout_height="wrap_content"
-	       			    android:text="@string/protocolHTTP" />
-	       			<RadioButton
-	       			    android:id="@id/radioButtonDataCollectorHTTPS"
-	       			    android:layout_width="wrap_content"
-	       			    android:layout_height="wrap_content"
-	       			    android:text="@string/protocolHTTPS" />
- 			</RadioGroup>
-            
-               <Button
-                   android:id="@+id/saveButton"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:onClick="onSave"
-                   android:text="@string/save_start"
-                   >
-               </Button>
-        </LinearLayout>
     </LinearLayout>
+
 </ScrollView>

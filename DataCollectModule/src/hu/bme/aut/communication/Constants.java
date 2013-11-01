@@ -22,6 +22,9 @@ public class Constants {
 	public static final String ALGTYPE ="algType";
 	public static final String PARAM_NAME ="name";
 	
+	public static final String HTTP ="http";
+	public static final String HTTPS ="htts";
+	
 	// For basic auth test
 	public static final String USER ="algos";
 	public static final String PASSWORD ="algos";
@@ -46,9 +49,14 @@ public class Constants {
 	// Server specific
 	public static String NodeServerIP = "192.168.1.113";
 	public static String GCMServerIP = "192.168.1.113";
+	public static String DataCollectorServerIP = "192.168.1.113";
 	public static String NodeServerPort = "3000";
-	public static String DataCollectorServerPort = "3003";
+	public static String NodeServerPortHttps = "3002";
+	public static String DataCollectorServerPort = "3001";
+	public static String DataCollectorServerPortHttps = "3003";
 	public static String GCMServerPort = "8080";
+	public static String GCMServerPortHttps = "8443";
+	public static String GCMServerProtocol = "http";
 	public static String NodeServerProtocol = "http";
 	public static String DataCollectorServerProtocol = "https";
 	
