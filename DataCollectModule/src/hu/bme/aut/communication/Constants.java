@@ -23,7 +23,7 @@ public class Constants {
 	public static final String PARAM_NAME ="name";
 	
 	public static final String HTTP ="http";
-	public static final String HTTPS ="htts";
+	public static final String HTTPS ="https";
 	
 	// For basic auth test
 	public static final String USER ="algos";
@@ -47,71 +47,25 @@ public class Constants {
 	
 	
 	// Server specific
-	public static String NodeServerIP = "192.168.1.113";
-	public static String GCMServerIP = "192.168.1.113";
-	public static String DataCollectorServerIP = "192.168.1.113";
-	public static String NodeServerPort = "3000";
-	public static String NodeServerPortHttps = "3002";
-	public static String DataCollectorServerPort = "3001";
-	public static String DataCollectorServerPortHttps = "3003";
-	public static String GCMServerPort = "8080";
-	public static String GCMServerPortHttps = "8443";
-	public static String GCMServerProtocol = "http";
-	public static String NodeServerProtocol = "http";
-	public static String DataCollectorServerProtocol = "https";
+	public static final String NodeServerIP = "192.168.1.113";
+	public static final String GCMServerIP = "192.168.1.113";
+	public static final String DataCollectorServerIP = "192.168.1.113";
+	public static final String NodeServerPort = "3000";
+	public static final String NodeServerPortHttps = "3002";
+	public static final String DataCollectorServerPort = "3001";
+	public static final String DataCollectorServerPortHttps = "3003";
+	public static final String GCMServerPort = "8080";
+	public static final String GCMServerPortHttps = "8443";
+	public static final String GCMServerProtocol = "http";
+	public static final String NodeServerProtocol = "http";
+	public static final String DataCollectorServerProtocol = "https";
 	
-	public static String getNodeServerAddress(Context context){
-    	
-    	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-    	return String.format("://%s:%s/", 
-    			sharedPrefs.getString(DataCollectService.DEC_NODE_IP, Constants.NodeServerIP), 
-    			sharedPrefs.getString(DataCollectService.DEC_NODE_PORT, Constants.NodeServerPort));
-    }
-	
-	 public static String getNodeServerProtocol(Context context){
-	    	
-	    	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-	    	return  sharedPrefs.getString(DataCollectService.DEC_NODE_PROTOCOL, Constants.NodeServerProtocol); 
-	    }
-    
-    public static String getDataCollectorServerAddress(Context context){
-    	
-    	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-    	return String.format("://%s:%s/", 
-    			sharedPrefs.getString(DataCollectService.DEC_NODE_IP, Constants.NodeServerIP), 
-    			DataCollectorServerPort);
-    }
-    
-    public static String getDataCollectorServerProtocol(Context context){
-    	
-    	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-    	return  sharedPrefs.getString(DataCollectService.DATA_COLLECTOR_PROTOCOL, Constants.DataCollectorServerProtocol); 
-    }
-    
-    public static String getGCMServerAddress(Context context){
-    	
-    	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-    	return String.format("http://%s:%s/DistributedEnvironmentCoordination", 
-    			sharedPrefs.getString(DataCollectService.DEC_ADMIN_IP, Constants.GCMServerIP), 
-    			sharedPrefs.getString(DataCollectService.DEC_ADMIN_PORT, Constants.GCMServerPort));
-    }
-    
-    public static String getNodeServerPort(Context context){
-       	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-       	return  sharedPrefs.getString(DataCollectService.DEC_NODE_PORT, Constants.NodeServerPort);
-    }
-    
-    public static String getDataCollectorServerPort(Context context){
-       	return Constants.DataCollectorServerPort; 
-    }
-    
-    public static String getDeviceIP(Context context){
+	public static String getDeviceIP(Context context){
     	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
        	return  sharedPrefs.getString(DataCollectService.DEVICE_IP_WIFI, "");
     }
-
     
-	//GCM specific
+    //GCM specific
 	public static final String OFFER_REQUEST="offerRequest";
 	public static final String OFFER_REPLY="offerReply";
 	

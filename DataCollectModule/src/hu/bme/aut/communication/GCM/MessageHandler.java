@@ -1,6 +1,7 @@
 package hu.bme.aut.communication.GCM;
 
 import hu.bme.aut.communication.Constants;
+import hu.bme.aut.communication.utils.HttpParamsUtils;
 import hu.bme.aut.datacollect.activity.CameraActivity;
 import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.activity.R;
@@ -113,8 +114,8 @@ public class MessageHandler implements Closeable {
 				String recurrence = null;
 				JSONArray columns = null;
 				String reqId = null;
-				String port = Constants.getDataCollectorServerPort(context);
-				String protocol = Constants.getDataCollectorServerProtocol(context);
+				String port = HttpParamsUtils.getDataCollectorServerPort(context);
+				String protocol = HttpParamsUtils.getDataCollectorServerProtocol(context);
 				JSONObject requestParams = jsMessage.optJSONObject(Constants.REQUEST_PARAMS);
 				
 				String width = null;

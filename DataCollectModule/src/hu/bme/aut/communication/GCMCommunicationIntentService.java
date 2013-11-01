@@ -10,6 +10,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import static hu.bme.aut.communication.GCM.CommonUtilities.SENDER_ID;
 import hu.bme.aut.communication.GCM.ServerUtilities;
+import hu.bme.aut.communication.utils.HttpParamsUtils;
+
 import com.google.android.gcm.GCMRegistrar;
 
 
@@ -68,7 +70,8 @@ public class GCMCommunicationIntentService  extends IntentService{
 	 * Registering to the GCM push notification service.
 	 */
 	private void registerGCM() {
-		checkNotNull(Constants.getGCMServerAddress(this), "SERVER_URL");
+		String address = HttpParamsUtils.getFullGcmAddress(this);
+		checkNotNull(address, "SERVER_URL");
 		checkNotNull(SENDER_ID, "SENDER_ID");
 		// Make sure the device has the proper dependencies.
 		GCMRegistrar.checkDevice(this);

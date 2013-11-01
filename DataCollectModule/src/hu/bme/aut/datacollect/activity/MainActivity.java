@@ -3,6 +3,7 @@ package hu.bme.aut.datacollect.activity;
 import hu.bme.aut.communication.CommunicationService;
 import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
 import hu.bme.aut.communication.Constants;
+import hu.bme.aut.communication.utils.HttpParamsUtils;
 import hu.bme.aut.datacollect.activity.DataCollectService.ServiceBinder;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
 import hu.bme.aut.datacollect.listener.IListener;
@@ -234,14 +235,14 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		
 		EditText et = (EditText)this.findViewById(R.id.nodeAddress);
 		et.setKeyListener(null);
-		et.setText(Constants.getNodeServerProtocol(this)+ Constants.getNodeServerAddress(this));
+		et.setText(HttpParamsUtils.getFullNodeAddress(this));
 		
 		et = (EditText)this.findViewById(R.id.gcmAddress);
-		et.setText(Constants.getGCMServerAddress(this));
+		et.setText(HttpParamsUtils.getFullGcmAddress(this));
 		et.setKeyListener(null);
 		
 		et = (EditText)this.findViewById(R.id.dataCollectProtocol);
-		et.setText(Constants.getDataCollectorServerProtocol(this));
+		et.setText(HttpParamsUtils.getDataCollectorServerProtocol(this));
 		et.setKeyListener(null);
 		
 		et = (EditText)this.findViewById(R.id.deviceIP);

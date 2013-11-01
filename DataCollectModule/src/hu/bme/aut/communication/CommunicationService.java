@@ -2,6 +2,7 @@ package hu.bme.aut.communication;
 
 import static hu.bme.aut.communication.GCM.CommonUtilities.DISPLAY_MESSAGE_ACTION;
 import static hu.bme.aut.communication.GCM.CommonUtilities.EXTRA_MESSAGE;
+import hu.bme.aut.communication.utils.HttpParamsUtils;
 import hu.bme.aut.communication.utils.JsonUtils;
 import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.activity.MainActivity;
@@ -214,8 +215,7 @@ public class CommunicationService extends Service implements
 	private void unregisterFormDistributedAlgos(){
 		registeredToDistributedAlgos=SyncronizationValues.SENDING;
 		StringBuilder builder = new StringBuilder();
-		builder.append(Constants.getNodeServerProtocol(this));
-		builder.append(Constants.getNodeServerAddress(this));
+		builder.append(HttpParamsUtils.getFullNodeAddress(this));
 		builder.append(Constants.UNREGISTER);
 		builder.append("?" + Constants.ALGTYPE);
 		builder.append("=" + Constants.ALGTYPE_DIST_ALGOS);
@@ -309,7 +309,7 @@ public class CommunicationService extends Service implements
 		JSONObject message = JsonUtils.createMainBodyWithAlgos(Constants.ALGTYPE_DIST_ALGOS, JsonUtils
 				.createAlgoBody(JsonUtils.createSimpleArray(offerList), null));
 
-		sendJobToNodeService(Constants.REGISTER,Constants.REGISTER, Constants.getNodeServerProtocol(this) + Constants.getNodeServerAddress(this) + Constants.REGISTER, message.toString());
+		sendJobToNodeService(Constants.REGISTER,Constants.REGISTER, HttpParamsUtils.getFullNodeAddress(this) + Constants.REGISTER, message.toString());
 		
 	}
 	
@@ -332,8 +332,7 @@ public class CommunicationService extends Service implements
 	private void handleOffer(String key, boolean value) {
 		if (IsWifiAvaiable()) {
 			StringBuilder builder = new StringBuilder();
-			builder.append(Constants.getNodeServerProtocol(this));
-			builder.append(Constants.getNodeServerAddress(this));
+			builder.append(HttpParamsUtils.getFullNodeAddress(this));
 			if (value == true) {
 				builder.append(Constants.OFFER);
 			} else {

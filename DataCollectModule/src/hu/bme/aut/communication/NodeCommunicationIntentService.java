@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import hu.bme.aut.communication.helpers.HttpManager;
 import hu.bme.aut.communication.helpers.HttpManager.HttpManagerListener;
+import hu.bme.aut.communication.utils.HttpParamsUtils;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
@@ -49,10 +50,10 @@ public class NodeCommunicationIntentService extends IntentService implements Htt
 		
 		if(url!=null) {
 			if(jsObj==null){ // It is a GET.
-				httpManager.sendGetRequest(url,Constants.getNodeServerPort(this));
+				httpManager.sendGetRequest(url,HttpParamsUtils.getNodeServerPort(this));
 			}
 			else{ // It is a POST.
-				httpManager.sendPostRequest(url, jsObj, Constants.getNodeServerPort(this));
+				httpManager.sendPostRequest(url, jsObj, HttpParamsUtils.getNodeServerPort(this));
 			}
 		}
 		else {
