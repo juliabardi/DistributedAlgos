@@ -16,6 +16,7 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 	
 	protected String address;
 	protected String reqId;
+	protected String port;
 
 	public interface Callback {
 		void onSuccess(String url);
@@ -31,9 +32,10 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 	
 	protected HttpManager httpManager = new HttpManager(this);
 	
-	public UploadTask(String address, String reqId){
+	public UploadTask(String address, String reqId, String port){
 		this.address = address;
 		this.reqId = reqId;
+		this.port = port;
 	}
 
 	@Override

@@ -25,12 +25,10 @@ public class TrafficStatsUploadTask extends UploadTask {
 	private List<String> params;
 	private int max_times;
 	private int interval;
-	private String port;
 	
 	public TrafficStatsUploadTask(Context context, String address, String port, String reqId, int max_times, int interval, List<String> params) {
-		super(address, reqId);
+		super(address, reqId, port);
 		this.params = params;
-		this.port=port;
 		
 		this.setTimesAndInterval(max_times, interval);
 		

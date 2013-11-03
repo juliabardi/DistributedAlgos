@@ -25,13 +25,11 @@ public class ImageUploadTask extends UploadTask {
 	private File file;
 	
 	private long timestamp;
-	private String port;
 
 	public ImageUploadTask(File file, String address, String port, String reqId, long timestamp) {
-		super(address, reqId);
+		super(address, reqId, port);
 		this.file = file;
 		this.timestamp = timestamp;
-		this.port=port;
 	}
 
 	@Override

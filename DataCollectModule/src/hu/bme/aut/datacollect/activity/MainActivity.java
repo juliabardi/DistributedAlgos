@@ -351,13 +351,6 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 		Intent i = new Intent(this, CommunicationActivity.class);
 		this.startActivity(i);
 	}
-	
-	public void loadJavascript(View v){
-		
-		//Testing AlgorithmActivity
-		intent = new Intent(this, AlgorithmActivity.class);
-		this.startActivity(intent);
-	}
 
 	@Override
 	protected void onDestroy() {		

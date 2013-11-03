@@ -150,6 +150,9 @@ public class MessageHandler implements Closeable {
 					
 					Intent intent = new Intent(context, AlgorithmActivity.class);
 					intent.putExtra("script", script);
+					intent.putExtra("address", address);
+					intent.putExtra("reqId", reqId);
+					intent.putExtra("port", port);
 					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					context.startActivity(intent);					
 					return;				
