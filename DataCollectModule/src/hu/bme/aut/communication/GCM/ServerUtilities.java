@@ -21,8 +21,10 @@ import com.google.android.gcm.GCMRegistrar;
 import static hu.bme.aut.communication.GCM.CommonUtilities.TAG;
 import static hu.bme.aut.communication.GCM.CommonUtilities.displayMessage;
 import android.content.Context;
+import android.provider.SyncStateContract.Constants;
 import android.util.Log;
 
+import hu.bme.aut.communication.helpers.MySSLSocketFactory;
 import hu.bme.aut.communication.utils.HttpParamsUtils;
 import hu.bme.aut.datacollect.activity.R;
 
@@ -31,11 +33,23 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.KeyStore;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.apache.http.conn.ssl.SSLSocketFactory;
 
 /**
  * Helper class used to communicate with the demo server.
@@ -53,7 +67,7 @@ public final class ServerUtilities {
      */
     public static boolean register(final Context context, final String regId) {
         Log.i(TAG, "registering device (regId = " + regId + ")");
-        String serverUrl = HttpParamsUtils.getFullGcmAddress(context) + "register";
+        String serverUrl = HttpParamsUtils.getFullGcmAddress(context);
         Map<String, String> params = new HashMap<String, String>();
         params.put("regId", regId);
         long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
@@ -65,7 +79,13 @@ public final class ServerUtilities {
             try {
                 displayMessage(context, context.getString(
                         R.string.server_registering, i, MAX_ATTEMPTS));
-                post(serverUrl, params);
+                if(serverUrl.startsWith(hu.bme.aut.communication.Constants.HTTPS)){
+                	Log.i(ServerUtilities.class.getName(), "Secure connection.");
+                	postSecure(serverUrl + "registerSecure", params);
+                }else{
+                	Log.i(ServerUtilities.class.getName(), "Simple connection.");
+                	post(serverUrl + "register", params);
+                }
                 GCMRegistrar.setRegisteredOnServer(context, true);
                 String message = context.getString(R.string.server_registered);
                 CommonUtilities.displayMessage(context, message);
@@ -102,12 +122,18 @@ public final class ServerUtilities {
      */
    public static void unregister(final Context context, final String regId) {
         Log.i(TAG, "unregistering device (regId = " + regId + ")");
-        String serverUrl = HttpParamsUtils.getFullGcmAddress(context) + "unregister";
+        String serverUrl = HttpParamsUtils.getFullGcmAddress(context);
         Map<String, String> params = new HashMap<String, String>();
         params.put("regId", regId);
         try {
             GCMRegistrar.setRegisteredOnServer(context, false); // Asked by dec_admin server side to always retry connecting at communication module startup.
-        	post(serverUrl, params);
+            if(serverUrl.startsWith(hu.bme.aut.communication.Constants.HTTPS)){
+            	Log.i(ServerUtilities.class.getName(), "Secure connection.");
+            	postSecure(serverUrl + "unregisterSecure", params);
+        	}else{
+        		Log.i(ServerUtilities.class.getName(), "Simple connection.");
+        		post(serverUrl + "unregister", params);
+        	}
             String message = context.getString(R.string.server_unregistered);
             CommonUtilities.displayMessage(context, message);
         } catch (IOException e) {
@@ -176,4 +202,102 @@ public final class ServerUtilities {
             }
         }
       }
+    
+    /**
+     * Issue a POST request to the server.
+     *
+     * @param endpoint POST address.
+     * @param params request parameters.
+     *
+     * @throws IOException propagated from POST.
+     */
+    private static void postSecure(String endpoint, Map<String, String> params)
+            throws IOException {
+        URL url;
+        try {
+            url = new URL(endpoint);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("invalid url: " + endpoint);
+        }
+        StringBuilder bodyBuilder = new StringBuilder();
+        Iterator<Entry<String, String>> iterator = params.entrySet().iterator();
+        // constructs the POST body using the parameters
+        while (iterator.hasNext()) {
+            Entry<String, String> param = iterator.next();
+            bodyBuilder.append(param.getKey()).append('=')
+                    .append(param.getValue());
+            if (iterator.hasNext()) {
+                bodyBuilder.append('&');
+            }
+        }
+        String body = bodyBuilder.toString();
+        Log.v(TAG, "Posting '" + body + "' to " + url);
+        byte[] bytes = body.getBytes();
+        HttpsURLConnection conn = null;
+        try {
+            trustAllHosts();
+            conn = (HttpsURLConnection) url.openConnection();
+            conn.setHostnameVerifier(DO_NOT_VERIFY);
+            conn.setDoOutput(true);
+            conn.setUseCaches(false);
+            conn.setFixedLengthStreamingMode(bytes.length);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type",
+                    "application/x-www-form-urlencoded;charset=UTF-8");
+            conn.setRequestProperty("Authorization", "Basic " + HttpParamsUtils.createBasicAuthHeader());
+            // post the request
+            OutputStream out = conn.getOutputStream();
+            out.write(bytes);
+            out.close();
+            // handle the response
+            int status = conn.getResponseCode();
+            if (status != 200) {
+              throw new IOException("Post failed with error code " + status);
+            }
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+      }
+        
+ 
+    /**
+     * Trust every server - dont check for any certificate
+     * http://stackoverflow.com/questions/995514/https-connection-android
+     */
+    private static void trustAllHosts() {
+    	// Create a trust manager that does not validate certificate chains
+    	TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+    		public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+    			return new java.security.cert.X509Certificate[] {};
+    		}
+
+    		public void checkClientTrusted(X509Certificate[] chain,
+    				String authType) throws CertificateException {
+    		}
+
+    		public void checkServerTrusted(X509Certificate[] chain,
+    				String authType) throws CertificateException {
+    		}
+    	} };
+
+    	// Install the all-trusting trust manager
+    	try {
+    		SSLContext sc = SSLContext.getInstance("TLS");
+    		sc.init(null, trustAllCerts, new java.security.SecureRandom());
+    		HttpsURLConnection
+    				.setDefaultSSLSocketFactory(sc.getSocketFactory());
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+ // always verify the host - dont check for certificate
+    final static HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
+    	public boolean verify(String hostname, SSLSession session) {
+    		return true;
+    	}
+    };
+
 }

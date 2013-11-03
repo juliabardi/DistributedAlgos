@@ -1,6 +1,6 @@
 package hu.bme.aut.communication.helpers;
 
-import hu.bme.aut.communication.Constants;
+import hu.bme.aut.communication.utils.HttpParamsUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,7 +25,6 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.json.JSONObject;
 
-import android.util.Base64;
 import android.util.Log;
 
 /**
@@ -79,7 +78,7 @@ public class HttpManager {
 	public void sendSecureGetRequest(String url, int portNumber){
 		HttpClient httpclient = getNewHttpClient(portNumber);
 		HttpGet httpget = new HttpGet(url);
-	    httpget.addHeader("Authorization", "Basic " + createBasicAuthHeader());   
+	    httpget.addHeader("Authorization", "Basic " + HttpParamsUtils.createBasicAuthHeader());   
 	  	sendGet(httpclient,httpget);			   
 	}
 		
@@ -136,7 +135,7 @@ public class HttpManager {
 	public void sendSecurePostRequest(String url, String JSobject,int port){
 		HttpClient httpclient = getNewHttpClient(port);
 		HttpPost httppost = new HttpPost(url);
-		httppost.addHeader("Authorization", "Basic " + createBasicAuthHeader());
+		httppost.addHeader("Authorization", "Basic " + HttpParamsUtils.createBasicAuthHeader());
 		try {
 			this.sendPost(httpclient, httppost, JSobject.getBytes("UTF8"));
 		} catch (UnsupportedEncodingException e) {
@@ -207,12 +206,6 @@ public class HttpManager {
 					}
 		    	}
 		    }
-	}
-	
-	private String createBasicAuthHeader(){
-		String credentials = Constants.USER + ":" + Constants.PASSWORD; 
-	    String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-	    return base64EncodedCredentials;
 	}
 	
 	/**

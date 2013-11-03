@@ -5,6 +5,7 @@ import hu.bme.aut.datacollect.activity.DataCollectService;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Base64;
 
 public class HttpParamsUtils {
 
@@ -15,6 +16,7 @@ public class HttpParamsUtils {
 		builder.append(HttpParamsUtils.getGcmIpServerAddress(context));
 		builder.append(":");
 		builder.append(HttpParamsUtils.getGcmServerPort(context));
+		builder.append("/DistributedEnvironmentCoordination");
 		builder.append("/");
 		return builder.toString();
 	}
@@ -87,5 +89,13 @@ public class HttpParamsUtils {
 		SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext()); 	
 		return  sharedPrefs.getString(DataCollectService.DEC_NODE_IP, Constants.NodeServerIP);
 	}
+
+	public static String createBasicAuthHeader(){
+		String credentials = Constants.USER + ":" + Constants.PASSWORD; 
+	    String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+	    return base64EncodedCredentials;
+	}
+	
+	
 
 }
