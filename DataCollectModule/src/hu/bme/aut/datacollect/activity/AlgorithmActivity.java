@@ -1,7 +1,7 @@
 package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.datacollect.db.DataProvider;
-import hu.bme.aut.datacollect.utils.FileUtils;
+import hu.bme.aut.datacollect.utils.StringUtils;
 
 import java.io.IOException;
 
@@ -27,21 +27,29 @@ public class AlgorithmActivity extends Activity {
 		
 		this.setContentView(R.layout.algorithm_activity);
 		
-		this.webView = (WebView)this.findViewById(R.id.webView);
+		//this.webView = (WebView)this.findViewById(R.id.webView);
 		
 		//this is ok too, not necessary to show the webview
-		//this.webView = new WebView(this);
+		this.webView = new WebView(this);
 		
 		this.webView.getSettings().setJavaScriptEnabled(true);
 		this.webView.addJavascriptInterface(dataProvider, "dataProvider");
+		
+		String script = null;
+		if (getIntent() != null){
+			script = StringUtils.trimToNull(getIntent().getStringExtra("script"));			
+		}
+		final String s = script;
+		Log.d(TAG, "Algorithm activity started with script: " + s);
 		
 		this.webView.setWebViewClient(new WebViewClient(){
 		    @Override  
 		    public void onPageFinished(WebView view, String url)  
 		    {  		    	
-		    	String js = FileUtils.getStringFromStream(
-		    			getResources().openRawResource(R.raw.script));
-		    	webView.loadUrl("javascript:(" + js + ")()");
+//		    	String js = FileUtils.getStringFromStream(
+//		    			getResources().openRawResource(R.raw.script));
+		    	webView.loadUrl("javascript:(" + s + ")()");
+		    	AlgorithmActivity.this.finish();
 		    } 
 		});
 		

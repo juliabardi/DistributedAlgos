@@ -80,10 +80,11 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	
 	public static final String RECURRING_REQUEST = "RecurringRequest";
 	public static final String TRAFFIC = "TrafficData";
+	public static final String ALGORITHM = "Algorithm";
 
 	public static final List<String> sharedPrefKeys = Arrays.asList(ACCELERATION,
 			LIGHT, TEMPERATURE, GYROSCOPE, LOCATION, CALL,
-			SMS, PACKAGE, CONNECTIVITY, BATTERY, PROXIMITY, SCREEN, IMAGE, TRAFFIC);
+			SMS, PACKAGE, CONNECTIVITY, BATTERY, PROXIMITY, SCREEN, IMAGE, TRAFFIC, ALGORITHM);
 	
 	public static final String DEC_NODE_IP = "decNodeIP";
 	public static final String DEC_ADMIN_IP = "decAdminIP";

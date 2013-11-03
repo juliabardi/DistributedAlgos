@@ -67,4 +67,9 @@
 		  android:key="@string/image"
 		  android:summaryOff="Kikapcsolva"
 		  android:summaryOn="Bekapcsolva"/>
+    <SwitchPreference
+		  android:title="Javascript futtatás"
+		  android:key="@string/algorithm"
+		  android:summaryOff="Kikapcsolva"
+		  android:summaryOn="Bekapcsolva"/>
 </PreferenceScreen>

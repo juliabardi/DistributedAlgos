@@ -69,6 +69,7 @@
     <string name="protocolHTTPS">HTTPS</string>
     <string name="ip">IP</string>
     <string name="port">port</string>
+    <string name="algorithm">Algorithm</string>
     
 
 </resources>

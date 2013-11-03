@@ -21,6 +21,7 @@ public class Constants {
 	
 	public static final String ALGTYPE ="algType";
 	public static final String PARAM_NAME ="name";
+	public static final String SCRIPT = "script";
 	
 	public static final String HTTP ="http";
 	public static final String HTTPS ="https";

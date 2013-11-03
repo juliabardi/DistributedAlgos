@@ -2,6 +2,7 @@ package hu.bme.aut.communication.GCM;
 
 import hu.bme.aut.communication.Constants;
 import hu.bme.aut.communication.utils.HttpParamsUtils;
+import hu.bme.aut.datacollect.activity.AlgorithmActivity;
 import hu.bme.aut.datacollect.activity.CameraActivity;
 import hu.bme.aut.datacollect.activity.DataCollectService;
 import hu.bme.aut.datacollect.activity.R;
@@ -117,6 +118,7 @@ public class MessageHandler implements Closeable {
 				String port = HttpParamsUtils.getDataCollectorServerPort(context);
 				String protocol = HttpParamsUtils.getDataCollectorServerProtocol(context);
 				JSONObject requestParams = jsMessage.optJSONObject(Constants.REQUEST_PARAMS);
+				String script = jsMessage.optString(Constants.SCRIPT);
 				
 				String width = null;
 				String height = null;
@@ -143,6 +145,15 @@ public class MessageHandler implements Closeable {
 				String dataType = jsMessage.getString(Constants.PARAM_NAME);
 				String address = protocol + "://"+ip+":"+port+"/"+ Constants.OFFER_REPLY;
 				
+				if (DataCollectService.ALGORITHM.equals(dataType) &&
+						DataCollectService.isDataTypeEnabled(context, DataCollectService.ALGORITHM)){
+					
+					Intent intent = new Intent(context, AlgorithmActivity.class);
+					intent.putExtra("script", script);
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					context.startActivity(intent);					
+					return;				
+				} 
 				if (DataCollectService.IMAGE.equals(dataType) && 
 						DataCollectService.isDataTypeEnabled(context, DataCollectService.IMAGE)){
 					
