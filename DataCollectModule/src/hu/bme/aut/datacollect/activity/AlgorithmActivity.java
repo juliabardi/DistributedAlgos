@@ -1,6 +1,6 @@
 package hu.bme.aut.datacollect.activity;
 
-import hu.bme.aut.datacollect.db.DataProvider;
+import hu.bme.aut.datacollect.upload.JavascriptCallback;
 import hu.bme.aut.datacollect.utils.StringUtils;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ public class AlgorithmActivity extends Activity {
 	
 	private WebView webView;
 	
-	private DataProvider dataProvider = new DataProvider(this);
+	private JavascriptCallback callback;
 
 	@SuppressLint("SetJavaScriptEnabled") 
 	@Override
@@ -27,20 +27,21 @@ public class AlgorithmActivity extends Activity {
 		
 		this.setContentView(R.layout.algorithm_activity);
 		
+		String script = null;
+		script = StringUtils.trimToNull(getIntent().getStringExtra("script"));
+		final String s = script;
+		Log.d(TAG, "Algorithm activity started with script: " + s);
+		
+		callback = new JavascriptCallback(this, getIntent().getStringExtra("address"), 
+			getIntent().getStringExtra("reqId"), getIntent().getStringExtra("port"));
+		
 		//this.webView = (WebView)this.findViewById(R.id.webView);
 		
 		//this is ok too, not necessary to show the webview
 		this.webView = new WebView(this);
 		
 		this.webView.getSettings().setJavaScriptEnabled(true);
-		this.webView.addJavascriptInterface(dataProvider, "dataProvider");
-		
-		String script = null;
-		if (getIntent() != null){
-			script = StringUtils.trimToNull(getIntent().getStringExtra("script"));			
-		}
-		final String s = script;
-		Log.d(TAG, "Algorithm activity started with script: " + s);
+		this.webView.addJavascriptInterface(callback, "callback");
 		
 		this.webView.setWebViewClient(new WebViewClient(){
 		    @Override  
@@ -62,12 +63,10 @@ public class AlgorithmActivity extends Activity {
 		super.onDestroy();
 		
 		try {
-			this.dataProvider.close();
+			this.callback.close();
 		} catch (IOException e) {
 			Log.e(TAG, e.getMessage());
 		}
 	}
-	
-
 	
 }

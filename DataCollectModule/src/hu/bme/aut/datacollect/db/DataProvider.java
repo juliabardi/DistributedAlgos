@@ -3,17 +3,13 @@ package hu.bme.aut.datacollect.db;
 import hu.bme.aut.datacollect.entity.IData;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.util.Log;
-import android.webkit.JavascriptInterface;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
@@ -47,7 +43,6 @@ public class DataProvider implements IDataProvider{
 	}
 	
 	@Override
-	@JavascriptInterface
 	public JSONObject getAllData(String name, String reqId) {		
 		return this.getAllDataParams(name, reqId, null);
 	}
@@ -83,27 +78,5 @@ public class DataProvider implements IDataProvider{
 		}
 		
 		return this.getDataAfterTimestamp(clazz, reqId, date.getTime(), params);
-	}
-	
-	@JavascriptInterface
-	public void setJSON(String json){
-		
-		Log.d(TAG, "Javascript returned string: " + json);
-		JSONArray j = null;
-		try {
-			j = new JSONArray(json);
-		} catch (JSONException e) {
-			Log.e(TAG, "Javascript-returned json parse failed.");
-			return;
-		}
-		Log.d(TAG, "JsonArray processed: " + j);
-	}
-	
-	@JavascriptInterface
-	public String getAllDataParamsString(String name, String reqId, String params){
-		String[] p = params.split(",");
-		Log.d(TAG, "Javascript params: " + params);
-		JSONObject result = this.getAllDataParams(name, reqId, Arrays.asList(p));	
-		return result==null?null:result.toString();
 	}
 }
