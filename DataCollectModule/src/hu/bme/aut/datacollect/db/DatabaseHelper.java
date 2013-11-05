@@ -1,5 +1,7 @@
 package hu.bme.aut.datacollect.db;
 
+import hu.bme.aut.communication.entity.RequestLogData;
+import hu.bme.aut.communication.entity.ResponseLogData;
 import hu.bme.aut.datacollect.entity.AccelerationData;
 import hu.bme.aut.datacollect.entity.BatteryData;
 import hu.bme.aut.datacollect.entity.CallData;
@@ -32,7 +34,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 	
 	private static final String TAG ="DataCollect:DatabaseHelper";
 
-	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 6;
 	private static final String DATABASE_NAME = "DataCollectDb.db";
 	
 	@SuppressWarnings("rawtypes")
@@ -56,6 +58,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 		map.put(ScreenData.class, null);
 		
 		map.put(RecurringRequest.class, null);
+		map.put(RequestLogData.class, null);
+		map.put(ResponseLogData.class, null);
 	}
 	
 	@Override

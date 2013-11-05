@@ -1,6 +1,7 @@
 package hu.bme.aut.communication.GCM;
 
 import hu.bme.aut.communication.Constants;
+import hu.bme.aut.communication.entity.RequestLogData;
 import hu.bme.aut.communication.utils.HttpParamsUtils;
 import hu.bme.aut.datacollect.activity.AlgorithmActivity;
 import hu.bme.aut.datacollect.activity.CameraActivity;
@@ -56,6 +57,7 @@ public class MessageHandler implements Closeable {
 	
 	private DatabaseHelper dbHelper = null;
 	private DaoBase<RecurringRequest> recurringDao;
+	private DaoBase<RequestLogData> requestLogDao;
 	
 	public MessageHandler(Context context) {
 		cmdList.put(Constants.OFFER_REQUEST,new Action(){public void performAction(String msg) {offerRequest(msg);}});
@@ -66,6 +68,7 @@ public class MessageHandler implements Closeable {
 		this.queue = UploadTaskQueue.instance(context);
 		
 		this.recurringDao = getHelper().getDaoBase(RecurringRequest.class);
+		this.requestLogDao = getHelper().getDaoBase(RequestLogData.class);
 	}
 	
     private DatabaseHelper getHelper() {
@@ -104,12 +107,15 @@ public class MessageHandler implements Closeable {
 	public void handleGCMMessage(String msg)
 	{
 		Log.i(TAG, msg);
+		RequestLogData requestLog = new RequestLogData();
+		requestLog.setRequestReceived(Calendar.getInstance().getTimeInMillis());
+		requestLog.setRequestParams(msg);
 		try {
 			JSONObject jsMessage = new JSONObject(msg);
 			
 			//Calling the DataCollect module
 			if (Constants.ALGTYPE_DIST_ALGOS.equals(jsMessage.getString(Constants.ALGTYPE))){
-				
+				requestLog.setValidRequest(true);
 				String time = null;
 				String date = null;
 				String recurrence = null;
@@ -145,6 +151,9 @@ public class MessageHandler implements Closeable {
 				String dataType = jsMessage.getString(Constants.PARAM_NAME);
 				String address = protocol + "://"+ip+":"+port+"/"+ Constants.OFFER_REPLY;
 				
+				requestLog.setLogData(reqId, recurrence!=null?true:false, dataType);
+				this.requestLogDao.create(requestLog);
+				
 				if (DataCollectService.ALGORITHM.equals(dataType) &&
 						DataCollectService.isDataTypeEnabled(context, DataCollectService.ALGORITHM)){
 					
@@ -153,6 +162,7 @@ public class MessageHandler implements Closeable {
 					intent.putExtra("address", address);
 					intent.putExtra("reqId", reqId);
 					intent.putExtra("port", port);
+					intent.putExtra("idRequestLog", requestLog.getId());
 					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					context.startActivity(intent);					
 					return;				
@@ -160,7 +170,7 @@ public class MessageHandler implements Closeable {
 				if (DataCollectService.IMAGE.equals(dataType) && 
 						DataCollectService.isDataTypeEnabled(context, DataCollectService.IMAGE)){
 					
-					this.addNotificationImage(address, port, reqId, width, height, times, recurrence);
+					this.addNotificationImage(address, port, reqId, width, height, times, recurrence, requestLog.getId());
 					return;
 				}
 				
@@ -175,8 +185,9 @@ public class MessageHandler implements Closeable {
 				
 				if (DataCollectService.TRAFFIC.equals(dataType) && 
 						DataCollectService.isDataTypeEnabled(context, DataCollectService.TRAFFIC)){
-					
-					this.queue.add(new TrafficStatsUploadTask(context, address, port, reqId, timesInt, recurrenceInt, params));
+					TrafficStatsUploadTask trafficTask=new TrafficStatsUploadTask(context, address, port, reqId, timesInt, recurrenceInt, params);
+					trafficTask.setIdRequestLog(requestLog.getId());
+					this.queue.add(trafficTask);
 				}
 				//send only if enabled
 				else if (DataCollectService.sharedPrefKeys.contains(dataType) && 
@@ -192,7 +203,9 @@ public class MessageHandler implements Closeable {
 						queryDate = this.subtractSeconds(time);
 					}
 					
-					this.queue.add(new DataUploadTask(this.context, dataType, reqId, address, port, queryDate, params));
+					DataUploadTask dataTask = new DataUploadTask(this.context, dataType, reqId, address, port, queryDate, params); 
+					dataTask.setIdRequestLog(requestLog.getId());
+					this.queue.add(dataTask);
 					
 					//deleting previous similar request, not to remain recurring if the new is not that
 					this.deleteRequestIfExists(ip, port, dataType);
@@ -204,12 +217,17 @@ public class MessageHandler implements Closeable {
 						this.recurringDao.createOrUpdate(recurringRequest);
 					}
 				}
+			}else{
+				requestLog.setValidRequest(false);
 			}
 			
 		} catch (JSONException e) {
 			Log.e(TAG, "Could not process msg");
+			requestLog.setValidRequest(false);
 			cmdList.get(Constants.JSON_PARSE_ERROR).performAction("Could not parse JSON");
 			e.printStackTrace();
+		}finally{
+			this.requestLogDao.createOrUpdate(requestLog);
 		}
 	}
 	
@@ -257,12 +275,14 @@ public class MessageHandler implements Closeable {
 		return false;
 	}
 	
-	public void addNotificationImage(String address, String port, String reqId, String width, String height, String times, String recurrence){
+	public void addNotificationImage(String address, String port, String reqId, String width, String height, String times, String recurrence, int idRequestLog){
 		
 		Intent notificationIntent = new Intent(context, CameraActivity.class).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		notificationIntent.putExtra("address", address);
 		notificationIntent.putExtra("port", port);
 		notificationIntent.putExtra("reqId", reqId);
+		notificationIntent.putExtra("idRequestLog", idRequestLog);
+		
 		this.putIntIfExists(notificationIntent, "width", width);
 		this.putIntIfExists(notificationIntent, "height", height);
 		this.putIntIfExists(notificationIntent, "times", times);

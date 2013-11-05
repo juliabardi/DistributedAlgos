@@ -17,6 +17,15 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 	protected String address;
 	protected String reqId;
 	protected String port;
+	protected int idRequestLog; // This is the foreign key which must be inserted.
+
+	public int getIdRequestLog() {
+		return idRequestLog;
+	}
+
+	public void setIdRequestLog(int idRequestLog) {
+		this.idRequestLog = idRequestLog;
+	}
 
 	public interface Callback {
 		void onSuccess(String url);
