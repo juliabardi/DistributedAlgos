@@ -20,16 +20,17 @@ import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 
-public class LocationProvider extends AbstractListener implements LocationListener{
+public class LocationProvider implements LocationListener, IListener{
 	
 	private static final String TAG = "DataCollect:LocationProvider";
+	
+	protected DataCollectService mContext;
 	
 	private final LocationManager locationManager;	
 	private DaoBase<LocationData> locationDao = null;
 	
 	public LocationProvider(DataCollectService context, DaoBase<LocationData> locationDao){
-		super(context);	
-		
+		this.mContext = context;		
 		this.locationDao = locationDao;
 		
 		//request location updates

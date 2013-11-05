@@ -5,12 +5,14 @@ import android.content.Context;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-public abstract class SensorListener extends AbstractListener implements SensorEventListener{
+public abstract class SensorListener implements SensorEventListener, IListener{
 	
 	protected final SensorManager sensorManager;
 	
+	protected DataCollectService mContext;
+	
 	public SensorListener(DataCollectService context) {
-		super(context);
+		this.mContext = context;
 		//get sensor manager
 		sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);		
 	}

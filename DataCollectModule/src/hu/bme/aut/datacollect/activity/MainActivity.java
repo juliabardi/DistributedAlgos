@@ -5,9 +5,7 @@ import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
 import hu.bme.aut.communication.Constants;
 import hu.bme.aut.communication.utils.HttpParamsUtils;
 import hu.bme.aut.datacollect.activity.DataCollectService.ServiceBinder;
-import hu.bme.aut.datacollect.db.DatabaseHelper;
 import hu.bme.aut.datacollect.listener.IListener;
-import hu.bme.aut.datacollect.upload.DataUploadTask;
 import hu.bme.aut.datacollect.upload.UploadTaskQueue;
 import hu.bme.aut.datacollect.utils.FileUtils;
 
@@ -15,12 +13,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.Map;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
@@ -46,9 +41,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ToggleButton;
 
-import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
-
-public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
+public class MainActivity extends Activity implements
 		OnSharedPreferenceChangeListener {
 	
 	private static final String TAG ="DataCollect:MainActivity";
