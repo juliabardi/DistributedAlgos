@@ -32,7 +32,7 @@ public class ResponseLogData {
 	private  String statusCode;
 	
 	// Optional message from the requester.
-	@DatabaseField(canBeNull=false)
+	@DatabaseField(canBeNull=true)
 	private  String answerParams;
 	
 	public ResponseLogData() {

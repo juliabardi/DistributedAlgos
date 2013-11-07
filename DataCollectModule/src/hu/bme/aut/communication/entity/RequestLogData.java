@@ -28,11 +28,11 @@ public class RequestLogData {
 	private String requestId;
 	
 	// This is a periodic or a one-time request.
-	@DatabaseField(canBeNull=true)
+	@DatabaseField(canBeNull=false)
 	private Boolean periodic;
 		
 	// The name of the offer the requester asks for.
-	@DatabaseField(canBeNull=true)
+	@DatabaseField(canBeNull=false)
 	private String offerName;
 	
 	// All of the requestParams for test purposes.
@@ -54,6 +54,16 @@ public class RequestLogData {
 
 	public RequestLogData() {
 		super();
+	}
+	
+	public RequestLogData(Boolean validRequest, Boolean periodic,
+			String offerName, String requestParams, long requestReceived) {
+		super();
+		this.validRequest = validRequest;
+		this.periodic = periodic;
+		this.offerName = offerName;
+		this.requestParams = requestParams;
+		this.requestReceived = requestReceived;
 	}
 	
 	public  void setLogData(String requestId, Boolean periodic,

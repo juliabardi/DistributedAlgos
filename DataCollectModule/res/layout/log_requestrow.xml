@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	    xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:background="@color/white">
+	<RelativeLayout
+	 	    android:id="@+id/rootView"
+	 	    android:layout_margin="3dp"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:background="@color/white">
+		<LinearLayout
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content" 
+		    android:orientation="vertical"
+		    android:layout_toLeftOf="@+id/imageViewRec" >
+		    <TextView
+		        android:id="@+id/textViewName"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="Name"
+		        android:textStyle="bold"
+		        android:paddingTop="5dp"
+		        android:paddingBottom="5dp"
+		        android:textColor="@color/black"
+		        android:textAppearance="?android:attr/textAppearanceMedium" />
+		
+		    <TextView
+		        android:id="@+id/textViewDate"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="Date"
+		        android:padding="5dp"
+		        android:textColor="@color/black"
+		        android:textAppearance="?android:attr/textAppearanceSmall" />	
+	</LinearLayout>
+	
+		<ImageView
+		    android:id="@id/imageViewRec"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_alignParentRight="true"
+		    android:layout_centerVertical="true"
+		    android:visibility="invisible"
+		    android:src="@drawable/recurrence" />
+	
+	</RelativeLayout>
+</LinearLayout>

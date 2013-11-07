@@ -6,6 +6,11 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
+        <Button
+            android:text="Log test"
+           android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:onClick="testLog" />
         <TextView
             android:id="@+id/tableName"
             android:layout_width="wrap_content"

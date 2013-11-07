@@ -79,7 +79,7 @@
         </activity>
         <activity android:name="hu.bme.aut.datacollect.activity.AlgorithmActivity" />
         <activity android:name="hu.bme.aut.datacollect.activity.CommunicationActivity"
-            android:label="@string/sync" />
+            android:label="@string/sync" /><activity android:name=".log.RequestListActivity"></activity>
 
         <service android:name="hu.bme.aut.datacollect.activity.DataCollectService" >
         </service>
@@ -128,6 +128,7 @@
         <receiver android:name="hu.bme.aut.datacollect.listener.ConnectivityReceiver" ></receiver>
         <receiver android:name="hu.bme.aut.datacollect.listener.BatteryReceiver" ></receiver>
 		<receiver android:name="hu.bme.aut.datacollect.listener.ScreenReceiver" ></receiver>
+		
     </application>
 
 </manifest>

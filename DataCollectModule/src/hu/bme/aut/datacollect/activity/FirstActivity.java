@@ -1,6 +1,7 @@
 package hu.bme.aut.datacollect.activity;
 
 import hu.bme.aut.communication.Constants;
+import hu.bme.aut.datacollect.activity.log.RequestListActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -135,6 +136,11 @@ public class FirstActivity extends Activity {
 		editor.commit();
 		
 		this.startActivity(new Intent(this, MainActivity.class));
+	}
+	
+	public void testLog(View v)
+	{
+		this.startActivity(new Intent(this, RequestListActivity.class));
 	}
 	
 	
