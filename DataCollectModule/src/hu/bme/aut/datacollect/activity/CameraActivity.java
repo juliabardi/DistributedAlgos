@@ -119,6 +119,7 @@ public class CameraActivity extends Activity {
 	private int width = 0;
 	private int height = 0;
 	private String port;
+	private int idRequestLog;
 	
 	//seconds
 	private int recurrence = 1;
@@ -158,7 +159,7 @@ public class CameraActivity extends Activity {
 			}
 			
 			Log.d(TAG, String.format("Image number %d captured", times));
-			CameraActivity.this.imageQueue.add(new ImageUploadTask(pictureFile, address, port, reqId, timestamp));
+			CameraActivity.this.imageQueue.add(new ImageUploadTask(CameraActivity.this, idRequestLog, pictureFile, address, port, reqId, timestamp));
 			
 			//need to start preview to make another picture
 			if (times < max_times)
@@ -201,6 +202,7 @@ public class CameraActivity extends Activity {
 			this.width = intent.getIntExtra("width", 0);
 			this.height = intent.getIntExtra("height", 0);
 			this.port = intent.getStringExtra("port");
+			this.idRequestLog = intent.getIntExtra("idRequestLog", 0);
 			this.setRecurrenceMaxTimes(intent);
 			Log.d(TAG, String.format("init called, params: times:%d, recurrence:%d, width: %d, height: %d", max_times, recurrence, width, height));
 		}

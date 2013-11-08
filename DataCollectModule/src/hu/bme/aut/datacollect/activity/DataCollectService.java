@@ -260,7 +260,7 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 				}
 				String address = request.getProtocol() + "://"+request.getIp()+":"+request.getPort()+"/"+ Constants.OFFER_REPLY;
 				Date date = new Date(request.getLastSent());
-				this.queue.add(new DataUploadTask(this, request.getDataType(), request.getReqId(), 
+				this.queue.add(new DataUploadTask(this, request.getIdRequestLog(), request.getDataType(), request.getReqId(), 
 						address, request.getPort(), date, params));
 				
 				request.setLastSent(millis);

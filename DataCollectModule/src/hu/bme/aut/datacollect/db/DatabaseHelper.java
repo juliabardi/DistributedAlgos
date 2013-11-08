@@ -34,7 +34,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper{
 	
 	private static final String TAG ="DataCollect:DatabaseHelper";
 
-	private static final int DATABASE_VERSION = 7;
+	private static final int DATABASE_VERSION = 9;
 	private static final String DATABASE_NAME = "DataCollectDb.db";
 	
 	@SuppressWarnings("rawtypes")

@@ -1,5 +1,7 @@
 package hu.bme.aut.datacollect.db;
 
+import hu.bme.aut.communication.entity.RequestLogData;
+import hu.bme.aut.communication.entity.ResponseLogData;
 import hu.bme.aut.datacollect.entity.IData;
 
 import java.io.Closeable;
@@ -27,4 +29,8 @@ public interface IDataProvider extends Closeable  {
 	public JSONObject getDataAfterDate(String name, String reqId, Date date);
 	
 	public JSONObject getDataAfterDate(String name, String reqId, Date date, List<String> params);
+	
+	public RequestLogData getRequestLogDataById(int id);
+	
+	public int createResponseLogData(ResponseLogData data);
 }

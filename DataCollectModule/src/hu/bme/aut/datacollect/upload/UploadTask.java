@@ -1,8 +1,14 @@
 package hu.bme.aut.datacollect.upload;
 
+import java.io.IOException;
+import java.util.Date;
+
+import hu.bme.aut.communication.entity.ResponseLogData;
 import hu.bme.aut.communication.helpers.HttpManager;
 import hu.bme.aut.communication.helpers.HttpManager.HttpManagerListener;
-
+import hu.bme.aut.datacollect.db.DataProvider;
+import hu.bme.aut.datacollect.db.IDataProvider;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -18,6 +24,9 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 	protected String reqId;
 	protected String port;
 	protected int idRequestLog; // This is the foreign key which must be inserted.
+	protected ResponseLogData responseLog;
+	
+	protected IDataProvider dataProvider;
 
 	public int getIdRequestLog() {
 		return idRequestLog;
@@ -41,28 +50,45 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 	
 	protected HttpManager httpManager = new HttpManager(this);
 	
-	public UploadTask(String address, String reqId, String port){
+	public UploadTask(Context context, String address, String reqId, String port, int idRequestLog){
 		this.address = address;
 		this.reqId = reqId;
 		this.port = port;
+		this.idRequestLog = idRequestLog;
+		
+		this.dataProvider = new DataProvider(context);
 	}
 
 	@Override
-	public void responseArrived(String response) {
-		Log.d(TAG, response);
+	public void responseArrived(String response, String code) {
+		//Log.d(TAG, response);
+		this.saveResponseLog(response, code);
 		this.uploadSuccess();
 	}
 
 	@Override
-	public void errorOccuredDuringHandleResponse(String error) {
-		Log.e(TAG, error);
+	public void errorOccuredDuringHandleResponse(String error, String code) {
+		//Log.e(TAG, error);
+		this.saveResponseLog(error, code);
 		this.uploadFailed();
 	}
 
 	@Override
 	public void errorOccured(String error) {
-		Log.e(TAG, error);
+		//Log.e(TAG, error);
+		this.saveResponseLog(error, null);
 		this.uploadFailed();
+	}
+	
+	protected void saveResponseLog(String message, String code){
+		
+		this.responseLog.setAnswerReceived(System.currentTimeMillis());
+		this.responseLog.setAnswerParams(message);
+		this.responseLog.setStatusCode(code);
+		Log.d(TAG, String.format("Saving ResponseLogData: requestLogId: %s, responseSent: %s, answerReceived: %s, statusCode: %s, answerParams: %s", 
+				responseLog.getRequestLogId().getId(), new Date(responseLog.getResponseSent()).toLocaleString(), new Date(responseLog.getAnswerReceived()).toLocaleString(), 
+				responseLog.getStatusCode(), responseLog.getAnswerParams()));
+		this.dataProvider.createResponseLogData(responseLog);
 	}
 	
 	protected void uploadFailed(){
@@ -93,7 +119,14 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 	}
 
 	//function to clean up when the task finished
-	protected void cleanup(){}
+	protected void cleanup(){
+		
+		try {
+			this.dataProvider.close();
+		} catch (IOException e) {
+			Log.e(TAG, e.getMessage());
+		}
+	}
 
 	/**
 	 * Call this in your implementation
@@ -101,6 +134,9 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 	@Override
 	public void execute(Callback callback) {
 		this.mCallback = callback;		
+		
+		this.responseLog = new ResponseLogData();
+		this.responseLog.setRequestLogId(this.dataProvider.getRequestLogDataById(idRequestLog));
 	}
 
 }

@@ -66,7 +66,7 @@ public class NodeCommunicationIntentService extends IntentService implements Htt
 	 * Here we get the JSON from the server. If error occured we could not register our offer.
 	 */
 	@Override
-	public void responseArrived(String response) {
+	public void responseArrived(String response, String code) {
 		boolean result=false;
 		Log.i(this.getClass().getName(), "resArrived: "+ response);
 		try {
@@ -84,7 +84,7 @@ public class NodeCommunicationIntentService extends IntentService implements Htt
 	}
 
 	@Override
-	public void errorOccuredDuringHandleResponse(String error) {
+	public void errorOccuredDuringHandleResponse(String error, String code) {
 		Log.i(this.getClass().getName(), "error in Parsing: " + error);
 		sendResponse(true,false);
 	}

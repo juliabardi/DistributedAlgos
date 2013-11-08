@@ -24,11 +24,13 @@ public class RecurringRequest {
 	private String dataType;
 	@DatabaseField(canBeNull=true)
 	private String params;
+	@DatabaseField(canBeNull=false)
+	private int idRequestLog;
 	
 	public RecurringRequest(){}
 	
 	public RecurringRequest(String reqId, String ip, String port, String protocol, int recurrence,
-			long lastSent, String dataType, String params) {
+			long lastSent, String dataType, String params, int idRequestLog) {
 		super();
 		this.ip = ip;
 		this.port = port;
@@ -38,10 +40,11 @@ public class RecurringRequest {
 		this.params = params;
 		this.reqId = reqId;
 		this.protocol = protocol;
+		this.idRequestLog = idRequestLog;
 	}
 
 	public RecurringRequest(String reqId, String ip, String port, String protocol, int recurrence,
-			long lastSent, String dataType) {
+			long lastSent, String dataType, int idRequestLog) {
 		super();
 		this.ip = ip;
 		this.port = port;
@@ -50,6 +53,7 @@ public class RecurringRequest {
 		this.dataType = dataType;
 		this.reqId = reqId;
 		this.protocol = protocol;
+		this.idRequestLog = idRequestLog;
 	}
 	
 	public String getReqId() {
@@ -116,12 +120,21 @@ public class RecurringRequest {
 		this.protocol = protocol;
 	}
 
+	public int getIdRequestLog() {
+		return idRequestLog;
+	}
+
+	public void setIdRequestLog(int idRequestLog) {
+		this.idRequestLog = idRequestLog;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
 				+ ((dataType == null) ? 0 : dataType.hashCode());
+		result = prime * result + idRequestLog;
 		result = prime * result + ((ip == null) ? 0 : ip.hashCode());
 		result = prime * result + (int) (lastSent ^ (lastSent >>> 32));
 		result = prime * result + ((params == null) ? 0 : params.hashCode());
@@ -146,6 +159,8 @@ public class RecurringRequest {
 			if (other.dataType != null)
 				return false;
 		} else if (!dataType.equals(other.dataType))
+			return false;
+		if (idRequestLog != other.idRequestLog)
 			return false;
 		if (ip == null) {
 			if (other.ip != null)
@@ -182,9 +197,9 @@ public class RecurringRequest {
 	@Override
 	public String toString() {
 		return String
-				.format("RecurringRequest [reqId=%s, ip=%s, port=%s, protocol=%s, recurrence=%s, lastSent=%s, dataType=%s, params=%s]",
+				.format("RecurringRequest [reqId=%s, ip=%s, port=%s, protocol=%s, recurrence=%s, lastSent=%s, dataType=%s, params=%s, idRequestLog=%s]",
 						reqId, ip, port, protocol, recurrence, lastSent,
-						dataType, params);
+						dataType, params, idRequestLog);
 	}
 	
 }

@@ -25,7 +25,7 @@ import android.util.Log;
 
 public class ConnectivityReceiver extends AbstractReceiver {
 	
-	private static final String TAG = "DataCollect:ConnectivityData";
+	private static final String TAG = "DataCollect:ConnectivityReceiver";
 	
 	private DaoBase<ConnectivityData> connDao = null;
 	
@@ -77,7 +77,7 @@ public class ConnectivityReceiver extends AbstractReceiver {
 			if (last != null && isConnected == last.isConnected() && type == last.getType() &&
 					StringUtils.equals(wifiAddress, last.getWifiAddress()) && 
 					StringUtils.equals(gsmAddress, last.getGsmAddress())){
-				Log.d(TAG, "No change, returning. Last: " + last.toString());
+				Log.d(TAG, "No change, returning.");   // Last: " + last.toString());
 				return;
 			}
 			//saving to the DB only if collecting is enabled

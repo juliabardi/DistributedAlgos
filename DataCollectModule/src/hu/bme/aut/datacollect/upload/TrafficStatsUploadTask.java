@@ -26,8 +26,8 @@ public class TrafficStatsUploadTask extends UploadTask {
 	private int max_times;
 	private int interval;
 	
-	public TrafficStatsUploadTask(Context context, String address, String port, String reqId, int max_times, int interval, List<String> params) {
-		super(address, reqId, port);
+	public TrafficStatsUploadTask(Context context, int idRequestLog, String address, String port, String reqId, int max_times, int interval, List<String> params) {
+		super(context, address, reqId, port, idRequestLog);
 		this.params = params;
 		
 		this.setTimesAndInterval(max_times, interval);
@@ -71,7 +71,7 @@ public class TrafficStatsUploadTask extends UploadTask {
 					mCallback.onFailure("No data available.");
 					return;
 				}
-				
+				responseLog.setResponseSent(System.currentTimeMillis());
 				httpManager.sendPostRequest(address, result.toString(),port);	
 				Log.d(TAG, "Executed Task, " + (max_times-1) + " remained.");
 				
@@ -82,7 +82,7 @@ public class TrafficStatsUploadTask extends UploadTask {
 						Log.e(TAG, e.getMessage());
 					}
 					//creating another task while max_times is not 0
-					queue.add(new TrafficStatsUploadTask(context, address, port, reqId, max_times-1, interval, params));
+					queue.add(new TrafficStatsUploadTask(context, idRequestLog, address, port, reqId, max_times-1, interval, params));
 				}
 				
 			}}).start();

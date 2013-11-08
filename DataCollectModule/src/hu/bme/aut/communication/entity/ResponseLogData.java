@@ -28,7 +28,7 @@ public class ResponseLogData {
 	@DatabaseField(canBeNull=false)
 	private long answerReceived;
 	
-	@DatabaseField(canBeNull=false)
+	@DatabaseField(canBeNull=true)
 	private  String statusCode;
 	
 	// Optional message from the requester.

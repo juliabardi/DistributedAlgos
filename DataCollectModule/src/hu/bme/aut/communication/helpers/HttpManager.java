@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.KeyStore;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -23,7 +24,6 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.json.JSONObject;
 
 import android.util.Log;
 
@@ -35,8 +35,8 @@ import android.util.Log;
 public class HttpManager {
 	
 	public interface HttpManagerListener {
-		public void responseArrived(String response);
-		public void errorOccuredDuringHandleResponse(String error);
+		public void responseArrived(String response, String statusCode);
+		public void errorOccuredDuringHandleResponse(String error, String statusCode);
 		public void errorOccured(String error);
 	}
 	
@@ -186,16 +186,16 @@ public class HttpManager {
 							bos.write(inChar);
 						}
 						
-						listener.responseArrived(bos.toString());
+						listener.responseArrived(bos.toString(), String.valueOf(HttpStatus.SC_OK));
 			        }
 			        else
-			        	listener.errorOccuredDuringHandleResponse("HttpEntity is empty"); // Error
+			        	listener.errorOccuredDuringHandleResponse("HttpEntity is empty", String.valueOf(response.getStatusLine().getStatusCode())); // Error
 		        }else{
 		        	listener.errorOccuredDuringHandleResponse("Status Code is: " + 
-		        			response.getStatusLine().getStatusCode()); // Error
+		        			response.getStatusLine().getStatusCode(), String.valueOf(response.getStatusLine().getStatusCode())); // Error
 		        }
 		    } catch (Exception e) {
-		    	listener.errorOccuredDuringHandleResponse(e.getMessage()); // Error
+		    	listener.errorOccuredDuringHandleResponse(e.getMessage(), null); // Error
 		    } finally {
 		    	if (is != null)
 		    	{

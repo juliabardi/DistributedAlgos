@@ -1,5 +1,7 @@
 package hu.bme.aut.datacollect.db;
 
+import hu.bme.aut.communication.entity.RequestLogData;
+import hu.bme.aut.communication.entity.ResponseLogData;
 import hu.bme.aut.datacollect.entity.IData;
 
 import java.io.IOException;
@@ -78,5 +80,19 @@ public class DataProvider implements IDataProvider{
 		}
 		
 		return this.getDataAfterTimestamp(clazz, reqId, date.getTime(), params);
+	}
+
+	@Override
+	public RequestLogData getRequestLogDataById(int id) {
+		
+		DaoBase<RequestLogData> dao = this.dbHelper.getDaoBase(RequestLogData.class);
+		return dao.queryForId(id);
+	}
+
+	@Override
+	public int createResponseLogData(ResponseLogData data) {
+		
+		DaoBase<ResponseLogData> dao = this.dbHelper.getDaoBase(ResponseLogData.class);
+		return dao.create(data);
 	}
 }

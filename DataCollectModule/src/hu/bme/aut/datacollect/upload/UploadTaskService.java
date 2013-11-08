@@ -37,7 +37,7 @@ public class UploadTaskService extends Service implements
 
 	@Override
 	public void onSuccess(final String url) {
-		Log.d(TAG, "Success, executing next UploadTask.");
+		//Log.d(TAG, "Success, executing next UploadTask.");
 		running = false;
 		queue.remove();
 		executeNext();
@@ -45,7 +45,7 @@ public class UploadTaskService extends Service implements
 
 	@Override
 	public void onFailure(String message) {
-		Log.d(TAG, "Failure, executing next UploadTask. Reason: " + message);
+		//Log.d(TAG, "Failure, executing next UploadTask. Reason: " + message);
 		//continuing the upload in case of failure for now
 		running = false;
 		queue.remove();

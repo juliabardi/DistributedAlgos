@@ -185,8 +185,7 @@ public class MessageHandler implements Closeable {
 				
 				if (DataCollectService.TRAFFIC.equals(dataType) && 
 						DataCollectService.isDataTypeEnabled(context, DataCollectService.TRAFFIC)){
-					TrafficStatsUploadTask trafficTask=new TrafficStatsUploadTask(context, address, port, reqId, timesInt, recurrenceInt, params);
-					trafficTask.setIdRequestLog(requestLog.getId());
+					TrafficStatsUploadTask trafficTask=new TrafficStatsUploadTask(context, requestLog.getId(), address, port, reqId, timesInt, recurrenceInt, params);
 					this.queue.add(trafficTask);
 				}
 				//send only if enabled
@@ -203,8 +202,7 @@ public class MessageHandler implements Closeable {
 						queryDate = this.subtractSeconds(time);
 					}
 					
-					DataUploadTask dataTask = new DataUploadTask(this.context, dataType, reqId, address, port, queryDate, params); 
-					dataTask.setIdRequestLog(requestLog.getId());
+					DataUploadTask dataTask = new DataUploadTask(this.context, requestLog.getId(), dataType, reqId, address, port, queryDate, params); 
 					this.queue.add(dataTask);
 					
 					//deleting previous similar request, not to remain recurring if the new is not that
@@ -212,7 +210,7 @@ public class MessageHandler implements Closeable {
 					
 					if (recurrence != null){
 						long millis = Calendar.getInstance().getTimeInMillis();
-						RecurringRequest recurringRequest = new RecurringRequest(reqId, ip, port, protocol, recurrenceInt, millis, dataType, joinedCols);
+						RecurringRequest recurringRequest = new RecurringRequest(reqId, ip, port, protocol, recurrenceInt, millis, dataType, joinedCols, requestLog.getId());
 						Log.d(TAG, "Saving recurring request: " + recurringRequest.toString());
 						this.recurringDao.createOrUpdate(recurringRequest);
 					}

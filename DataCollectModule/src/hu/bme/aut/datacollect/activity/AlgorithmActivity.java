@@ -32,7 +32,7 @@ public class AlgorithmActivity extends Activity {
 		final String s = script;
 		Log.d(TAG, "Algorithm activity started with script: " + s);
 		
-		callback = new JavascriptCallback(this, getIntent().getStringExtra("address"), 
+		callback = new JavascriptCallback(this, getIntent().getIntExtra("idRequestLog", 0), getIntent().getStringExtra("address"), 
 			getIntent().getStringExtra("reqId"), getIntent().getStringExtra("port"));
 		
 		//this.webView = (WebView)this.findViewById(R.id.webView);

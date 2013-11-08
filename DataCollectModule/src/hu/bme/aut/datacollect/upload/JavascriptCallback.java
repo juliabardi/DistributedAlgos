@@ -27,17 +27,22 @@ public class JavascriptCallback implements Closeable {
 	
 	private UploadTaskQueue queue;
 	
+	private Context context;
+	
 	private String address;
 	private String reqId;
 	private String port;
+	private int idRequestLog;
 	
-	public JavascriptCallback(Context context, String address, String reqId, String port){
+	public JavascriptCallback(Context context, int idRequestLog, String address, String reqId, String port){
 		this.dataProvider = new DataProvider(context);
 		queue = UploadTaskQueue.instance(context);
 		
 		this.address = address;
 		this.reqId = reqId;
 		this.port = port;
+		this.context = context;
+		this.idRequestLog = idRequestLog;
 	}
 	
 	@JavascriptInterface
@@ -63,7 +68,7 @@ public class JavascriptCallback implements Closeable {
 			//validating
 			JSONArray j = new JSONArray(json);
 			
-			this.queue.add(new UploadTask(address, reqId, port) {
+			this.queue.add(new UploadTask(context, address, reqId, port, idRequestLog) {
 
 				@Override
 				public void execute(Callback callback) {
@@ -73,6 +78,7 @@ public class JavascriptCallback implements Closeable {
 						@Override
 						public void run() {				
 							Log.d(TAG, "Sending result to address: " + address);
+							responseLog.setResponseSent(System.currentTimeMillis());
 							httpManager.sendPostRequest(address, json, port);				
 							
 						}}).start();

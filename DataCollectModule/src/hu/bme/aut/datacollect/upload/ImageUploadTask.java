@@ -11,6 +11,7 @@ import java.io.InputStream;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
 
@@ -26,8 +27,8 @@ public class ImageUploadTask extends UploadTask {
 	
 	private long timestamp;
 
-	public ImageUploadTask(File file, String address, String port, String reqId, long timestamp) {
-		super(address, reqId, port);
+	public ImageUploadTask(Context context, int idRequestLog, File file, String address, String port, String reqId, long timestamp) {
+		super(context, address, reqId, port, idRequestLog);
 		this.file = file;
 		this.timestamp = timestamp;
 	}
@@ -65,6 +66,7 @@ public class ImageUploadTask extends UploadTask {
 					json.put("binary", new String(Base64.encode(imageBytes, Base64.DEFAULT)));
 									
 					Log.d(TAG, "Sending reply to address: " + address + ", port: " + port);
+					responseLog.setResponseSent(System.currentTimeMillis());
 					httpManager.sendPostRequest(address, json.toString(), port);
 						
 					//catching outofmemoryerror, dont send anything then
