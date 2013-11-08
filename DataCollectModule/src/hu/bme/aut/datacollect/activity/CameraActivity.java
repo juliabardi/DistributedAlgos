@@ -1,5 +1,6 @@
 package hu.bme.aut.datacollect.activity;
 
+import hu.bme.aut.communication.GCM.RequestParams;
 import hu.bme.aut.datacollect.upload.CameraPreview;
 import hu.bme.aut.datacollect.upload.ImageUploadTask;
 import hu.bme.aut.datacollect.upload.ImageUploadTaskQueue;
@@ -37,13 +38,24 @@ public class CameraActivity extends Activity {
 
 	public static final int MEDIA_TYPE_IMAGE = 1;
 	public static final int MEDIA_TYPE_VIDEO = 2;
-	private static final String TAG = "DataCollect:CameraActivity";
 	
-//	private static int MAX_TIMES = 1;
-//	private static int FREQUENCY = 1000;
+	private static final String TAG = "DataCollect:CameraActivity";
 
 	private CameraPreview mPreview;
 	private Camera mCamera;
+	
+	private Object signalObject = new Object();
+	private boolean imageInProgress = false;
+	
+	private ImageUploadTaskQueue imageQueue = ImageUploadTaskQueue.instance(this);
+	
+	private RequestParams rParams;
+	
+	//seconds
+	private int recurrence = 1;
+	private int max_times = 1;
+	
+	private boolean released = false;
 	
 	private Timer timer;
 	private int times = 0;
@@ -108,24 +120,6 @@ public class CameraActivity extends Activity {
 			}
 		};
 	}
-	
-	private Object signalObject = new Object();
-	private boolean imageInProgress = false;
-	
-	private ImageUploadTaskQueue imageQueue = ImageUploadTaskQueue.instance(this);
-	
-	private String address = null;
-	private String reqId;
-	private int width = 0;
-	private int height = 0;
-	private String port;
-	private int idRequestLog;
-	
-	//seconds
-	private int recurrence = 1;
-	private int max_times = 1;
-	
-	private boolean released = false;
 
 	private PictureCallback mPicture = new PictureCallback() {
 
@@ -159,7 +153,7 @@ public class CameraActivity extends Activity {
 			}
 			
 			Log.d(TAG, String.format("Image number %d captured", times));
-			CameraActivity.this.imageQueue.add(new ImageUploadTask(CameraActivity.this, idRequestLog, pictureFile, address, port, reqId, timestamp));
+			CameraActivity.this.imageQueue.add(new ImageUploadTask(CameraActivity.this, rParams, pictureFile, timestamp));
 			
 			//need to start preview to make another picture
 			if (times < max_times)
@@ -197,14 +191,9 @@ public class CameraActivity extends Activity {
 	private void init(Intent intent){
 		
 		if (intent != null){
-			this.address = intent.getStringExtra("address");
-			this.reqId = intent.getStringExtra("reqId");
-			this.width = intent.getIntExtra("width", 0);
-			this.height = intent.getIntExtra("height", 0);
-			this.port = intent.getStringExtra("port");
-			this.idRequestLog = intent.getIntExtra("idRequestLog", 0);
-			this.setRecurrenceMaxTimes(intent);
-			Log.d(TAG, String.format("init called, params: times:%d, recurrence:%d, width: %d, height: %d", max_times, recurrence, width, height));
+			this.rParams = (RequestParams)intent.getSerializableExtra("requestParams");
+			this.setRecurrenceMaxTimes();
+			Log.d(TAG, String.format("init called, params: times:%d, recurrence:%d, width: %d, height: %d", max_times, recurrence, rParams.getWidthInt(), rParams.getHeightInt()));
 		}
 
 		if (this.checkCameraHardware()) {
@@ -239,8 +228,8 @@ public class CameraActivity extends Activity {
 		
 		Parameters parameters = mCamera.getParameters();
 		if (this.pictureSizeExists()){			
-			parameters.setPictureSize(width, height);			
-			Log.d(TAG, String.format("Picture size %dx%d was set.", width, height));
+			parameters.setPictureSize(rParams.getWidthInt(), rParams.getHeightInt());			
+			Log.d(TAG, String.format("Picture size %dx%d was set.", rParams.getWidthInt(), rParams.getHeightInt()));
 		}
 		else {
 			List<Size> supported = mCamera.getParameters().getSupportedPictureSizes();
@@ -254,12 +243,12 @@ public class CameraActivity extends Activity {
 	//returning true if the given picture size (width, height) is supported, else false
 	private boolean pictureSizeExists(){
 		
-		if (width != 0 && height != 0){
+		if (rParams.getWidthInt() > 0 && rParams.getWidthInt() > 0){
 			
 			List<Size> sizes = mCamera.getParameters().getSupportedPictureSizes();
 			for (Size size : sizes){
-				if (size.width == width && size.height == height){
-					Log.d(TAG, String.format("Picture size %dx%d exists.", width, height));
+				if (size.width == rParams.getWidthInt() && size.height == rParams.getHeightInt()){
+					Log.d(TAG, String.format("Picture size %dx%d exists.", rParams.getWidthInt(), rParams.getHeightInt()));
 					return true;
 				}
 			}
@@ -267,27 +256,25 @@ public class CameraActivity extends Activity {
 		return false;
 	}
 	
-	private void setRecurrenceMaxTimes(Intent intent){
-		if (intent != null){
-			
-			if (intent.hasExtra("recurrence") && intent.hasExtra("times")){
-				this.max_times = intent.getIntExtra("times", 1);
-				this.recurrence = intent.getIntExtra("recurrence", 1);
-			}
-			if (intent.hasExtra("recurrence") && !intent.hasExtra("times")){
-				this.recurrence = intent.getIntExtra("recurrence", 1);
-				this.max_times = 10;  //restricting max times to 10 because of performance problems
-			}
-			if (!intent.hasExtra("recurrence") && intent.hasExtra("times")){
-				this.max_times = intent.getIntExtra("times", 1);
-			}
+	private void setRecurrenceMaxTimes(){
+		
+		if (rParams.getRecurrenceInt() != -1 && rParams.getTimesInt() != -1){
+			this.max_times = rParams.getTimesInt();
+			this.recurrence = rParams.getRecurrenceInt();
+		}
+		if (rParams.getRecurrenceInt() != -1 && rParams.getTimesInt() == -1){
+			this.recurrence = rParams.getRecurrenceInt();
+			this.max_times = 10;  //restricting max times to 10 because of performance problems
+		}
+		if (rParams.getRecurrenceInt() == -1 && rParams.getTimesInt() != -1){
+			this.max_times = rParams.getTimesInt();
 		}
 	}
 	
 	private void cancelNotification(){
 		NotificationManager mNotificationManager =
 			    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.cancel(reqId, DataCollectService.IMAGE_NOTIF_ID);
+		mNotificationManager.cancel(rParams.getReqId(), DataCollectService.IMAGE_NOTIF_ID);
 	}
 
 	/** Check if this device has a camera */

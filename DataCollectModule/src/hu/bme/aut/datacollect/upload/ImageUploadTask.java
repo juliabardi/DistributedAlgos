@@ -1,5 +1,7 @@
 package hu.bme.aut.datacollect.upload;
 
+import hu.bme.aut.communication.GCM.RequestParams;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,8 +29,8 @@ public class ImageUploadTask extends UploadTask {
 	
 	private long timestamp;
 
-	public ImageUploadTask(Context context, int idRequestLog, File file, String address, String port, String reqId, long timestamp) {
-		super(context, address, reqId, port, idRequestLog);
+	public ImageUploadTask(Context context, RequestParams rParams, File file, long timestamp) {
+		super(context, rParams);
 		this.file = file;
 		this.timestamp = timestamp;
 	}
@@ -57,7 +59,7 @@ public class ImageUploadTask extends UploadTask {
 					byte[] imageBytes = bos.toByteArray();
 
 					json.put("name", "ImageData");
-					json.put("id", reqId);
+					json.put("id", rParams.getReqId());
 					json.put("type", "binary");
 					json.put("size", imageBytes.length);
 					json.put("timestamp", timestamp);
@@ -65,9 +67,9 @@ public class ImageUploadTask extends UploadTask {
 					Log.d(TAG, json.toString()); //log out before adding the binary part
 					json.put("binary", new String(Base64.encode(imageBytes, Base64.DEFAULT)));
 									
-					Log.d(TAG, "Sending reply to address: " + address + ", port: " + port);
+					Log.d(TAG, "Sending reply to address: " + rParams.getAddress() + ", port: " + rParams.getPort());
 					responseLog.setResponseSent(System.currentTimeMillis());
-					httpManager.sendPostRequest(address, json.toString(), port);
+					httpManager.sendPostRequest(rParams.getAddress(), json.toString(), rParams.getPort());
 						
 					//catching outofmemoryerror, dont send anything then
 				} catch (OutOfMemoryError e){

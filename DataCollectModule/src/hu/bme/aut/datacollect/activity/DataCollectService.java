@@ -1,6 +1,5 @@
 package hu.bme.aut.datacollect.activity;
 
-import hu.bme.aut.communication.Constants;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
 import hu.bme.aut.datacollect.entity.AccelerationData;
@@ -31,11 +30,9 @@ import hu.bme.aut.datacollect.listener.SmsListener;
 import hu.bme.aut.datacollect.listener.TemperatureSensorListener;
 import hu.bme.aut.datacollect.upload.DataUploadTask;
 import hu.bme.aut.datacollect.upload.UploadTaskQueue;
-import hu.bme.aut.datacollect.utils.Utils;
 
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -254,14 +251,7 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 			if (millis - request.getLastSent() >= (request.getRecurrence()*1000)){
 				
 				Log.d(TAG, "Time to send data to requestor: " + request.toString());
-				List<String> params = null;
-				if (request.getParams() != null){
-					params = Utils.convertCsvToList(request.getParams());
-				}
-				String address = request.getProtocol() + "://"+request.getIp()+":"+request.getPort()+"/"+ Constants.OFFER_REPLY;
-				Date date = new Date(request.getLastSent());
-				this.queue.add(new DataUploadTask(this, request.getIdRequestLog(), request.getDataType(), request.getReqId(), 
-						address, request.getPort(), date, params));
+				this.queue.add(new DataUploadTask(this, request.getRequestParams()));
 				
 				request.setLastSent(millis);
 				Log.d(TAG, "Updating request: " + request.toString());

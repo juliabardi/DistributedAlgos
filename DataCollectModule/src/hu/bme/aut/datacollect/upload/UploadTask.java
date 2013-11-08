@@ -3,6 +3,7 @@ package hu.bme.aut.datacollect.upload;
 import java.io.IOException;
 import java.util.Date;
 
+import hu.bme.aut.communication.GCM.RequestParams;
 import hu.bme.aut.communication.entity.ResponseLogData;
 import hu.bme.aut.communication.helpers.HttpManager;
 import hu.bme.aut.communication.helpers.HttpManager.HttpManagerListener;
@@ -20,21 +21,11 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 	
 	private static final long serialVersionUID = -7039527931471322551L;
 	
-	protected String address;
-	protected String reqId;
-	protected String port;
-	protected int idRequestLog; // This is the foreign key which must be inserted.
+	protected RequestParams rParams;
+	
 	protected ResponseLogData responseLog;
 	
 	protected IDataProvider dataProvider;
-
-	public int getIdRequestLog() {
-		return idRequestLog;
-	}
-
-	public void setIdRequestLog(int idRequestLog) {
-		this.idRequestLog = idRequestLog;
-	}
 
 	public interface Callback {
 		void onSuccess(String url);
@@ -50,11 +41,9 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 	
 	protected HttpManager httpManager = new HttpManager(this);
 	
-	public UploadTask(Context context, String address, String reqId, String port, int idRequestLog){
-		this.address = address;
-		this.reqId = reqId;
-		this.port = port;
-		this.idRequestLog = idRequestLog;
+	public UploadTask(Context context, RequestParams requestParams){
+		
+		this.rParams = requestParams;
 		
 		this.dataProvider = new DataProvider(context);
 	}
@@ -80,6 +69,7 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 		this.uploadFailed();
 	}
 	
+	@SuppressWarnings("deprecation")
 	protected void saveResponseLog(String message, String code){
 		
 		this.responseLog.setAnswerReceived(System.currentTimeMillis());
@@ -136,7 +126,7 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 		this.mCallback = callback;		
 		
 		this.responseLog = new ResponseLogData();
-		this.responseLog.setRequestLogId(this.dataProvider.getRequestLogDataById(idRequestLog));
+		this.responseLog.setRequestLogId(this.dataProvider.getRequestLogDataById(rParams.getIdRequestLog()));
 	}
 
 }

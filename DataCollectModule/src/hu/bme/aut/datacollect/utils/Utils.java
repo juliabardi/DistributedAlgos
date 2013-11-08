@@ -35,4 +35,8 @@ public class Utils {
 		}
 		return builder.toString();
 	}
+	
+	public static JSONArray convertListToJSONArray(List<String> list){
+		return new JSONArray(list);
+	}
 }

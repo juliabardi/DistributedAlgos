@@ -1,5 +1,6 @@
 package hu.bme.aut.datacollect.entity;
 
+import hu.bme.aut.communication.GCM.RequestParams;
 import hu.bme.aut.datacollect.db.DaoBase;
 
 import com.j256.ormlite.field.DatabaseField;
@@ -29,31 +30,17 @@ public class RecurringRequest {
 	
 	public RecurringRequest(){}
 	
-	public RecurringRequest(String reqId, String ip, String port, String protocol, int recurrence,
-			long lastSent, String dataType, String params, int idRequestLog) {
+	public RecurringRequest(RequestParams rParams, long lastSent) {
 		super();
-		this.ip = ip;
-		this.port = port;
-		this.recurrence = recurrence;
+		this.ip = rParams.getIp();
+		this.port = rParams.getPort();
+		this.recurrence = rParams.getRecurrenceInt();
 		this.lastSent = lastSent;
-		this.dataType = dataType;
-		this.params = params;
-		this.reqId = reqId;
-		this.protocol = protocol;
-		this.idRequestLog = idRequestLog;
-	}
-
-	public RecurringRequest(String reqId, String ip, String port, String protocol, int recurrence,
-			long lastSent, String dataType, int idRequestLog) {
-		super();
-		this.ip = ip;
-		this.port = port;
-		this.recurrence = recurrence;
-		this.lastSent = lastSent;
-		this.dataType = dataType;
-		this.reqId = reqId;
-		this.protocol = protocol;
-		this.idRequestLog = idRequestLog;
+		this.dataType = rParams.getDataType();
+		this.params = rParams.getJoinedCols();
+		this.reqId = rParams.getReqId();
+		this.protocol = rParams.getProtocol();
+		this.idRequestLog = rParams.getIdRequestLog();
 	}
 	
 	public String getReqId() {
@@ -126,6 +113,20 @@ public class RecurringRequest {
 
 	public void setIdRequestLog(int idRequestLog) {
 		this.idRequestLog = idRequestLog;
+	}
+	
+	public RequestParams getRequestParams(){
+		
+		RequestParams requestParams = new RequestParams();
+		requestParams.setReqId(reqId);
+		requestParams.setIp(ip);
+		requestParams.setPort(port);
+		requestParams.setProtocol(protocol);
+		requestParams.setRecurrence(String.valueOf(recurrence));
+		requestParams.setDataType(dataType);
+		requestParams.setJoinedCols(params);
+		requestParams.setIdRequestLog(idRequestLog);
+		return requestParams;
 	}
 
 	@Override

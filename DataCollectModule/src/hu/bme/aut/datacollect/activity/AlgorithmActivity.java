@@ -1,7 +1,7 @@
 package hu.bme.aut.datacollect.activity;
 
+import hu.bme.aut.communication.GCM.RequestParams;
 import hu.bme.aut.datacollect.upload.JavascriptCallback;
-import hu.bme.aut.datacollect.utils.StringUtils;
 
 import java.io.IOException;
 
@@ -27,13 +27,11 @@ public class AlgorithmActivity extends Activity {
 		
 		this.setContentView(R.layout.algorithm_activity);
 		
-		String script = null;
-		script = StringUtils.trimToNull(getIntent().getStringExtra("script"));
-		final String s = script;
+		RequestParams rParams = (RequestParams)getIntent().getSerializableExtra("requestParams");
+		final String s = rParams.getScript();
 		Log.d(TAG, "Algorithm activity started with script: " + s);
 		
-		callback = new JavascriptCallback(this, getIntent().getIntExtra("idRequestLog", 0), getIntent().getStringExtra("address"), 
-			getIntent().getStringExtra("reqId"), getIntent().getStringExtra("port"));
+		callback = new JavascriptCallback(this, rParams);
 		
 		//this.webView = (WebView)this.findViewById(R.id.webView);
 		

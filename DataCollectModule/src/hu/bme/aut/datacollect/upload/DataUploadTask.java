@@ -1,7 +1,6 @@
 package hu.bme.aut.datacollect.upload;
 
-import java.util.Date;
-import java.util.List;
+import hu.bme.aut.communication.GCM.RequestParams;
 
 import org.json.JSONObject;
 
@@ -15,15 +14,8 @@ public class DataUploadTask extends UploadTask {
 		TAG = "DataCollect:DataUploadTask";
 	}
 	
-	private String dataType;
-	private Date date;
-	private List<String> params;
-	
-	public DataUploadTask(Context context, int idRequestLog, String dataType, String reqId, String address, String port, Date date, List<String> params) {
-		super(context, address, reqId, port, idRequestLog);
-		this.dataType = dataType;
-		this.date = date;
-		this.params = params;		
+	public DataUploadTask(Context context, RequestParams requestParams) {
+		super(context, requestParams);
 	}
 
 	@Override
@@ -36,11 +28,11 @@ public class DataUploadTask extends UploadTask {
 				
 				JSONObject result;
 				
-				if (date == null){
-					result = dataProvider.getAllDataParams(dataType, reqId, params);
+				if (rParams.getQueryDate() == null){
+					result = dataProvider.getAllDataParams(rParams.getDataType(), rParams.getReqId(), rParams.getParams());
 				}
 				else {
-					result = dataProvider.getDataAfterDate(dataType, reqId, date, params);
+					result = dataProvider.getDataAfterDate(rParams.getDataType(), rParams.getReqId(), rParams.getQueryDate(), rParams.getParams());
 				}
 				
 				if (result == null){
@@ -48,7 +40,7 @@ public class DataUploadTask extends UploadTask {
 					return;
 				}
 				responseLog.setResponseSent(System.currentTimeMillis());
-				httpManager.sendPostRequest(address, result.toString(),port);				
+				httpManager.sendPostRequest(rParams.getAddress(), result.toString(), rParams.getPort());				
 				
 			}}).start();
 	}

@@ -14,19 +14,13 @@ import hu.bme.aut.datacollect.upload.DataUploadTask;
 import hu.bme.aut.datacollect.upload.TrafficStatsUploadTask;
 import hu.bme.aut.datacollect.upload.UploadTaskQueue;
 import hu.bme.aut.datacollect.utils.StringUtils;
-import hu.bme.aut.datacollect.utils.Utils;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -116,101 +110,71 @@ public class MessageHandler implements Closeable {
 			//Calling the DataCollect module
 			if (Constants.ALGTYPE_DIST_ALGOS.equals(jsMessage.getString(Constants.ALGTYPE))){
 				requestLog.setValidRequest(true);
-				String time = null;
-				String date = null;
-				String recurrence = null;
-				JSONArray columns = null;
-				String reqId = null;
-				String port = HttpParamsUtils.getDataCollectorServerPort(context);
-				String protocol = HttpParamsUtils.getDataCollectorServerProtocol(context);
-				JSONObject requestParams = jsMessage.optJSONObject(Constants.REQUEST_PARAMS);
-				String script = jsMessage.optString(Constants.SCRIPT);
+				RequestParams rParams = new RequestParams();				
+				rParams.setPort(HttpParamsUtils.getDataCollectorServerPort(context));
+				rParams.setProtocol(HttpParamsUtils.getDataCollectorServerProtocol(context));
+				rParams.setScript(jsMessage.optString(Constants.SCRIPT));
 				
-				String width = null;
-				String height = null;
-				String times = null;				
+				JSONObject requestParams = jsMessage.optJSONObject(Constants.REQUEST_PARAMS);			
 				
 				if (requestParams != null){
 					
-					time = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_TIME));
-					date = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_DATE));
-					recurrence = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_RECURRENCE));
-					columns = requestParams.optJSONArray(Constants.REQUEST_COLUMNS);	
-					reqId = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_ID));
+					rParams.setTime(StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_TIME)));
+					rParams.setDate(StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_DATE)));
+					rParams.setRecurrence(StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_RECURRENCE)));
+					rParams.setColumns(requestParams.optJSONArray(Constants.REQUEST_COLUMNS));	
+					rParams.setReqId(StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_ID)));
 					String p = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_PORT));
-					port = (p == null) ? port : p;
+					if (p != null){ rParams.setPort(p); }
 					String prot = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_PROTOCOL));
-					protocol = (prot == null) ? protocol : prot;
+					if (prot != null){ rParams.setProtocol(prot); }
 					
-					width = StringUtils.trimToNull(requestParams.optString("width"));
-					height = StringUtils.trimToNull(requestParams.optString("height"));
-					times = StringUtils.trimToNull(requestParams.optString("times"));
+					rParams.setWidth(StringUtils.trimToNull(requestParams.optString("width")));
+					rParams.setHeight(StringUtils.trimToNull(requestParams.optString("height")));
+					rParams.setTimes(StringUtils.trimToNull(requestParams.optString("times")));
 				}
 
-				String ip = jsMessage.getString(Constants.REQUEST_ADDRESS);
-				String dataType = jsMessage.getString(Constants.PARAM_NAME);
-				String address = protocol + "://"+ip+":"+port+"/"+ Constants.OFFER_REPLY;
+				rParams.setIp(jsMessage.getString(Constants.REQUEST_ADDRESS));
+				rParams.setDataType(jsMessage.getString(Constants.PARAM_NAME));
 				
-				requestLog.setLogData(reqId, recurrence!=null?true:false, dataType);
+				requestLog.setLogData(rParams.getReqId(), rParams.getRecurrence()!=null?true:false, rParams.getDataType());
 				this.requestLogDao.create(requestLog);
+				rParams.setIdRequestLog(requestLog.getId());
 				
-				if (DataCollectService.ALGORITHM.equals(dataType) &&
+				if (DataCollectService.ALGORITHM.equals(rParams.getDataType()) &&
 						DataCollectService.isDataTypeEnabled(context, DataCollectService.ALGORITHM)){
 					
 					Intent intent = new Intent(context, AlgorithmActivity.class);
-					intent.putExtra("script", script);
-					intent.putExtra("address", address);
-					intent.putExtra("reqId", reqId);
-					intent.putExtra("port", port);
-					intent.putExtra("idRequestLog", requestLog.getId());
+					intent.putExtra("requestParams", rParams);
 					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					context.startActivity(intent);					
 					return;				
 				} 
-				if (DataCollectService.IMAGE.equals(dataType) && 
+				if (DataCollectService.IMAGE.equals(rParams.getDataType()) && 
 						DataCollectService.isDataTypeEnabled(context, DataCollectService.IMAGE)){
 					
-					this.addNotificationImage(address, port, reqId, width, height, times, recurrence, requestLog.getId());
+					this.addNotificationImage(rParams);
 					return;
 				}
 				
-				String joinedCols = null;
-				List<String> params = null;
-				if (columns != null){
-					params = Utils.convertJSONArrayToList(columns);
-					joinedCols = Utils.convertListToCsv(params);					
-				}
-				int recurrenceInt = recurrence==null?0:Integer.parseInt(recurrence);
-				int timesInt = times==null?0:Integer.parseInt(times);
-				
-				if (DataCollectService.TRAFFIC.equals(dataType) && 
+				if (DataCollectService.TRAFFIC.equals(rParams.getDataType()) && 
 						DataCollectService.isDataTypeEnabled(context, DataCollectService.TRAFFIC)){
-					TrafficStatsUploadTask trafficTask=new TrafficStatsUploadTask(context, requestLog.getId(), address, port, reqId, timesInt, recurrenceInt, params);
+					TrafficStatsUploadTask trafficTask=new TrafficStatsUploadTask(context, rParams);
 					this.queue.add(trafficTask);
 				}
 				//send only if enabled
-				else if (DataCollectService.sharedPrefKeys.contains(dataType) && 
-						DataCollectService.isDataTypeEnabled(context, dataType)){
+				else if (DataCollectService.sharedPrefKeys.contains(rParams.getDataType()) && 
+						DataCollectService.isDataTypeEnabled(context, rParams.getDataType())){
 					
-					Date queryDate = null;
-					
-					//only one of date and time should be given (if both are, time will overwrite date)
-					if (date != null){
-						queryDate = this.parseDate(date);
-					}
-					if (time != null){
-						queryDate = this.subtractSeconds(time);
-					}
-					
-					DataUploadTask dataTask = new DataUploadTask(this.context, requestLog.getId(), dataType, reqId, address, port, queryDate, params); 
+					DataUploadTask dataTask = new DataUploadTask(this.context, rParams); 
 					this.queue.add(dataTask);
 					
 					//deleting previous similar request, not to remain recurring if the new is not that
-					this.deleteRequestIfExists(ip, port, dataType);
+					this.deleteRequestIfExists(rParams);
 					
-					if (recurrence != null){
+					if (rParams.getRecurrence() != null){
 						long millis = Calendar.getInstance().getTimeInMillis();
-						RecurringRequest recurringRequest = new RecurringRequest(reqId, ip, port, protocol, recurrenceInt, millis, dataType, joinedCols, requestLog.getId());
+						RecurringRequest recurringRequest = new RecurringRequest(rParams, millis);
 						Log.d(TAG, "Saving recurring request: " + recurringRequest.toString());
 						this.recurringDao.createOrUpdate(recurringRequest);
 					}
@@ -229,38 +193,13 @@ public class MessageHandler implements Closeable {
 		}
 	}
 	
-	//trying to parse param date in yyyy-MM-dd format
-	private Date parseDate(String date){
-		
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		try {
-			return format.parse(date);
-		} catch (ParseException e) {
-			Log.e(TAG, "Error parsing date in (yyyy-MM-dd) format: " + date);
-			return null;
-		}
-	}
-	
-	private Date subtractSeconds(String time){
-		
-		try {
-			int timeInt = Integer.parseInt(time);
-			Calendar cal = Calendar.getInstance();
-			cal.add(Calendar.SECOND, timeInt*(-1));
-			return cal.getTime();
-		} catch (NumberFormatException e) {
-			Log.e(TAG, "Error parsing time to int: " + time);
-			return null;
-		}
-	}
-	
 	//identifying by ip, port, dataType
-	private boolean deleteRequestIfExists(String ip, String port, String dataType){
+	private boolean deleteRequestIfExists(RequestParams rParams){
 		
 		try {
-			RecurringRequest request = this.recurringDao.queryBuilder().where().eq("ip", ip)
-					.and().eq("port", port)
-					.and().eq("dataType", dataType).queryForFirst();
+			RecurringRequest request = this.recurringDao.queryBuilder().where().eq("ip", rParams.getIp())
+					.and().eq("port", rParams.getPort())
+					.and().eq("dataType", rParams.getDataType()).queryForFirst();
 			
 			if (request != null){
 				Log.d(TAG, "Deleting previous request: " + request.toString());
@@ -273,18 +212,10 @@ public class MessageHandler implements Closeable {
 		return false;
 	}
 	
-	public void addNotificationImage(String address, String port, String reqId, String width, String height, String times, String recurrence, int idRequestLog){
+	public void addNotificationImage(RequestParams rParams){
 		
 		Intent notificationIntent = new Intent(context, CameraActivity.class).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		notificationIntent.putExtra("address", address);
-		notificationIntent.putExtra("port", port);
-		notificationIntent.putExtra("reqId", reqId);
-		notificationIntent.putExtra("idRequestLog", idRequestLog);
-		
-		this.putIntIfExists(notificationIntent, "width", width);
-		this.putIntIfExists(notificationIntent, "height", height);
-		this.putIntIfExists(notificationIntent, "times", times);
-		this.putIntIfExists(notificationIntent, "recurrence", recurrence);
+		notificationIntent.putExtra("requestParams", rParams);
 		
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
 				notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -292,25 +223,12 @@ public class MessageHandler implements Closeable {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(
 				context).setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle("Kép kérelem érkezett")
-				//.setContentText("Kattintson kép készítéséhez")
-				.setContentText("Id: " + reqId + " Hányszor: " + (times==null?"1":times) + " Idõköz: " + (recurrence==null?"-":recurrence))
+				.setContentText("Id: " + rParams.getReqId() + " Hányszor: " + (rParams.getTimes()==null?"1":rParams.getTimes()) + " Idõköz: " + (rParams.getRecurrence()==null?"-":rParams.getRecurrence()))
 				.setContentIntent(pendingIntent);
 
 		NotificationManager mNotificationManager =
 			    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-			// mId allows you to update the notification later on.
-		//mNotificationManager.cancel(DataCollectService.IMAGE_NOTIF_ID);
-		mNotificationManager.notify(reqId, DataCollectService.IMAGE_NOTIF_ID, builder.build());
+		mNotificationManager.notify(rParams.getReqId(), DataCollectService.IMAGE_NOTIF_ID, builder.build());
 	}
-
-	private void putIntIfExists(Intent intent, String name, String input){
-		
-		if (input != null){
-			try {
-				intent.putExtra(name, Integer.parseInt(input));
-			} catch (NumberFormatException e){
-				Log.e(TAG, e.getMessage());
-			}
-		}
-	}
+	
 }

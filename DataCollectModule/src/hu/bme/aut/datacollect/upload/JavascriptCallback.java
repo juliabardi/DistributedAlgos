@@ -1,5 +1,6 @@
 package hu.bme.aut.datacollect.upload;
 
+import hu.bme.aut.communication.GCM.RequestParams;
 import hu.bme.aut.datacollect.db.DataProvider;
 import hu.bme.aut.datacollect.db.IDataProvider;
 
@@ -29,20 +30,14 @@ public class JavascriptCallback implements Closeable {
 	
 	private Context context;
 	
-	private String address;
-	private String reqId;
-	private String port;
-	private int idRequestLog;
+	private RequestParams reqParams;
 	
-	public JavascriptCallback(Context context, int idRequestLog, String address, String reqId, String port){
+	public JavascriptCallback(Context context, RequestParams rParams){
 		this.dataProvider = new DataProvider(context);
 		queue = UploadTaskQueue.instance(context);
-		
-		this.address = address;
-		this.reqId = reqId;
-		this.port = port;
+	
 		this.context = context;
-		this.idRequestLog = idRequestLog;
+		this.reqParams = rParams;
 	}
 	
 	@JavascriptInterface
@@ -66,9 +61,11 @@ public class JavascriptCallback implements Closeable {
 		Log.d(TAG, "Javascript returned string: " + json);
 		try {
 			//validating
-			JSONArray j = new JSONArray(json);
+			new JSONArray(json);
 			
-			this.queue.add(new UploadTask(context, address, reqId, port, idRequestLog) {
+			this.queue.add(new UploadTask(context, reqParams) {
+
+				private static final long serialVersionUID = -487489535369947349L;
 
 				@Override
 				public void execute(Callback callback) {
@@ -77,9 +74,9 @@ public class JavascriptCallback implements Closeable {
 					new Thread(new Runnable() {
 						@Override
 						public void run() {				
-							Log.d(TAG, "Sending result to address: " + address);
+							Log.d(TAG, "Sending result to address: " + rParams.getAddress());
 							responseLog.setResponseSent(System.currentTimeMillis());
-							httpManager.sendPostRequest(address, json, port);				
+							httpManager.sendPostRequest(rParams.getAddress(), json, rParams.getPort());				
 							
 						}}).start();
 				}
