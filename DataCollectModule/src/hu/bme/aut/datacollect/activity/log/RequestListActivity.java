@@ -2,6 +2,7 @@ package hu.bme.aut.datacollect.activity.log;
 
 import hu.bme.aut.communication.entity.RequestLogData;
 import hu.bme.aut.datacollect.activity.R;
+import hu.bme.aut.datacollect.activity.log.exchangedetails.ExchangeDetailsTabActivity;
 import hu.bme.aut.datacollect.activity.log.viewHelper.RequestLogsAdapter;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
@@ -9,19 +10,19 @@ import hu.bme.aut.datacollect.db.DatabaseHelper;
 import java.util.Calendar;
 import java.util.List;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
+import com.j256.ormlite.android.apptools.OrmLiteBaseListActivity;
 
 /**
  * List of requests this device received as part of the Distributed Algorithms.
  * @author Eva Pataji
  *
  */
-public class RequestListActivity extends OrmLiteBaseActivity<DatabaseHelper>
+public class RequestListActivity extends OrmLiteBaseListActivity<DatabaseHelper>
 {
 	private DaoBase<RequestLogData> requestLogDao;
 	
@@ -40,14 +41,16 @@ public class RequestListActivity extends OrmLiteBaseActivity<DatabaseHelper>
 		requestLogDao.create(requestLog3);
 		
 		List<RequestLogData> requestList = requestLogDao.queryForAll();
-		if(requestList.size()==0){
-			((TextView)findViewById(R.id.textViewNoData)).setVisibility(View.VISIBLE);
-		}
-		else{
-			ListView mList = (ListView)findViewById(R.id.listViewRequests);
-			RequestLogsAdapter adapter = new RequestLogsAdapter(this, requestList);
-			mList.setAdapter(adapter);
-		}
+		RequestLogsAdapter adapter = new RequestLogsAdapter(this, requestList);
+		setListAdapter(adapter);
+	}
+
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		super.onListItemClick(l, v, position, id);
+		Intent i = new Intent();
+		i.putExtra(ExchangeDetailsTabActivity.REQUEST_ID, id);
+		this.startActivity(new Intent(this, ExchangeDetailsTabActivity.class));
 	}
 	
 }

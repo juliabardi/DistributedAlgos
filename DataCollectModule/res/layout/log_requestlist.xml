@@ -4,18 +4,17 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textViewNoData"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nincs még adat a logban..."
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:visibility="gone" />
-	
-    <ListView
-        android:id="@+id/listViewRequests"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
+    <ListView android:id="@android:id/list"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:background="@color/white"
+               android:layout_weight="1"
+               android:drawSelectorOnTop="false"/>
+
+     <TextView android:id="@android:id/empty"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:background="#FF0000"
+               android:text="No data"/>
 
 </LinearLayout>

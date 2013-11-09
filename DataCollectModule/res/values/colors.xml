@@ -4,6 +4,6 @@
     <color name="black">#000</color>
     <color name="white">#fff</color>
     <color name="red">#f00</color>
-  	<color name="green">#0f0</color>  
-  	
+  	<color name="green">#0f0</color>
+  	<color name="lightGrey">#e6e6e6</color>  
 </resources>

@@ -79,6 +79,10 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 				responseLog.getRequestLogId().getId(), new Date(responseLog.getResponseSent()).toLocaleString(), new Date(responseLog.getAnswerReceived()).toLocaleString(), 
 				responseLog.getStatusCode(), responseLog.getAnswerParams()));
 		this.dataProvider.createResponseLogData(responseLog);
+		
+		if(!this.responseLog.getRequestLogId().getPeriodic()){ // Result of the request.
+			this.responseLog.getRequestLogId().setStatusCode(code);
+		}
 	}
 	
 	protected void uploadFailed(){

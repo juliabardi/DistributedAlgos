@@ -81,7 +81,7 @@
         <activity android:name="hu.bme.aut.datacollect.activity.CommunicationActivity"
             android:label="@string/sync" /><activity android:name=".log.RequestListActivity"></activity>
 
-        <service android:name="hu.bme.aut.datacollect.activity.DataCollectService" >
+        <activity android:name=".log.exchangedetails.ExchangeDetailsTabActivity"></activity><activity android:name=".log.exchangedetails.RequestDetailsTabActivity"></activity><activity android:name=".log.exchangedetails.ResponsesTabActivity"></activity><service android:name="hu.bme.aut.datacollect.activity.DataCollectService" >
         </service>
        <service android:name="hu.bme.aut.communication.CommunicationService" >
         </service>
@@ -128,6 +128,9 @@
         <receiver android:name="hu.bme.aut.datacollect.listener.ConnectivityReceiver" ></receiver>
         <receiver android:name="hu.bme.aut.datacollect.listener.BatteryReceiver" ></receiver>
 		<receiver android:name="hu.bme.aut.datacollect.listener.ScreenReceiver" ></receiver>
+		
+		
+		
 		
     </application>
 
