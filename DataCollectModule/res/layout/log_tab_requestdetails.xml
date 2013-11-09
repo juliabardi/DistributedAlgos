@@ -1,8 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-    
+    android:layout_height="wrap_content">
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical" >
+	
+	    <TextView
+	        style="@style/column.title"
+	        android:text="Kiajánlott adat" />
+	
+	    <TextView
+	        android:id="@+id/textViewOfferName"
+	        style="@style/column.value"
+	        android:text="-" />
 
-</LinearLayout>
+   	    <TextView
+	        style="@style/column.title"
+	        android:text="Kérés ideje" />
+	
+	    <TextView
+	        android:id="@+id/textViewRequestReceived"
+	        style="@style/column.value"
+	        android:text="-" />
+	    	
+	    <TextView
+	        style="@style/column.title"
+	        android:text="Helyes kérés" />
+	
+	    <TextView
+	        android:id="@+id/textViewValidRequest"
+	        style="@style/column.value"
+	        android:text="-" />
+	
+	    <TextView
+	        style="@style/column.title"
+	        android:text="Kérés azonosító a szerver felé" />
+	
+	    <TextView
+	        android:id="@+id/textViewRequestId"
+	        style="@style/column.value"
+	        android:text="-" />
+	
+	    <TextView
+	        style="@style/column.title"
+	        android:text="Periodikus kérés" />
+	
+	    <TextView
+	        android:id="@+id/textViewPeriodic"
+	        style="@style/column.value"
+	        android:text="-" />
+	
+	    <TextView
+	        style="@style/column.title"
+	        android:text="Kérés paraméterei" />
+	
+	    <TextView
+	        android:id="@+id/textViewRequestParams"
+	        style="@style/column.value"
+	        android:text="-" />
+	    
+	    <TextView
+	        android:layout_width="fill_parent"
+	        android:layout_height="1dp"
+	        android:background="@color/skyBlue" />
+		
+	</LinearLayout>
+</ScrollView>

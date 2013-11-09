@@ -2,23 +2,20 @@ package hu.bme.aut.datacollect.activity.log.viewHelper;
 
 import hu.bme.aut.communication.entity.RequestLogData;
 import hu.bme.aut.datacollect.activity.R;
+import hu.bme.aut.datacollect.activity.log.utils.ViewDataUtils;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView.FindListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.RelativeLayout;
 
 /**
- * 
+ * RequestList helper.
  * @author Eva Pataji
  *
  */
@@ -40,11 +37,7 @@ public class RequestLogsAdapter extends ArrayAdapter<RequestLogData> {
 			        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    View rowView = inflater.inflate(R.layout.log_requestrow, parent, false);
 	    ((TextView) rowView.findViewById(R.id.textViewName)).setText(request.getOfferName());
-	    Calendar.getInstance().getTimeInMillis();
-	    Calendar calendar = Calendar.getInstance();
-	    calendar.setTimeInMillis(request.getRequestReceived());
-	    String display = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
-	    ((TextView) rowView.findViewById(R.id.textViewDate)).setText(display);
+	    ((TextView) rowView.findViewById(R.id.textViewDate)).setText(ViewDataUtils.getDateInString(request.getRequestReceived()));
 	    ImageView image = (ImageView)rowView.findViewById(R.id.imageViewRec);
 	    if(request.getPeriodic()){
 	    	image.setVisibility(View.VISIBLE);
@@ -57,11 +50,6 @@ public class RequestLogsAdapter extends ArrayAdapter<RequestLogData> {
 	    		image.setImageResource(R.drawable.error);
 	    	}
 	    }
-	    return rowView;
-		
+	    return rowView;		
 	}
-	
-	
-
-
 }

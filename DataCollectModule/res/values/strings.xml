@@ -70,6 +70,7 @@
     <string name="ip">IP</string>
     <string name="port">port</string>
     <string name="algorithm">Algorithm</string>
+    <string name="no_data">Nincs adat</string>
     
 
 </resources>

@@ -1,8 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-    
+    android:layout_height="wrap_content"
+	android:orientation="vertical" >
+	
+	    <TextView
+	        style="@style/column.title"
+	        android:text="Adat kiküldési ideje" />
+	
+	    <TextView
+	        android:id="@+id/textViewResponseSent"
+	        style="@style/column.value"
+	        android:text="-" />
 
-</LinearLayout>
+   	    <TextView
+	        style="@style/column.title"
+	        android:text="Válasz megérkezési ideje" />
+	
+	    <TextView
+	        android:id="@+id/textViewAnswerReceived"
+	        style="@style/column.value"
+	        android:text="-" />
+	    	
+	    <TextView
+	        style="@style/column.title"
+	        android:text="Státusz kód" />
+	
+	    <TextView
+	        android:id="@+id/textViewStatusCode"
+	        style="@style/column.value"
+	        android:text="-" />
+	
+	    <TextView
+	        style="@style/column.title"
+	        android:text="Válasz paraméterei" />
+	
+	    <TextView
+	        android:id="@+id/textViewAnswerParams"
+	        style="@style/column.value"
+	        android:text="-" />		
+	</LinearLayout>

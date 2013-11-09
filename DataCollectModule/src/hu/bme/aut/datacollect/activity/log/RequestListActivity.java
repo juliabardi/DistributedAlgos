@@ -1,6 +1,7 @@
 package hu.bme.aut.datacollect.activity.log;
 
 import hu.bme.aut.communication.entity.RequestLogData;
+import hu.bme.aut.communication.entity.ResponseLogData;
 import hu.bme.aut.datacollect.activity.R;
 import hu.bme.aut.datacollect.activity.log.exchangedetails.ExchangeDetailsTabActivity;
 import hu.bme.aut.datacollect.activity.log.viewHelper.RequestLogsAdapter;
@@ -25,12 +26,16 @@ import com.j256.ormlite.android.apptools.OrmLiteBaseListActivity;
 public class RequestListActivity extends OrmLiteBaseListActivity<DatabaseHelper>
 {
 	private DaoBase<RequestLogData> requestLogDao;
+	private DaoBase<ResponseLogData> responseLogDao;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.log_requestlist);
 		requestLogDao = getHelper().getDaoBase(RequestLogData.class);
+		responseLogDao = getHelper().getDaoBase(ResponseLogData.class);
+
+		
 		RequestLogData requestLog = new RequestLogData(true, false, "ImageData", "fdf", Calendar.getInstance().getTimeInMillis());
 		requestLog.setStatusCode("200");
 		requestLogDao.create(requestLog);
@@ -39,6 +44,11 @@ public class RequestListActivity extends OrmLiteBaseListActivity<DatabaseHelper>
 		RequestLogData requestLog3 = new RequestLogData(true, false, "BatteryData", "fdf", Calendar.getInstance().getTimeInMillis());
 		requestLog3.setStatusCode("401.2");
 		requestLogDao.create(requestLog3);
+		
+		ResponseLogData data = new ResponseLogData
+				(requestLog, Calendar.getInstance().getTimeInMillis(), Calendar.getInstance().getTimeInMillis(),
+						"200", "fdfsrettr");
+		responseLogDao.create(data);
 		
 		List<RequestLogData> requestList = requestLogDao.queryForAll();
 		RequestLogsAdapter adapter = new RequestLogsAdapter(this, requestList);
@@ -49,8 +59,9 @@ public class RequestListActivity extends OrmLiteBaseListActivity<DatabaseHelper>
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		Intent i = new Intent();
-		i.putExtra(ExchangeDetailsTabActivity.REQUEST_ID, id);
-		this.startActivity(new Intent(this, ExchangeDetailsTabActivity.class));
+		i.putExtra(ExchangeDetailsTabActivity.REQUEST_ID, ((RequestLogData)l.getAdapter().getItem(position)).getId());
+		i.setClass(this, ExchangeDetailsTabActivity.class);
+		this.startActivity(i);
 	}
 	
 }

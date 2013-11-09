@@ -8,6 +8,7 @@ import hu.bme.aut.datacollect.db.DatabaseHelper;
 import java.io.Closeable;
 import java.io.IOException;
 
+import android.app.Activity;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.android.apptools.OrmLiteBaseTabActivity;
 
 
 /**
@@ -25,12 +27,9 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
  *
  */
 @SuppressWarnings("deprecation")
-public class ExchangeDetailsTabActivity extends TabActivity implements Closeable {
+public class ExchangeDetailsTabActivity extends TabActivity{
 
 	public static final String REQUEST_ID="reqId";
-	private DatabaseHelper dbHelper = null;
-	private DaoBase<RequestLogData> requestLogDao;
-	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +37,9 @@ public class ExchangeDetailsTabActivity extends TabActivity implements Closeable
 		setContentView(R.layout.log_tab_exchange);
 		TabHost tabHost = getTabHost(); 
 		
-		Intent intentRequest = new Intent().setClass(this, RequestDetailsTabActivity.class);
+		Intent intentRequest = new Intent()
+			.putExtra(REQUEST_ID, getIntent().getIntExtra(REQUEST_ID,-1))
+			.setClass(this, RequestDetailsTabActivity.class);
 		TabSpec tabSpecRequest = tabHost
 		  .newTabSpec("RequestTab")
 		  .setIndicator(setupTab("Kérés"))
@@ -46,7 +47,9 @@ public class ExchangeDetailsTabActivity extends TabActivity implements Closeable
 		
 		
 		
-		Intent intentRequest2 = new Intent().setClass(this, ResponsesTabActivity.class);
+		Intent intentRequest2 = new Intent()
+				.putExtra(REQUEST_ID, getIntent().getIntExtra(REQUEST_ID,-1))
+				.setClass(this, ResponsesTabActivity.class);
 		TabSpec tabSpecResponses = tabHost
 		  .newTabSpec("ResponseTab")
 		  .setIndicator(setupTab("Teljesítés"))
@@ -66,20 +69,5 @@ public class ExchangeDetailsTabActivity extends TabActivity implements Closeable
 		t.setText(title);
 		return layout;
 	}
-	
-	private DatabaseHelper getHelper() {
-        if (dbHelper == null) {
-            dbHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
-        }
-        return dbHelper;
-    }
-
-	@Override
-	public void close() throws IOException {
-		if (dbHelper != null) {
-            OpenHelperManager.releaseHelper();
-            dbHelper = null;
-        }
-	}
-	
+		
 }
