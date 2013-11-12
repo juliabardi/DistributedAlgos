@@ -1,16 +1,15 @@
 package hu.bme.aut.datacollect.upload;
 
 import hu.bme.aut.communication.GCM.RequestParams;
+import hu.bme.aut.datacollect.activity.DataCollectService;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -28,16 +27,24 @@ public class ImageUploadTask extends UploadTask {
 	private File file;
 	
 	private long timestamp;
+	
+	private Context mContext;
 
 	public ImageUploadTask(Context context, RequestParams rParams, File file, long timestamp) {
 		super(context, rParams);
 		this.file = file;
 		this.timestamp = timestamp;
+		this.mContext = context;
 	}
 
 	@Override
 	public void execute(final Callback callback) {
 		super.execute(callback);
+		
+		if (!DataCollectService.isDataTypeEnabled(mContext, DataCollectService.IMAGE)){			
+			mCallback.onFailure("ImageData is disabled by user");
+			return;
+		}
 		
 		new Thread(new Runnable() {
 			@Override
@@ -74,21 +81,22 @@ public class ImageUploadTask extends UploadTask {
 					//catching outofmemoryerror, dont send anything then
 				} catch (OutOfMemoryError e){
 					Log.e(TAG, "OutofMemoryError: " + e.getMessage());
-					callback.onFailure("OutofMemoryError");
-				} catch (FileNotFoundException fe) {	
-					Log.e(TAG, fe.getMessage());		
-				} catch (IOException ie) {	
-					Log.e(TAG, ie.getMessage());
-				} catch (JSONException je) {	
-					Log.e(TAG, je.getMessage());
+					callback.onFailure("OutofMemoryError occured: " + e.getMessage());
+				} catch (Exception e) {	
+					Log.e(TAG, e.getMessage());	
+					callback.onFailure("Exception occured: " + e.getMessage());
 				} finally {
 					try {
-						is.close();
+						if (is != null){
+							is.close();
+						}
 					} catch (IOException ie) {
 						Log.e(TAG, ie.getMessage());
 					}
 					try {
-						bos.close();
+						if (bos != null){
+							bos.close();
+						}
 					} catch (IOException ie) {
 						Log.e(TAG, ie.getMessage());
 					}
