@@ -5,6 +5,7 @@ import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
 import hu.bme.aut.communication.Constants;
 import hu.bme.aut.communication.utils.HttpParamsUtils;
 import hu.bme.aut.datacollect.activity.DataCollectService.ServiceBinder;
+import hu.bme.aut.datacollect.activity.log.RequestListActivity;
 import hu.bme.aut.datacollect.listener.IListener;
 import hu.bme.aut.datacollect.upload.UploadTaskQueue;
 import hu.bme.aut.datacollect.utils.FileUtils;
@@ -96,7 +97,6 @@ public class MainActivity extends Activity implements
 		
 		this.copyHtmlToSd();
 		
-		this.setAddressesOnGUI();
     }
     
     private boolean checkSetting(){
@@ -220,29 +220,9 @@ public class MainActivity extends Activity implements
 				this.startService(commIntent);
 				communicationButton.setChecked(true);
 			}
-			this.setAddressesOnGUI();
 		}
 	}
 	
-	private void setAddressesOnGUI(){
-		
-		EditText et = (EditText)this.findViewById(R.id.nodeAddress);
-		et.setKeyListener(null);
-		et.setText(HttpParamsUtils.getFullNodeAddress(this));
-		
-		et = (EditText)this.findViewById(R.id.gcmAddress);
-		et.setText(HttpParamsUtils.getFullGcmAddress(this));
-		et.setKeyListener(null);
-		
-		et = (EditText)this.findViewById(R.id.dataCollectProtocol);
-		et.setText(HttpParamsUtils.getDataCollectorServerProtocol(this));
-		et.setKeyListener(null);
-		
-		et = (EditText)this.findViewById(R.id.deviceIP);
-		et.setText(Constants.getDeviceIP(this));
-		et.setKeyListener(null);
-	}
-
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
@@ -344,6 +324,16 @@ public class MainActivity extends Activity implements
 		Intent i = new Intent(this, CommunicationActivity.class);
 		this.startActivity(i);
 	}
+	
+    public void  navigateToRequests(View v){
+    	this.startActivity(new Intent(this, RequestListActivity.class));
+    }
+    
+    public void navigateToServerData(View v){
+    	Intent i = new Intent(this, FirstActivity.class);
+    	i.setAction("showData");
+    	this.startActivity(i);
+    }
 
 	@Override
 	protected void onDestroy() {		

@@ -4,6 +4,7 @@ import hu.bme.aut.communication.CommunicationService;
 import hu.bme.aut.communication.CommunicationService.CommServiceBinder;
 import hu.bme.aut.communication.CommunicationService.CommunicationListener;
 import hu.bme.aut.communication.CommunicationService.SyncronizationValues;
+import hu.bme.aut.datacollect.activity.log.RequestListActivity;
 
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -72,7 +74,11 @@ public class CommunicationActivity extends Activity implements CommunicationList
 		else{
 			TextView tv = new TextView(this);
 			tv.setTextAppearance(this, android.R.style.TextAppearance_Large);
-			tv.setText("A kommunikációs modul inaktív.");
+			tv.setText("A kommunikációs modul inaktív...");
+			tv.setLayoutParams(new ViewGroup.LayoutParams(
+			        ViewGroup.LayoutParams.MATCH_PARENT,
+			        ViewGroup.LayoutParams.MATCH_PARENT));
+			tv.setGravity(Gravity.CENTER);
 			setContentView(tv);
 		}
 	}
@@ -194,7 +200,7 @@ public class CommunicationActivity extends Activity implements CommunicationList
     
     
     public void  navigateToRequests(View v){
-    	Toast.makeText(getApplication(), "Hamarosan jövünk!", Toast.LENGTH_SHORT).show();   	
+    	this.startActivity(new Intent(this, RequestListActivity.class));
     }
     
     public void syncCollectedDataStates(View v){

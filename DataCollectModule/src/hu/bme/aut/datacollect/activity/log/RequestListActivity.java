@@ -8,13 +8,17 @@ import hu.bme.aut.datacollect.activity.log.viewHelper.RequestLogsAdapter;
 import hu.bme.aut.datacollect.db.DaoBase;
 import hu.bme.aut.datacollect.db.DatabaseHelper;
 
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseListActivity;
 
@@ -34,25 +38,38 @@ public class RequestListActivity extends OrmLiteBaseListActivity<DatabaseHelper>
 		this.setContentView(R.layout.log_requestlist);
 		requestLogDao = getHelper().getDaoBase(RequestLogData.class);
 		responseLogDao = getHelper().getDaoBase(ResponseLogData.class);
+        setList();
+	}
+	
+	public void deleteLog(View v){
+		try {
+			responseLogDao.deleteBuilder().delete();
+			requestLogDao.deleteBuilder().delete();
+			setList();
+		} catch (SQLException e) {
+			Toast.makeText(this, "Az adatok törlése nem sikerült.", Toast.LENGTH_SHORT).show();
+			e.printStackTrace();
+		}
+	}
+	
+	private void setList(){ // ORMLite notifyPropChange does not work on refresh...
+		List<RequestLogData> requestList;
+		try {
+			requestList = requestLogDao.query(
+					requestLogDao.queryBuilder().
+					orderBy("requestReceived", false).prepare());
+			if(requestList.size()>0){
+				((LinearLayout)findViewById(R.id.header)).setVisibility(View.VISIBLE);
+			}else{
+				((LinearLayout)findViewById(R.id.header)).setVisibility(View.GONE);		
+			}
+				RequestLogsAdapter adapter = new RequestLogsAdapter(this, requestList);
+				setListAdapter(adapter);
 
-		
-		RequestLogData requestLog = new RequestLogData(true, false, "ImageData", "fdf", Calendar.getInstance().getTimeInMillis());
-		requestLog.setStatusCode("200");
-		requestLogDao.create(requestLog);
-		RequestLogData requestLog2 = new RequestLogData(true, true, "ScreenData", "fdf", Calendar.getInstance().getTimeInMillis());
-		requestLogDao.create(requestLog2);
-		RequestLogData requestLog3 = new RequestLogData(true, false, "BatteryData", "fdf", Calendar.getInstance().getTimeInMillis());
-		requestLog3.setStatusCode("401.2");
-		requestLogDao.create(requestLog3);
-		
-		ResponseLogData data = new ResponseLogData
-				(requestLog, Calendar.getInstance().getTimeInMillis(), Calendar.getInstance().getTimeInMillis(),
-						"200", "fdfsrettr");
-		responseLogDao.create(data);
-		
-		List<RequestLogData> requestList = requestLogDao.queryForAll();
-		RequestLogsAdapter adapter = new RequestLogsAdapter(this, requestList);
-		setListAdapter(adapter);
+		} catch (SQLException e) {
+			Toast.makeText(this, "Az adatok betöltése nem sikerült.", Toast.LENGTH_SHORT).show();
+			e.printStackTrace();
+		}
 	}
 
 	@Override

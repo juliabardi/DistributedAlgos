@@ -16,6 +16,8 @@ import android.widget.TextView;
 public class FirstActivity extends Activity {
 	
 	final static String ACTION_PREFS_SERVERS = "hu.bme.aut.datacollect.prefs.PREFS_SERVERS";
+	final static String ACTION_SHOW_DATA = "showData";
+	
 	
 	@Override
 	public void onCreate(Bundle bundle) {
@@ -26,7 +28,7 @@ public class FirstActivity extends Activity {
 
 			this.setContentView(R.layout.first_view);
 		}
-		else if (getIntent()!=null && ACTION_PREFS_SERVERS.equals(getIntent().getAction())){
+		else if (getIntent()!=null && (ACTION_PREFS_SERVERS.equals(getIntent().getAction())|| ACTION_SHOW_DATA.equals(getIntent().getAction()) )){
 			
 			this.setContentView(R.layout.first_view);
 			
@@ -136,13 +138,6 @@ public class FirstActivity extends Activity {
 		editor.commit();
 		
 		this.startActivity(new Intent(this, MainActivity.class));
-	}
-	
-	public void testLog(View v)
-	{
-		this.startActivity(new Intent(this, RequestListActivity.class));
-	}
-	
-	
+	}	
 
 }

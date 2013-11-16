@@ -61,11 +61,6 @@
 	        android:id="@+id/textViewRequestParams"
 	        style="@style/column.value"
 	        android:text="-" />
-	    
-	    <TextView
-	        android:layout_width="fill_parent"
-	        android:layout_height="1dp"
-	        android:background="@color/skyBlue" />
-		
+	   		
 	</LinearLayout>
 </ScrollView>
