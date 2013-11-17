@@ -65,7 +65,7 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 	@Override
 	public void errorOccured(String error) {
 		//Log.e(TAG, error);
-		this.saveResponseLog(error, null);
+		this.saveResponseLog(error, "-");
 		this.uploadFailed();
 	}
 	
@@ -81,7 +81,7 @@ public abstract class UploadTask implements Task<UploadTask.Callback>,
 		this.dataProvider.createResponseLogData(responseLog);
 		
 		if(!this.responseLog.getRequestLogId().getPeriodic()){ // Result of the request.
-			this.responseLog.getRequestLogId().setStatusCode(code);
+			this.dataProvider.updateRequestLogData(this.responseLog.getRequestLogId().getId(), code);
 		}
 	}
 	

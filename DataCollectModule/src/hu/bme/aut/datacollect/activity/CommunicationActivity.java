@@ -140,6 +140,7 @@ public class CommunicationActivity extends Activity implements CommunicationList
     
     private void setupData(){
  		updateGCMServerData();
+ 		updateDistAlgosServerData();
  		updateCollectedData();
     }
     
@@ -167,7 +168,8 @@ public class CommunicationActivity extends Activity implements CommunicationList
 	   		chtvNodeConn.setChecked(true);
 		}else{
 			chtvNodeConn.setChecked(false);
-			if(commService.getregisteredToDistributedAlgos() == SyncronizationValues.SENDING){
+			if(commService.getregisteredToDistributedAlgos() == SyncronizationValues.SENDING_REG
+					|| commService.getregisteredToDistributedAlgos() == SyncronizationValues.SENDING_UNREG){
 				chtvNodeConnSending.setVisibility(View.VISIBLE); return;
 				}
 			
@@ -181,7 +183,8 @@ public class CommunicationActivity extends Activity implements CommunicationList
 			chtvGCMConn.setChecked(true);
 		}else{
 			chtvGCMConn.setChecked(false);
-			if(commService.getRegisteredtoGCMServer() == SyncronizationValues.SENDING){
+			if(commService.getRegisteredtoGCMServer() == SyncronizationValues.SENDING_REG
+					|| commService.getRegisteredtoGCMServer() == SyncronizationValues.SENDING_UNREG){
 				chtvGCMConnSending.setVisibility(View.VISIBLE); return;
 				}
 		}

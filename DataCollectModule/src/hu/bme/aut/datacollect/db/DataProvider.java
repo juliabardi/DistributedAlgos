@@ -95,4 +95,12 @@ public class DataProvider implements IDataProvider{
 		DaoBase<ResponseLogData> dao = this.dbHelper.getDaoBase(ResponseLogData.class);
 		return dao.create(data);
 	}
+
+	@Override
+	public int updateRequestLogData(int id, String statuscode) {
+		DaoBase<RequestLogData> dao = this.dbHelper.getDaoBase(RequestLogData.class);
+		RequestLogData data = dao.queryForId(id);
+		data.setStatusCode(statuscode);
+		return dao.update(data);
+	}
 }

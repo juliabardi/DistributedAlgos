@@ -18,6 +18,7 @@ public class Constants {
 	public static final String NEED = "need";
 	public static final String OFFER = "offer";
 	public static final String UNREGISTER_OFFER = "unregisterOffer";
+	public static final String UPDATE_CONNECTION = "updateConnection";
 	
 	public static final String ALGTYPE ="algType";
 	public static final String PARAM_NAME ="name";

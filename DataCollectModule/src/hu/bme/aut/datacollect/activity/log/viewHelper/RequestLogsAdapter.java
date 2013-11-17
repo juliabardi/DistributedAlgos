@@ -42,13 +42,13 @@ public class RequestLogsAdapter extends ArrayAdapter<RequestLogData> {
 	    if(request.getPeriodic()){
 	    	image.setVisibility(View.VISIBLE);
 	    }
-	    if(request.getStatusCode()!=null && !request.getStatusCode().trim().equals("")){
-	    	image.setVisibility(View.VISIBLE);
+	    else if(request.getStatusCode()!=null){
 	    	if(request.getStatusCode().equals("200")){
 	    		image.setImageResource(R.drawable.ok);
 	    	}else{
 	    		image.setImageResource(R.drawable.error);
 	    	}
+	    	image.setVisibility(View.VISIBLE);
 	    }
 	    return rowView;		
 	}

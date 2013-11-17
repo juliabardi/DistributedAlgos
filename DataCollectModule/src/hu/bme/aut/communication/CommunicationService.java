@@ -10,6 +10,8 @@ import hu.bme.aut.datacollect.activity.R;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -82,7 +84,7 @@ public class CommunicationService extends Service implements
     }
 	
 	public static enum SyncronizationValues{
-		TRUE,FALSE,NONE,SENDING
+		TRUE,FALSE,NONE,SENDING_REG, SENDING_UNREG
 	}
 
 	private final CommServiceBinder mBinder = new CommServiceBinder();
@@ -91,14 +93,24 @@ public class CommunicationService extends Service implements
 	
 	private SyncronizationValues registeredToDistributedAlgos=SyncronizationValues.NONE; //dec_node
 	private SyncronizationValues registeredToGCM=SyncronizationValues.NONE; //dec_admin
+	private SyncronizationValues updatedConnection=SyncronizationValues.NONE; //dec_node new IP
+	
+	private String ipAddress; // Actual address
+	private String ipAddressOld=""; // Previous IP, just in case IP update does not manage, but there is a new IP update from shared preferences...
+	
 	
 	private boolean isSyncronized=false; // If all need/offer data could be sent to server.
 	private HashMap<String,SyncronizationValues> offerSyncronizationInfo;
 	private MyResultReceiver theReceiver = null;
 	
+	
 	public SyncronizationValues getRegisteredtoGCMServer(){
 		if(GCMRegistrar.isRegisteredOnServer(this)) registeredToGCM=SyncronizationValues.TRUE;
 		return registeredToGCM;
+	}
+	
+	public SyncronizationValues getUpdatedConnection(){
+		return updatedConnection;
 	}
 	
 	public Boolean getRegisteredtoGCMService(){
@@ -115,7 +127,7 @@ public class CommunicationService extends Service implements
 	}
 	
 	public boolean reConnectToDistAlgos(){
-		if(! (getregisteredToDistributedAlgos() == SyncronizationValues.TRUE || getregisteredToDistributedAlgos() == SyncronizationValues.SENDING)){
+		if(! (getregisteredToDistributedAlgos() == SyncronizationValues.TRUE || getregisteredToDistributedAlgos() == SyncronizationValues.SENDING_REG)){
 			registerPeer();
 			return true;
 		}
@@ -123,7 +135,7 @@ public class CommunicationService extends Service implements
 	}
 	
 	public boolean reConnectToGCM(){
-		if(!(getRegisteredtoGCMServer() == SyncronizationValues.TRUE || getRegisteredtoGCMServer() == SyncronizationValues.SENDING) ){
+		if(!(getRegisteredtoGCMServer() == SyncronizationValues.TRUE || getRegisteredtoGCMServer() == SyncronizationValues.SENDING_REG) ){
 			registerGCM();
 			return true;
 		}
@@ -170,6 +182,7 @@ public class CommunicationService extends Service implements
 	    theReceiver.setParentContext(this);
 	    registeredToDistributedAlgos=SyncronizationValues.NONE;
 	    registeredToGCM=SyncronizationValues.NONE;
+	    ipAddress = Constants.getDeviceIP(this);
 	    
 		offerSyncronizationInfo = new HashMap<String,SyncronizationValues>();		
 		manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -198,7 +211,7 @@ public class CommunicationService extends Service implements
 		manager.cancel(3);
 		
 		unregisterReceiver(mGCMHandleMessageReceiver);
-		if(registeredToDistributedAlgos==SyncronizationValues.TRUE || registeredToDistributedAlgos==SyncronizationValues.SENDING){
+		if(registeredToDistributedAlgos==SyncronizationValues.TRUE || registeredToDistributedAlgos==SyncronizationValues.SENDING_REG){
 			unregisterFormDistributedAlgos();
 		}
 		
@@ -213,7 +226,7 @@ public class CommunicationService extends Service implements
 	}
 	
 	private void unregisterFormDistributedAlgos(){
-		registeredToDistributedAlgos=SyncronizationValues.SENDING;
+		registeredToDistributedAlgos=SyncronizationValues.SENDING_UNREG;
 		StringBuilder builder = new StringBuilder();
 		builder.append(HttpParamsUtils.getFullNodeAddress(this));
 		builder.append(Constants.UNREGISTER);
@@ -291,7 +304,7 @@ public class CommunicationService extends Service implements
 	 * Register peer need and offers when starting this service.
 	 */
 	private void registerPeer() {
-		setupSyncronizationInfo(SyncronizationValues.SENDING);
+		setupSyncronizationInfo(SyncronizationValues.SENDING_REG);
 		
 		ArrayList<String> offerList = new ArrayList<String>();
 		Map<String, ?> keys = settings.getAll();
@@ -314,10 +327,12 @@ public class CommunicationService extends Service implements
 	}
 	
 	private void registerGCM(){
+		registeredToGCM = SyncronizationValues.SENDING_REG;
 		sendJobToGcmService(Constants.REGISTER);
 	}
 	
 	private void unRegisterGCM(){
+		registeredToGCM = SyncronizationValues.SENDING_UNREG;
 		sendJobToGcmService(Constants.UNREGISTER);
 	}
 
@@ -333,7 +348,7 @@ public class CommunicationService extends Service implements
 		if (IsWifiAvaiable()) {
 			StringBuilder builder = new StringBuilder();
 			builder.append(HttpParamsUtils.getFullNodeAddress(this));
-			if (value == true) {
+			if (value) {
 				builder.append(Constants.OFFER);
 			} else {
 				builder.append(Constants.UNREGISTER_OFFER);
@@ -342,8 +357,8 @@ public class CommunicationService extends Service implements
 					+ "&" + Constants.PARAM_NAME+"=" + key);
 
 			String url = builder.toString();
+			offerSyncronizationInfo.put(key, value?SyncronizationValues.SENDING_REG:SyncronizationValues.SENDING_UNREG);
 			sendJobToNodeService(Constants.OFFER,key,url, null);
-			offerSyncronizationInfo.put(key, SyncronizationValues.SENDING);
 		} else {
 			offerSyncronizationInfo.put(key, SyncronizationValues.FALSE);
 			Log.i(this.getClass().getName(),
@@ -354,7 +369,7 @@ public class CommunicationService extends Service implements
 	}
 
 	private void sendJobToNodeService(String messageType, String itemName,String url, String jsObj) {
-		registeredToDistributedAlgos = SyncronizationValues.SENDING;
+		registeredToDistributedAlgos = SyncronizationValues.SENDING_REG;
 		if(updateListener!=null){
         	updateListener.refreshCollectedDataStates();
         }
@@ -372,7 +387,6 @@ public class CommunicationService extends Service implements
 	}
 	
 	private void sendJobToGcmService(String msg){
-		registeredToGCM = SyncronizationValues.SENDING;
 		if(updateListener!=null){
         	updateListener.refreshGCMConnData();
         }
@@ -392,6 +406,30 @@ public class CommunicationService extends Service implements
 			String key) {
 		if (DataCollectService.sharedPrefKeys.contains(key)){
 			handleOffer(key, sharedPrefs.getBoolean(key, false));
+		}else if(DataCollectService.DEVICE_IP_WIFI.equals(key) 
+				&& (registeredToDistributedAlgos == SyncronizationValues.TRUE
+				|| registeredToDistributedAlgos == SyncronizationValues.SENDING_REG)){ // We got a new IP address, must notify the server...
+			
+			JSONObject connectionInfo=new JSONObject();
+			try {
+				connectionInfo.put("oldAddress", ipAddress );
+				ipAddressOld = ipAddress;
+				ipAddress = key;
+				connectionInfo.put("newAddress", key);
+				if(registeredToGCM == SyncronizationValues.TRUE){
+					connectionInfo.put("gcmAddress", GCMRegistrar.getRegistrationId(this));	
+				}
+				updatedConnection = SyncronizationValues.SENDING_REG;
+				sendJobToNodeService(Constants.UPDATE_CONNECTION,Constants.UPDATE_CONNECTION, HttpParamsUtils.getFullNodeAddress(this) + Constants.UPDATE_CONNECTION, connectionInfo.toString());
+				
+			} catch (JSONException e) {
+				Log.e(this.getClass().getName(), "Could not update IP Address, an error has occured...");
+				e.printStackTrace();
+			}
+		}else if(key.equals(DataCollectService.DEC_NODE_IP)){ // IP reset
+			registerPeer();
+		}else if(key.equals(DataCollectService.DEC_ADMIN_IP)){ // IP reset
+			registerGCM();
 		}
 	}
 
@@ -433,7 +471,7 @@ public class CommunicationService extends Service implements
 					manager.cancel(3);	// Cancel Wi-Fi notif if it is still there and was not clicked.
 					Log.i(this.getClass().getName(), "Network connection establisted.");
 				} else {
-					// Wi-FI connection was lost.
+					// Wi-Fi connection was lost.
 				}
 	
 			}
@@ -464,13 +502,22 @@ public class CommunicationService extends Service implements
 	        String messageType = resultData.getString(Constants.MESSAGE_TYPE);
 	        if(messageType.equals(Constants.REGISTER)){
 	        	if(resultData.getBoolean(Constants.ITEM_SYNC_VALUE, false)){
-	        		setupSyncronizationInfo(SyncronizationValues.TRUE);	        		
+	        		setupSyncronizationInfo(SyncronizationValues.TRUE);
+	        		updatedConnection = SyncronizationValues.TRUE;
 	        	}else{
 	        		setupSyncronizationInfo(SyncronizationValues.FALSE);
 	        	}
 	        }
 	        else if (messageType.equals(Constants.UNREGISTER)){
 	        	// Do nothing, but could also set registeredToDistributedAlgos here false...
+	        }
+	        else if (messageType.equals(Constants.UPDATE_CONNECTION)){
+	        	if(resultCode == 200){
+	        		updatedConnection = SyncronizationValues.TRUE;
+	        	}else{
+	        		updatedConnection = SyncronizationValues.FALSE;
+	        		ipAddress = ipAddressOld; // In case of resend...
+	        	}
 	        }
 	        else{
 	        	String itemName = resultData.getString(Constants.ITEM_NAME);

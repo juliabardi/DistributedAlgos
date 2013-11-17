@@ -33,4 +33,6 @@ public interface IDataProvider extends Closeable  {
 	public RequestLogData getRequestLogDataById(int id);
 	
 	public int createResponseLogData(ResponseLogData data);
+	
+	public int updateRequestLogData(int id, String statuscode);
 }
