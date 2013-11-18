@@ -50,11 +50,31 @@ public class HttpParamsUtils {
 		}
 	}
 
+	/**
+	 * Default
+	 * @param context
+	 * @return
+	 */
 	public static String getDataCollectorServerPort(Context context){
 	   	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 	   	if(HttpParamsUtils.getDataCollectorServerProtocol(context).equals(Constants.HTTP))
 	   		return sharedPrefs.getString(DataCollectService.DATA_COLLECTOR_PORT, Constants.DataCollectorServerPort);
 		else{
+			return sharedPrefs.getString(DataCollectService.DATA_COLLECTOR_PORT_HTTPS, Constants.DataCollectorServerPortHttps);
+		} 
+	}
+	
+	/**
+	 * Protocol-dependent
+	 * @param context
+	 * @param protocol
+	 * @return
+	 */
+	public static String getDataCollectorServerPortProtocol(Context context, String protocol){
+	   	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+	   	if(protocol.equals(Constants.HTTP))
+	   		return sharedPrefs.getString(DataCollectService.DATA_COLLECTOR_PORT, Constants.DataCollectorServerPort);
+		else{ // HTTPS
 			return sharedPrefs.getString(DataCollectService.DATA_COLLECTOR_PORT_HTTPS, Constants.DataCollectorServerPortHttps);
 		} 
 	}

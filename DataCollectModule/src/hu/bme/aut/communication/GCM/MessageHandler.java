@@ -1,5 +1,6 @@
 package hu.bme.aut.communication.GCM;
 
+import hu.bme.aut.communication.CommunicationService;
 import hu.bme.aut.communication.Constants;
 import hu.bme.aut.communication.entity.RequestLogData;
 import hu.bme.aut.communication.utils.HttpParamsUtils;
@@ -24,8 +25,10 @@ import java.util.HashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
@@ -97,99 +100,119 @@ public class MessageHandler implements Closeable {
 		Log.i(this.getClass().getName(), msg);
 	}
 	
+	private boolean isServiceRunning(String serviceName) {
+	    ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+	        if (serviceName.equals(service.service.getClassName())) {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
 	
 	public void handleGCMMessage(String msg)
 	{
 		Log.i(TAG, msg);
-		RequestLogData requestLog = new RequestLogData();
-		requestLog.setRequestReceived(Calendar.getInstance().getTimeInMillis());
-		requestLog.setRequestParams(msg);
-		try {
-			JSONObject jsMessage = new JSONObject(msg);
-			
-			//Calling the DataCollect module
-			if (Constants.ALGTYPE_DIST_ALGOS.equals(jsMessage.getString(Constants.ALGTYPE))){
-				requestLog.setValidRequest(true);
-				RequestParams rParams = new RequestParams();				
-				rParams.setPort(HttpParamsUtils.getDataCollectorServerPort(context));
-				rParams.setProtocol(HttpParamsUtils.getDataCollectorServerProtocol(context));
-				rParams.setScript(jsMessage.optString(Constants.SCRIPT));
+		if(isServiceRunning(CommunicationService.class.getName())){ // GCM unreg error or sync problems could result in receiving messages when the communication module is inactive. We assume user wanted to unreg for a while from communication.
+			RequestLogData requestLog = new RequestLogData();
+			requestLog.setRequestReceived(Calendar.getInstance().getTimeInMillis());
+			requestLog.setRequestParams(msg);
+			try {
+				JSONObject jsMessage = new JSONObject(msg);
 				
-				JSONObject requestParams = jsMessage.optJSONObject(Constants.REQUEST_PARAMS);			
-				
-				if (requestParams != null){
+				//Calling the DataCollect module
+				if (Constants.ALGTYPE_DIST_ALGOS.equals(jsMessage.getString(Constants.ALGTYPE))){
+					requestLog.setValidRequest(true);
+					RequestParams rParams = new RequestParams();				
+					rParams.setPort(HttpParamsUtils.getDataCollectorServerPort(context));
+					rParams.setProtocol(HttpParamsUtils.getDataCollectorServerProtocol(context));
+					rParams.setScript(jsMessage.optString(Constants.SCRIPT));
 					
-					rParams.setTime(StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_TIME)));
-					rParams.setDate(StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_DATE)));
-					rParams.setRecurrence(StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_RECURRENCE)));
-					rParams.setColumns(requestParams.optJSONArray(Constants.REQUEST_COLUMNS));	
-					rParams.setReqId(StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_ID)));
-					String p = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_PORT));
-					if (p != null){ rParams.setPort(p); }
-					String prot = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_PROTOCOL));
-					if (prot != null){ rParams.setProtocol(prot); }
+					JSONObject requestParams = jsMessage.optJSONObject(Constants.REQUEST_PARAMS);			
 					
-					rParams.setWidth(StringUtils.trimToNull(requestParams.optString("width")));
-					rParams.setHeight(StringUtils.trimToNull(requestParams.optString("height")));
-					rParams.setTimes(StringUtils.trimToNull(requestParams.optString("times")));
-				}
-
-				rParams.setIp(jsMessage.getString(Constants.REQUEST_ADDRESS));
-				rParams.setDataType(jsMessage.getString(Constants.PARAM_NAME));
-				
-				requestLog.setLogData(rParams.getReqId(), rParams.getRecurrence()!=null?true:false, rParams.getDataType());
-				this.requestLogDao.create(requestLog);
-				rParams.setIdRequestLog(requestLog.getId());
-				
-				if (DataCollectService.ALGORITHM.equals(rParams.getDataType()) &&
-						DataCollectService.isDataTypeEnabled(context, DataCollectService.ALGORITHM)){
-					
-					Intent intent = new Intent(context, AlgorithmActivity.class);
-					intent.putExtra("requestParams", rParams);
-					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					context.startActivity(intent);					
-					return;				
-				} 
-				if (DataCollectService.IMAGE.equals(rParams.getDataType()) && 
-						DataCollectService.isDataTypeEnabled(context, DataCollectService.IMAGE)){
-					
-					this.addNotificationImage(rParams);
-					return;
-				}
-				
-				if (DataCollectService.TRAFFIC.equals(rParams.getDataType()) && 
-						DataCollectService.isDataTypeEnabled(context, DataCollectService.TRAFFIC)){
-					TrafficStatsUploadTask trafficTask=new TrafficStatsUploadTask(context, rParams);
-					this.queue.add(trafficTask);
-				}
-				//send only if enabled
-				else if (DataCollectService.sharedPrefKeys.contains(rParams.getDataType()) && 
-						DataCollectService.isDataTypeEnabled(context, rParams.getDataType())){
-					
-					DataUploadTask dataTask = new DataUploadTask(this.context, rParams); 
-					this.queue.add(dataTask);
-					
-					//deleting previous similar request, not to remain recurring if the new is not that
-					this.deleteRequestIfExists(rParams);
-					
-					if (rParams.getRecurrence() != null){
-						long millis = Calendar.getInstance().getTimeInMillis();
-						RecurringRequest recurringRequest = new RecurringRequest(rParams, millis);
-						Log.d(TAG, "Saving recurring request: " + recurringRequest.toString());
-						this.recurringDao.createOrUpdate(recurringRequest);
+					if (requestParams != null){
+						
+						rParams.setTime(StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_TIME)));
+						rParams.setDate(StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_DATE)));
+						rParams.setRecurrence(StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_RECURRENCE)));
+						rParams.setColumns(requestParams.optJSONArray(Constants.REQUEST_COLUMNS));	
+						rParams.setReqId(StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_ID)));
+						String p = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_PORT));
+						if (p != null){ rParams.setPort(p); }
+						String prot = StringUtils.trimToNull(requestParams.optString(Constants.REQUEST_PROTOCOL));
+						if (prot != null){ 
+							rParams.setProtocol(prot);
+							if(p==null ){ // Protocol is set but port is not, get default depending on protocol...
+								rParams.setPort(HttpParamsUtils.getDataCollectorServerPortProtocol(context, prot));
+							}
+						}
+						
+						rParams.setWidth(StringUtils.trimToNull(requestParams.optString("width")));
+						rParams.setHeight(StringUtils.trimToNull(requestParams.optString("height")));
+						rParams.setTimes(StringUtils.trimToNull(requestParams.optString("times")));
 					}
+	
+					rParams.setIp(jsMessage.getString(Constants.REQUEST_ADDRESS));
+					rParams.setDataType(jsMessage.getString(Constants.PARAM_NAME));
+					
+					requestLog.setLogData(rParams.getReqId(), rParams.getRecurrence()!=null?true:false, rParams.getDataType());
+					this.requestLogDao.create(requestLog);
+					rParams.setIdRequestLog(requestLog.getId());
+					
+					Log.i(this.getClass().getName(), "The created address for this request: " + rParams.getAddress());
+					
+					if (DataCollectService.ALGORITHM.equals(rParams.getDataType()) &&
+							DataCollectService.isDataTypeEnabled(context, DataCollectService.ALGORITHM)){
+						
+						Intent intent = new Intent(context, AlgorithmActivity.class);
+						intent.putExtra("requestParams", rParams);
+						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						context.startActivity(intent);					
+						return;				
+					} 
+					if (DataCollectService.IMAGE.equals(rParams.getDataType()) && 
+							DataCollectService.isDataTypeEnabled(context, DataCollectService.IMAGE)){
+						
+						this.addNotificationImage(rParams);
+						return;
+					}
+					
+					if (DataCollectService.TRAFFIC.equals(rParams.getDataType()) && 
+							DataCollectService.isDataTypeEnabled(context, DataCollectService.TRAFFIC)){
+						TrafficStatsUploadTask trafficTask=new TrafficStatsUploadTask(context, rParams);
+						this.queue.add(trafficTask);
+					}
+					//send only if enabled
+					else if (DataCollectService.sharedPrefKeys.contains(rParams.getDataType()) && 
+							DataCollectService.isDataTypeEnabled(context, rParams.getDataType())){
+						
+						DataUploadTask dataTask = new DataUploadTask(this.context, rParams); 
+						this.queue.add(dataTask);
+						
+						//deleting previous similar request, not to remain recurring if the new is not that
+						this.deleteRequestIfExists(rParams);
+						
+						if (rParams.getRecurrence() != null){
+							long millis = Calendar.getInstance().getTimeInMillis();
+							RecurringRequest recurringRequest = new RecurringRequest(rParams, millis);
+							Log.d(TAG, "Saving recurring request: " + recurringRequest.toString());
+							this.recurringDao.createOrUpdate(recurringRequest);
+						}
+					}
+				}else{
+					requestLog.setValidRequest(false);
 				}
-			}else{
+				
+			} catch (JSONException e) {
+				Log.e(TAG, "Could not process msg");
 				requestLog.setValidRequest(false);
+				cmdList.get(Constants.JSON_PARSE_ERROR).performAction("Could not parse JSON");
+				e.printStackTrace();
+			}finally{
+				this.requestLogDao.createOrUpdate(requestLog);
 			}
-			
-		} catch (JSONException e) {
-			Log.e(TAG, "Could not process msg");
-			requestLog.setValidRequest(false);
-			cmdList.get(Constants.JSON_PARSE_ERROR).performAction("Could not parse JSON");
-			e.printStackTrace();
-		}finally{
-			this.requestLogDao.createOrUpdate(requestLog);
+		}else{
+			Log.i(this.getClass().getName(), "Communication service is not running, user may have stopped it for a while.");
 		}
 	}
 	
