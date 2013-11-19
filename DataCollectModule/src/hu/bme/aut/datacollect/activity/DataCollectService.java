@@ -97,10 +97,16 @@ public class DataCollectService extends OrmLiteBaseService<DatabaseHelper> {
 	public static final String DATA_COLLECTOR_PROTOCOL = "dataCollectorProtocol";
 	public static final String DEVICE_IP_WIFI = "deviceIP";
 	
+	public static final String USER_NAME = "userName";
+	public static final String USER_PASSWORD = "userPassoword";
+	
 	public static final List<String> serverKeys = Arrays.asList(
 			DEC_ADMIN_IP, DEC_ADMIN_PORT,DEC_ADMIN_PORT_HTTPS,DEC_ADMIN_PROTOCOL,
 			DEC_NODE_IP, DEC_NODE_PORT,DEC_NODE_PORT_HTTPS,DEC_NODE_PROTOCOL,
 			DATA_COLLECTOR_IP,DATA_COLLECTOR_PORT,DATA_COLLECTOR_PORT_HTTPS,DATA_COLLECTOR_PROTOCOL);
+	
+	public static final List<String> userKeys = Arrays.asList(
+			USER_NAME, USER_PASSWORD);
 
 	private final ServiceBinder mBinder = new ServiceBinder();
 

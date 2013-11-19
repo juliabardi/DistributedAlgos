@@ -48,6 +48,8 @@ public class MainActivity extends Activity implements
 	private static final String TAG ="DataCollect:MainActivity";
 	private static final int SENDER_COMMUNICATION=0;
 	private static final int SENDER_WIFI=1;
+	private static final int SENDER_USERDATA=2;
+	
 	private SharedPreferences settings;
 	
 	private static final int REQUEST_CODE_OPTIONS = 0;
@@ -66,6 +68,7 @@ public class MainActivity extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        BaseUserDataActivity.showProgress=false;
         communicationButton = (ToggleButton)findViewById(R.id.buttonCommunicationStop);
                         
 		settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -83,16 +86,7 @@ public class MainActivity extends Activity implements
 		}
 		
 		if (!isServiceRunning(CommunicationService.class.getName())){			
-			if(checkSetting()){
-				Log.d(TAG, "Starting CommunicationService");
-				this.startService(commIntent);
-			}else{
-				communicationButton.setChecked(false);
-				setupAlertDialog(
-						"Adatgyûjtés engedélyezése",
-						"A beállításoknál még nem adott meg gyûjtendõ adatot, szeretne most megadni?",
-						SENDER_COMMUNICATION);
-			}
+			 startCommServiceCheck();
 		}
 		
 		this.copyHtmlToSd();
@@ -210,6 +204,10 @@ public class MainActivity extends Activity implements
 		startActivityForResult(i, REQUEST_CODE_OPTIONS);
 	}
 	
+	private void startUserSettings(){
+		startActivity(new Intent(this, LoginActivity.class));	
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -278,19 +276,30 @@ public class MainActivity extends Activity implements
 					commBound = false;
 				}
 			} else {
-				if (checkSetting()) {
-					startService(commIntent);
-					this.bindService(commIntent, commConnection, 0);
-				} else {
-					communicationButton.setChecked(false);
-					setupAlertDialog(
-							"Kommunikáció indítása",
-							"A beállításoknál nem adott meg gyûjtendõ adatot, így a modul nem indítható. Kérem, állítson be gyûjtendõ adatot!",
-							SENDER_COMMUNICATION);
-				}
+				 startCommServiceCheck();
 			}
 			break;
 		}
+	}
+	
+	private void startCommServiceCheck(){
+		if(settings.getString(DataCollectService.USER_NAME, null)==null){
+			communicationButton.setChecked(false);
+			setupAlertDialog("Kommunikáció indítása",
+			"Kérem, jelentkezzen be!", SENDER_USERDATA);
+			return;
+		}
+		if (checkSetting()) {
+			startService(commIntent);
+			this.bindService(commIntent, commConnection, 0);
+		} else {
+			communicationButton.setChecked(false);
+			setupAlertDialog(
+					"Kommunikáció indítása",
+					"A beállításoknál nem adott meg gyûjtendõ adatot, így a modul nem indítható. Kérem, állítson be gyûjtendõ adatot!",
+					SENDER_COMMUNICATION);
+		}
+		
 	}
 	
 	private void setupAlertDialog(String title, String msg, int senderId){
@@ -307,6 +316,9 @@ public class MainActivity extends Activity implements
 			case SENDER_WIFI:
 				startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
 				break;
+			case SENDER_USERDATA:
+				startUserSettings();
+				break;
 			default:
 				break;
 			}
@@ -319,7 +331,7 @@ public class MainActivity extends Activity implements
 			});
 		alertbox.show();
 	}
-	
+		
 	public void communicationDetailsClicked(View view){
 		Intent i = new Intent(this, CommunicationActivity.class);
 		this.startActivity(i);

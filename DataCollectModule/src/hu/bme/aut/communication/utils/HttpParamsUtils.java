@@ -31,10 +31,36 @@ public class HttpParamsUtils {
 		builder.append("/");
 		return builder.toString();
 	}
+	
+	/**
+	 * Some requests must work only under HTTPS.
+	 * @param context
+	 * @param protocol
+	 * @return
+	 */
+	public static String getFullNodeAddressProtocol(Context context, String protocol){
+		StringBuilder builder = new StringBuilder();
+		builder.append(protocol);
+		builder.append("://");
+		builder.append(HttpParamsUtils.getNodeIpServerAddress(context));
+		builder.append(":");
+		builder.append(HttpParamsUtils.getNodeServerPortProtocol(context, protocol));
+		builder.append("/");
+		return builder.toString();
+	}
 
 	public static String getNodeServerPort(Context context){
 	   	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 	   	if(HttpParamsUtils.getNodeServerProtocol(context).equals(Constants.HTTP))
+			return sharedPrefs.getString(DataCollectService.DEC_NODE_PORT, Constants.NodeServerPort);
+		else{
+			return sharedPrefs.getString(DataCollectService.DEC_NODE_PORT_HTTPS, Constants.NodeServerPortHttps);
+		}
+	}
+	
+	public static String getNodeServerPortProtocol(Context context, String protocol){
+	   	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+	   	if(protocol.equals(Constants.HTTP))
 			return sharedPrefs.getString(DataCollectService.DEC_NODE_PORT, Constants.NodeServerPort);
 		else{
 			return sharedPrefs.getString(DataCollectService.DEC_NODE_PORT_HTTPS, Constants.NodeServerPortHttps);

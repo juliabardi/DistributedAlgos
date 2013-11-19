@@ -31,6 +31,9 @@ public class Constants {
 	public static final String USER ="algos";
 	public static final String PASSWORD ="algos";
 	
+	public static final String REGISTER_USER="registerUser";
+	public static final String LOGIN_USER="loginUser";
+	
 	//For push
 	public static final String REQUEST_PARAMS ="requestParams";
 	public static final String REQUEST_TIME ="time";

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+     <TextView
+        android:text="Regisztráció"
+        style="@style/title" />
+
+     <EditText
+         android:id="@+id/editTextEMail"
+         android:ems="10"
+         android:hint="Azonosító"
+         style="@style/userEditText" >
+
+         <requestFocus />
+     </EditText>
+
+     <EditText
+         android:id="@+id/editTextPassword"
+         android:ems="10"
+         android:inputType="textPassword"
+         android:hint="Jelszó"
+         style="@style/userEditText" />
+     
+     <EditText
+         android:id="@+id/editTextPasswordAgain"
+         android:ems="10"
+         android:inputType="textPassword"
+         android:hint="Jelszó újra"
+         style="@style/userEditText" />
+     
+     
+     <Button
+         android:layout_width="130dp"
+         android:layout_height="wrap_content"
+         android:layout_marginBottom="10dp"
+         android:layout_marginTop="10dp"
+         android:layout_marginLeft="5dp"
+         android:onClick="onRegistration"
+         android:text="Regisztráció" />
+</LinearLayout>

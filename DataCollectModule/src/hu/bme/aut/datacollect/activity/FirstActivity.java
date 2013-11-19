@@ -136,8 +136,11 @@ public class FirstActivity extends Activity {
 		editor.putString(DataCollectService.DATA_COLLECTOR_PROTOCOL, ((RadioButton)findViewById(R.id.radioButtonDataCollectorHTTP)).isChecked()? Constants.HTTP:Constants.HTTPS);
 		
 		editor.commit();
-		
-		this.startActivity(new Intent(this, MainActivity.class));
+		if(settings.getString(DataCollectService.USER_NAME, null)!=null){
+			this.startActivity(new Intent(this, MainActivity.class));
+		}else{
+			this.startActivity(new Intent(this, LoginActivity.class));			
+		}
 	}	
 
 }

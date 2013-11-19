@@ -17,9 +17,6 @@ import android.util.Log;
  * Sends GET and POST requests created by the CommunicationService and 
  * calls back with the results.
  * 
- * TODO Callback with either BroadcastReceiver or ResultReceiver
- * TODO Handle errors
- * 
  * @author Eva Pataji
  *
  */
@@ -85,22 +82,22 @@ public class NodeCommunicationIntentService extends IntentService implements Htt
 
 	@Override
 	public void errorOccuredDuringHandleResponse(String error, String code) {
-		Log.i(this.getClass().getName(), "error in Parsing: " + error);
+		Log.i(this.getClass().getName(), "Error in Parsing: " + error);
 		sendResponse(true,false);
 	}
 
 	@Override
 	public void errorOccured(String error) {
-		Log.i(this.getClass().getName(), "error: "+ error);
+		Log.i(this.getClass().getName(), "Error: "+ error);
 		sendResponse(false,false);
 	}
 	
-	private void sendResponse(boolean serverAvaiable,boolean value){
+	private void sendResponse(boolean serverCommSuccess,boolean value){
 		Bundle resultBundle = new Bundle();
 		resultBundle.putString(Constants.MESSAGE_TYPE, messageType);
 		resultBundle.putString(Constants.ITEM_NAME, itemName);
 		resultBundle.putBoolean(Constants.ITEM_SYNC_VALUE, value);
-		resultBundle.putBoolean(Constants.DISTRUBUTED_ALGOS_AVAIABLE_VALUE, serverAvaiable);
+		resultBundle.putBoolean(Constants.DISTRUBUTED_ALGOS_AVAIABLE_VALUE, serverCommSuccess);
 		resRec.send(1234, resultBundle);
 	}
 
