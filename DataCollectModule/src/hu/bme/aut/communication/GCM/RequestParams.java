@@ -161,6 +161,9 @@ public class RequestParams implements Serializable {
 	}
 	
 	public String getAddress() {
+		if(port==null || port.trim().equals("")){
+			return protocol + "://"+ip+"/"+ Constants.OFFER_REPLY;
+		}
 		return protocol + "://"+ip+":"+port+"/"+ Constants.OFFER_REPLY;
 	}
 	

@@ -56,8 +56,9 @@ public class HttpManager {
 	public void sendGetRequest(String url, String port)
 	{
 	  	if(url!=null && !url.trim().equals("")){
-	  		if(url.startsWith("https")){
+	  		if(url.startsWith("https")){ // If there is no port treat as openshift
 	  			try {
+	  				if(port.equals(""))port="443";
 		  			sendSecureGetRequest(url, Integer.parseInt(port));
 				} catch (NumberFormatException e) {
 					Log.e(this.getClass().getName(), "Port number cast exception at secure GET.");
@@ -102,9 +103,10 @@ public class HttpManager {
 		if(url!=null && !url.trim().equals("")){
 	  		if(url.startsWith("https")){
 	  			try {
+	  				if(port.equals(""))port="443";
 		  			sendSecurePostRequest(url, JSobject, Integer.parseInt(port));
 				} catch (NumberFormatException e) {
-					String reason = "Port number cast exception at secure GET.";
+					String reason = "Port number cast exception at secure POST.";
 					Log.e(this.getClass().getName(), reason);
 					listener.errorOccured(reason);
 				}

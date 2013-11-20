@@ -52,15 +52,15 @@ public class Constants {
 	
 	
 	// Server specific
-	public static final String NodeServerIP = "192.168.1.113";
-	public static final String GCMServerIP = "192.168.1.113";
-	public static final String DataCollectorServerIP = "192.168.1.113";
-	public static final String NodeServerPort = "3000";
-	public static final String NodeServerPortHttps = "3002";
-	public static final String DataCollectorServerPort = "3001";
-	public static final String DataCollectorServerPortHttps = "3003";
-	public static final String GCMServerPort = "8080";
-	public static final String GCMServerPortHttps = "8443";
+	public static final String NodeServerIP = "node-dec.rhcloud.com";
+	public static final String GCMServerIP = "admin-dec.rhcloud.com";
+	public static final String DataCollectorServerIP = "datacollector-distributedalgos.rhcloud.com";
+	public static final String NodeServerPort = "";
+	public static final String NodeServerPortHttps = "";
+	public static final String DataCollectorServerPort = "";
+	public static final String DataCollectorServerPortHttps = "";
+	public static final String GCMServerPort = "";
+	public static final String GCMServerPortHttps = "";
 	public static final String GCMServerProtocol = "http";
 	public static final String NodeServerProtocol = "http";
 	public static final String DataCollectorServerProtocol = "https";

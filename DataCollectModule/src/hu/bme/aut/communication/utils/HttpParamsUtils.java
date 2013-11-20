@@ -14,8 +14,10 @@ public class HttpParamsUtils {
 		builder.append(HttpParamsUtils.getGcmServerProtocol(context));
 		builder.append("://");
 		builder.append(HttpParamsUtils.getGcmIpServerAddress(context));
-		builder.append(":");
-		builder.append(HttpParamsUtils.getGcmServerPort(context));
+		String port = HttpParamsUtils.getGcmServerPort(context);
+		if(!port.trim().equals("")){
+			builder.append(":");
+			builder.append(port);}
 		builder.append("/DistributedEnvironmentCoordination");
 		builder.append("/");
 		return builder.toString();
@@ -26,8 +28,10 @@ public class HttpParamsUtils {
 		builder.append(HttpParamsUtils.getNodeServerProtocol(context));
 		builder.append("://");
 		builder.append(HttpParamsUtils.getNodeIpServerAddress(context));
-		builder.append(":");
-		builder.append(HttpParamsUtils.getNodeServerPort(context));
+		String port =HttpParamsUtils.getNodeServerPort(context);
+		if(!port.trim().equals("")){
+			builder.append(":");
+			builder.append(port);}
 		builder.append("/");
 		return builder.toString();
 	}
@@ -43,8 +47,10 @@ public class HttpParamsUtils {
 		builder.append(protocol);
 		builder.append("://");
 		builder.append(HttpParamsUtils.getNodeIpServerAddress(context));
-		builder.append(":");
-		builder.append(HttpParamsUtils.getNodeServerPortProtocol(context, protocol));
+		String port = HttpParamsUtils.getNodeServerPortProtocol(context, protocol);
+		if(!port.trim().equals("")){
+			builder.append(":");
+			builder.append(HttpParamsUtils.getNodeServerPortProtocol(context, protocol));}
 		builder.append("/");
 		return builder.toString();
 	}

@@ -56,11 +56,6 @@ public abstract class BaseUserDataActivity extends Activity{
 			progressDialog = null;
 		}
 	}
-		
-	@Override
-	public void onBackPressed() {
-		// Do nothing...
-	}
 
 	@Override
 	protected void onResume() {
