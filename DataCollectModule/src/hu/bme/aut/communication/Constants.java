@@ -11,7 +11,7 @@ import android.preference.PreferenceManager;
  *
  */
 public class Constants {
-	//Registration specific, only these messages can be sent to the server
+	//Registration, offer and update IP - specific, only these messages can be sent to the server
 	public static final String ALGTYPE_DIST_ALGOS = "DistributedAlgos";
 	public static final String REGISTER = "register";
 	public static final String UNREGISTER = "unregister";
@@ -19,6 +19,7 @@ public class Constants {
 	public static final String OFFER = "offer";
 	public static final String UNREGISTER_OFFER = "unregisterOffer";
 	public static final String UPDATE_CONNECTION = "updateConnection";
+	public static final String USER_DATA = "userData";
 	
 	public static final String ALGTYPE ="algType";
 	public static final String PARAM_NAME ="name";

@@ -55,11 +55,11 @@ public abstract class BaseUserDataActivity extends Activity{
 			progressDialog.dismiss();
 			progressDialog = null;
 		}
-	}
+	}	
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	protected void onPause() {
+		super.onPause();
 		if(progressDialog!=null && !showProgress){
 			hideProgress();
 		}

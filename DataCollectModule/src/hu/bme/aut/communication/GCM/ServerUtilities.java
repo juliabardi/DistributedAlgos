@@ -68,6 +68,7 @@ public final class ServerUtilities {
     public static boolean register(final Context context, final String regId) {
         Log.i(TAG, "registering device (regId = " + regId + ")");
         String serverUrl = HttpParamsUtils.getFullGcmAddress(context);
+        Log.i(ServerUtilities.class.getName(), "ServerUrl: " + serverUrl);
         Map<String, String> params = new HashMap<String, String>();
         params.put("regId", regId);
         long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);

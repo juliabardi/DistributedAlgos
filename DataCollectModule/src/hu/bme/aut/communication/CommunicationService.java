@@ -93,11 +93,7 @@ public class CommunicationService extends Service implements
 	
 	private SyncronizationValues registeredToDistributedAlgos=SyncronizationValues.NONE; //dec_node
 	private SyncronizationValues registeredToGCM=SyncronizationValues.NONE; //dec_admin
-	private SyncronizationValues updatedConnection=SyncronizationValues.NONE; //dec_node new IP
-	
-	private String ipAddress; // Actual address
-	private String ipAddressOld=""; // Previous IP, just in case IP update does not manage, but there is a new IP update from shared preferences...
-	
+	private SyncronizationValues updatedConnection=SyncronizationValues.NONE; //dec_node new IP	
 	
 	private boolean isSyncronized=false; // If all need/offer data could be sent to server.
 	private HashMap<String,SyncronizationValues> offerSyncronizationInfo;
@@ -182,7 +178,6 @@ public class CommunicationService extends Service implements
 	    theReceiver.setParentContext(this);
 	    registeredToDistributedAlgos=SyncronizationValues.NONE;
 	    registeredToGCM=SyncronizationValues.NONE;
-	    ipAddress = Constants.getDeviceIP(this);
 	    
 		offerSyncronizationInfo = new HashMap<String,SyncronizationValues>();		
 		manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -304,7 +299,11 @@ public class CommunicationService extends Service implements
 	 * Register peer need and offers when starting this service.
 	 */
 	private void registerPeer() {
-		setupSyncronizationInfo(SyncronizationValues.SENDING_REG);
+		String userID = settings.getString(DataCollectService.USER_NAME, "");
+		if(userID.equals("")){
+			// TODO NOTIFY TO LOGIN!!!
+			return;
+		}
 		
 		ArrayList<String> offerList = new ArrayList<String>();
 		Map<String, ?> keys = settings.getAll();
@@ -321,8 +320,16 @@ public class CommunicationService extends Service implements
 
 		JSONObject message = JsonUtils.createMainBodyWithAlgos(Constants.ALGTYPE_DIST_ALGOS, JsonUtils
 				.createAlgoBody(JsonUtils.createSimpleArray(offerList), null));
+		
+		try {
+			message.put(Constants.USER_DATA, createUserData(userID));
+			sendJobToNodeService(Constants.REGISTER,Constants.REGISTER, HttpParamsUtils.getFullNodeAddressProtocol(this, Constants.HTTPS) + Constants.REGISTER, message.toString());
+			setupSyncronizationInfo(SyncronizationValues.SENDING_REG);
 
-		sendJobToNodeService(Constants.REGISTER,Constants.REGISTER, HttpParamsUtils.getFullNodeAddress(this) + Constants.REGISTER, message.toString());
+		} catch (JSONException e) {
+			Log.e(this.getClass().getName(), "Could not register peer, JSON parse exception.");
+			e.printStackTrace();
+		}
 		
 	}
 	
@@ -345,20 +352,35 @@ public class CommunicationService extends Service implements
 	 *            true:register, false:unregister
 	 */
 	private void handleOffer(String key, boolean value) {
+		String userID = settings.getString(DataCollectService.USER_NAME, "");
+		if(userID.equals("")){
+			// TODO NOTIFY TO LOGIN!!!
+			return;
+		}
+		
 		if (IsWifiAvaiable()) {
+			JSONObject data= new JSONObject();
+			try {
+				data.put(Constants.ALGTYPE, Constants.ALGTYPE_DIST_ALGOS);
+				data.put(Constants.PARAM_NAME, key);
+				data.put(Constants.USER_DATA, createUserData(userID));
+			} catch (JSONException e) {
+				Log.e(this.getClass().getName(), "Could not handle peer offer, JSON parse exception.");
+				e.printStackTrace();
+			}
+			
 			StringBuilder builder = new StringBuilder();
-			builder.append(HttpParamsUtils.getFullNodeAddress(this));
+			builder.append(HttpParamsUtils.getFullNodeAddressProtocol(this, Constants.HTTPS));
 			if (value) {
 				builder.append(Constants.OFFER);
 			} else {
 				builder.append(Constants.UNREGISTER_OFFER);
 			}
-			builder.append("?" + Constants.ALGTYPE +"=" + Constants.ALGTYPE_DIST_ALGOS
-					+ "&" + Constants.PARAM_NAME+"=" + key);
-
+			
 			String url = builder.toString();
+			
 			offerSyncronizationInfo.put(key, value?SyncronizationValues.SENDING_REG:SyncronizationValues.SENDING_UNREG);
-			sendJobToNodeService(Constants.OFFER,key,url, null);
+			sendJobToNodeService(Constants.OFFER,key,url, data.toString());
 		} else {
 			offerSyncronizationInfo.put(key, SyncronizationValues.FALSE);
 			Log.i(this.getClass().getName(),
@@ -410,27 +432,40 @@ public class CommunicationService extends Service implements
 				&& (registeredToDistributedAlgos == SyncronizationValues.TRUE
 				|| registeredToDistributedAlgos == SyncronizationValues.SENDING_REG)){ // We got a new IP address, must notify the server...
 			
-			JSONObject connectionInfo=new JSONObject();
-			try {
-				connectionInfo.put("oldAddress", ipAddress );
-				ipAddressOld = ipAddress;
-				ipAddress = key;
-				connectionInfo.put("newAddress", key);
-				if(registeredToGCM == SyncronizationValues.TRUE){
-					connectionInfo.put("gcmAddress", GCMRegistrar.getRegistrationId(this));	
-				}
-				updatedConnection = SyncronizationValues.SENDING_REG;
-				sendJobToNodeService(Constants.UPDATE_CONNECTION,Constants.UPDATE_CONNECTION, HttpParamsUtils.getFullNodeAddress(this) + Constants.UPDATE_CONNECTION, connectionInfo.toString());
-				
-			} catch (JSONException e) {
-				Log.e(this.getClass().getName(), "Could not update IP Address, an error has occured...");
-				e.printStackTrace();
+			String userID = settings.getString(DataCollectService.USER_NAME, "");
+			if(userID.equals("")){
+				// TODO NOTIFY TO LOGIN!!!
+				return;
 			}
+			
+			JSONObject createUObject = createUserData(userID);
+			if(createUObject!=null){
+				updatedConnection = SyncronizationValues.SENDING_REG;
+				sendJobToNodeService(Constants.UPDATE_CONNECTION,Constants.UPDATE_CONNECTION, 
+						HttpParamsUtils.getFullNodeAddressProtocol(this, Constants.HTTPS)
+						+ Constants.UPDATE_CONNECTION, createUObject.toString());
+			}
+			
 		}else if(key.equals(DataCollectService.DEC_NODE_IP)){ // IP reset
 			registerPeer();
 		}else if(key.equals(DataCollectService.DEC_ADMIN_IP)){ // IP reset
 			registerGCM();
 		}
+	}
+	
+	private JSONObject createUserData(String userID){
+		JSONObject connectionInfo=new JSONObject();
+		try {
+			connectionInfo.put("userID", userID);
+			connectionInfo.put("password", settings.getString(DataCollectService.USER_PASSWORD, ""));
+			if(registeredToGCM == SyncronizationValues.TRUE){
+				connectionInfo.put("gcmAddress", GCMRegistrar.getRegistrationId(this));	
+			}
+		} catch (JSONException e) {
+			Log.e(this.getClass().getName(), "Could not update IP Address, an error has occured...");
+			e.printStackTrace();
+		}
+		return connectionInfo;
 	}
 
 	/**
@@ -516,7 +551,6 @@ public class CommunicationService extends Service implements
 	        		updatedConnection = SyncronizationValues.TRUE;
 	        	}else{
 	        		updatedConnection = SyncronizationValues.FALSE;
-	        		ipAddress = ipAddressOld; // In case of resend...
 	        	}
 	        }
 	        else{
