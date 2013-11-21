@@ -32,7 +32,6 @@ import android.widget.Toast;
  * @author Eva Pataji
  *
  */
-// TODO Update data on server events.
 public class CommunicationActivity extends Activity implements CommunicationListener {
 	private CommunicationService commService;
 	private boolean commBound = false;
@@ -164,6 +163,7 @@ public class CommunicationActivity extends Activity implements CommunicationList
     }
     
    private void updateDistAlgosServerData(){
+	   updateDistAlgosIP();
 	   if(commService.getregisteredToDistributedAlgos() == SyncronizationValues.TRUE){	
 	   		chtvNodeConn.setChecked(true);
 		}else{
@@ -175,6 +175,21 @@ public class CommunicationActivity extends Activity implements CommunicationList
 			
 		}
   		chtvNodeConnSending.setVisibility(View.INVISIBLE);
+   }
+   
+   private void updateDistAlgosIP(){
+	   if(commService.getUpdatedConnection() == SyncronizationValues.TRUE){
+		   ((CheckedTextView)findViewById(R.id.checkedDistAlgoIpUpdate)).setChecked(true);
+	   }
+	   else{
+		   ((CheckedTextView)findViewById(R.id.checkedDistAlgoIpUpdate)).setChecked(false); 		   
+			if(commService.getUpdatedConnection() == SyncronizationValues.SENDING_REG
+					|| commService.getUpdatedConnection() == SyncronizationValues.SENDING_UNREG){
+				((TextView)findViewById(R.id.checkedGDistAlgosIpUpdate)).setVisibility(View.VISIBLE); return;
+				}
+			
+		}
+	   ((TextView)findViewById(R.id.checkedGDistAlgosIpUpdate)).setVisibility(View.INVISIBLE);	   
    }
    
    private void updateGCMServerData(){
@@ -201,6 +216,13 @@ public class CommunicationActivity extends Activity implements CommunicationList
     	return false;
     }
     
+    public void distIpUpdate(View v){
+    	if(commBound){
+    		if(commService.updateDistIP()){
+    			updateDistAlgosIP();
+    		}else Toast.makeText(getApplication(), "Nincs mit szinkronizálni.", Toast.LENGTH_SHORT).show();
+    	}
+    }
     
     public void  navigateToRequests(View v){
     	this.startActivity(new Intent(this, RequestListActivity.class));
@@ -218,7 +240,7 @@ public class CommunicationActivity extends Activity implements CommunicationList
     	if(commBound){
     		if(commService.reConnectToGCM()){
     			Toast.makeText(getApplicationContext(), "Csatlakozás folyamatban...", Toast.LENGTH_SHORT).show();
-    		}
+    		}else  Toast.makeText(getApplication(), "Nincs mit szinkronizálni.", Toast.LENGTH_SHORT).show();
     		
     		updateGCMServerData();
     	}
@@ -228,7 +250,7 @@ public class CommunicationActivity extends Activity implements CommunicationList
     	if(commBound){
     		if(commService.reConnectToDistAlgos()){
     			Toast.makeText(getApplicationContext(), "Csatlakozás folyamatban...", Toast.LENGTH_SHORT).show();
-    		}
+    		}else Toast.makeText(getApplication(), "Nincs mit szinkronizálni.", Toast.LENGTH_SHORT).show();
     		
     		updateDistAlgosServerData();
     	}

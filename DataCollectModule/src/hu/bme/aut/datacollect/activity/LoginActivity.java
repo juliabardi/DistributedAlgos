@@ -33,20 +33,20 @@ public class LoginActivity extends BaseUserDataActivity{
 	}
 	
 	public void onLogin(View v){
-		// TODO: wifi-check
-		
-		if((EditText)findViewById(R.id.editTextEMail)== null || 
-			((EditText)findViewById(R.id.editTextEMail)).getText().toString().equals("") ||
-			(EditText)findViewById(R.id.editTextPassword)== null || 
-			((EditText)findViewById(R.id.editTextPassword)).getText().toString().trim().equals("")){
-			Toast.makeText(this, "Nem adtál meg minden adatot!", Toast.LENGTH_SHORT).show();			
-			return;
-		}
-		
-		id =((EditText)findViewById(R.id.editTextEMail)).getText().toString();
-		passwd = ((EditText)findViewById(R.id.editTextPassword)).getText().toString();
+		if(isWifiAvaiable()){
+			if((EditText)findViewById(R.id.editTextEMail)== null || 
+				((EditText)findViewById(R.id.editTextEMail)).getText().toString().equals("") ||
+				(EditText)findViewById(R.id.editTextPassword)== null || 
+				((EditText)findViewById(R.id.editTextPassword)).getText().toString().trim().equals("")){
+				Toast.makeText(this, "Nem adtál meg minden adatot!", Toast.LENGTH_SHORT).show();			
+				return;
+			}
 			
-		sendMessage(Constants.LOGIN_USER);
+			id =((EditText)findViewById(R.id.editTextEMail)).getText().toString();
+			passwd = ((EditText)findViewById(R.id.editTextPassword)).getText().toString();
+				
+			sendMessage(Constants.LOGIN_USER);
+		}
 	}
 
 	public void onRegistration(View v){

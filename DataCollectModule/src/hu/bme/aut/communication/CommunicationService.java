@@ -5,6 +5,7 @@ import static hu.bme.aut.communication.GCM.CommonUtilities.EXTRA_MESSAGE;
 import hu.bme.aut.communication.utils.HttpParamsUtils;
 import hu.bme.aut.communication.utils.JsonUtils;
 import hu.bme.aut.datacollect.activity.DataCollectService;
+import hu.bme.aut.datacollect.activity.LoginActivity;
 import hu.bme.aut.datacollect.activity.MainActivity;
 import hu.bme.aut.datacollect.activity.R;
 import java.util.ArrayList;
@@ -63,7 +64,6 @@ import com.google.android.gcm.GCMRegistrar;
  *		- GCM request will arrive when we have connection again
  *		- If net connection is lost while we are trying to reply - either save request or server will ask later again if data is still necessary
  *	 
- *  TODO Handle errors coming back from started http msg-s to servers (e.g server is not available)
  * @author Eva Pataji
  *
  */
@@ -90,6 +90,7 @@ public class CommunicationService extends Service implements
 	private final CommServiceBinder mBinder = new CommServiceBinder();
 	private NotificationManager manager;
 	private boolean isWifiListener = false;
+	private boolean isUserLoginVisible = false;
 	
 	private SyncronizationValues registeredToDistributedAlgos=SyncronizationValues.NONE; //dec_node
 	private SyncronizationValues registeredToGCM=SyncronizationValues.NONE; //dec_admin
@@ -120,6 +121,14 @@ public class CommunicationService extends Service implements
 	
 	public void syncCollectedDataStates(){
 		registerPeer();
+	}
+	
+	public boolean updateDistIP(){
+		if(! ( getUpdatedConnection()== SyncronizationValues.TRUE || getUpdatedConnection() == SyncronizationValues.SENDING_REG)){
+			updateConnData();
+			return true;
+		}
+		return false;
 	}
 	
 	public boolean reConnectToDistAlgos(){
@@ -178,6 +187,7 @@ public class CommunicationService extends Service implements
 	    theReceiver.setParentContext(this);
 	    registeredToDistributedAlgos=SyncronizationValues.NONE;
 	    registeredToGCM=SyncronizationValues.NONE;
+	    updatedConnection=SyncronizationValues.NONE;
 	    
 		offerSyncronizationInfo = new HashMap<String,SyncronizationValues>();		
 		manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -193,7 +203,7 @@ public class CommunicationService extends Service implements
 			registerToServers();
 		} else // Start to listen to update when registration can be done.
 		{
-			setupSyncronizationInfo(SyncronizationValues.FALSE);			
+			setupSyncronizationInfo(SyncronizationValues.FALSE);
 			registerReceiver(mWifiConnectionChangedReceiver, new IntentFilter(
 					WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION));
 			isWifiListener=true;
@@ -206,7 +216,7 @@ public class CommunicationService extends Service implements
 		manager.cancel(3);
 		
 		unregisterReceiver(mGCMHandleMessageReceiver);
-		if(registeredToDistributedAlgos==SyncronizationValues.TRUE || registeredToDistributedAlgos==SyncronizationValues.SENDING_REG){
+		if(registeredToDistributedAlgos==SyncronizationValues.TRUE || registeredToDistributedAlgos==SyncronizationValues.NONE || registeredToDistributedAlgos==SyncronizationValues.SENDING_REG){
 			unregisterFormDistributedAlgos();
 		}
 		
@@ -260,24 +270,50 @@ public class CommunicationService extends Service implements
 			} else if (!wifi.isAvailable()) // If wifi is disabled again send
 											// notification to user
 			{
-				Intent notificationIntent = new Intent(
-						Settings.ACTION_WIFI_SETTINGS);
-				PendingIntent pendingIntent = PendingIntent.getActivity(this,
-						0, notificationIntent, 0);
-
-				NotificationCompat.Builder builder = new NotificationCompat.Builder(
-						this).setSmallIcon(R.drawable.ic_launcher)
-						.setContentTitle("CommunicationModule")
-						.setContentText("Wifi nincs engedélyezve.")
-						.setOngoing(true).setAutoCancel(true)
-						.setContentIntent(pendingIntent);
-
-				manager.notify(3, builder.build());
-
+				createWifiNotification();
 				return false;
 			}
 		}
 		return false;
+	}
+	
+	private void createWifiNotification(){
+		if(!isWifiListener){
+			Intent notificationIntent = new Intent(
+					Settings.ACTION_WIFI_SETTINGS);
+			PendingIntent pendingIntent = PendingIntent.getActivity(this,
+					0, notificationIntent, 0);
+	
+			NotificationCompat.Builder builder = new NotificationCompat.Builder(
+					this).setSmallIcon(R.drawable.ic_launcher)
+					.setContentTitle("CommunicationModule")
+					.setContentText("Wifi nincs engedélyezve.")
+					.setOngoing(true).setAutoCancel(true)
+					.setContentIntent(pendingIntent);
+	
+			manager.notify(3, builder.build());
+		}
+
+	}
+	
+	private void createLoginNotification(){
+		if(!isUserLoginVisible){
+		Intent notificationIntent = new Intent(this,
+				LoginActivity.class);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this,
+				0, notificationIntent, 0);
+
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(
+				this).setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle("CommunicationModule")
+				.setContentText("Kérlek, jelentkezz be!")
+				.setOngoing(true).setAutoCancel(true)
+				.setContentIntent(pendingIntent);
+
+		manager.notify(4, builder.build());
+		isUserLoginVisible= true;
+		}
+
 	}
 
 	private void setupForeground() {
@@ -301,7 +337,8 @@ public class CommunicationService extends Service implements
 	private void registerPeer() {
 		String userID = settings.getString(DataCollectService.USER_NAME, "");
 		if(userID.equals("")){
-			// TODO NOTIFY TO LOGIN!!!
+			createLoginNotification();
+			setupSyncronizationInfo(SyncronizationValues.FALSE);
 			return;
 		}
 		
@@ -354,7 +391,8 @@ public class CommunicationService extends Service implements
 	private void handleOffer(String key, boolean value) {
 		String userID = settings.getString(DataCollectService.USER_NAME, "");
 		if(userID.equals("")){
-			// TODO NOTIFY TO LOGIN!!!
+			createLoginNotification();
+			offerSyncronizationInfo.put(key,SyncronizationValues.FALSE);
 			return;
 		}
 		
@@ -428,28 +466,34 @@ public class CommunicationService extends Service implements
 			String key) {
 		if (DataCollectService.sharedPrefKeys.contains(key)){
 			handleOffer(key, sharedPrefs.getBoolean(key, false));
-		}else if(DataCollectService.DEVICE_IP_WIFI.equals(key) 
-				&& (registeredToDistributedAlgos == SyncronizationValues.TRUE
-				|| registeredToDistributedAlgos == SyncronizationValues.SENDING_REG)){ // We got a new IP address, must notify the server...
-			
-			String userID = settings.getString(DataCollectService.USER_NAME, "");
-			if(userID.equals("")){
-				// TODO NOTIFY TO LOGIN!!!
-				return;
-			}
-			
-			JSONObject createUObject = createUserData(userID);
-			if(createUObject!=null){
-				updatedConnection = SyncronizationValues.SENDING_REG;
-				sendJobToNodeService(Constants.UPDATE_CONNECTION,Constants.UPDATE_CONNECTION, 
-						HttpParamsUtils.getFullNodeAddressProtocol(this, Constants.HTTPS)
-						+ Constants.UPDATE_CONNECTION, createUObject.toString());
-			}
-			
+		}else if(DataCollectService.DEVICE_IP_WIFI.equals(key)){ // We got a new IP address, must notify the server...
+			updateConnData();
 		}else if(key.equals(DataCollectService.DEC_NODE_IP)){ // IP reset
 			registerPeer();
 		}else if(key.equals(DataCollectService.DEC_ADMIN_IP)){ // IP reset
 			registerGCM();
+		}else if(key.equals(DataCollectService.USER_NAME)){ // We only save it if Login,register was successful.
+			if(isUserLoginVisible){
+				manager.cancel(4);
+				isUserLoginVisible=false;
+			}
+		}
+	}
+	
+	private void updateConnData(){
+		String userID = settings.getString(DataCollectService.USER_NAME, "");
+		if(userID.equals("")){
+			updatedConnection = SyncronizationValues.FALSE;
+			createLoginNotification();
+			return;
+		}
+		
+		JSONObject createUObject = createUserData(userID);
+		if(createUObject!=null){
+			updatedConnection = SyncronizationValues.SENDING_REG;
+			sendJobToNodeService(Constants.UPDATE_CONNECTION,Constants.UPDATE_CONNECTION, 
+					HttpParamsUtils.getFullNodeAddressProtocol(this, Constants.HTTPS)
+					+ Constants.UPDATE_CONNECTION, createUObject.toString());
 		}
 	}
 	
@@ -502,8 +546,9 @@ public class CommunicationService extends Service implements
 						WifiManager.EXTRA_SUPPLICANT_CONNECTED, false)) {// There is net again, register if did not happen at startup.																			
 					registerToServers();
 					unregisterReceiver(mWifiConnectionChangedReceiver); // Dont listen when unnecessary.
-					isWifiListener=false;
-					manager.cancel(3);	// Cancel Wi-Fi notif if it is still there and was not clicked.
+					if(isWifiListener){
+						isWifiListener=false;
+						manager.cancel(3);}	// Cancel Wi-Fi notif if it is still there and was not clicked.
 					Log.i(this.getClass().getName(), "Network connection establisted.");
 				} else {
 					// Wi-Fi connection was lost.
@@ -532,13 +577,23 @@ public class CommunicationService extends Service implements
 	    protected void onReceiveResult (int resultCode, Bundle resultData) {
 	    	Log.i(Constants.ALGTYPE_DIST_ALGOS,"DistributedAlgos server response processed.");
 	    	boolean resultReg=resultData.getBoolean(Constants.DISTRUBUTED_ALGOS_AVAIABLE_VALUE, false);
-	    	if(resultReg) registeredToDistributedAlgos = SyncronizationValues.TRUE;
-	    	else registeredToDistributedAlgos = SyncronizationValues.FALSE;
-	        String messageType = resultData.getString(Constants.MESSAGE_TYPE);
+	    	if(resultReg) {
+	    		registeredToDistributedAlgos = SyncronizationValues.TRUE;
+	    		if(resultData.getBoolean(Constants.ITEM_SYNC_VALUE, false)){
+	        		updatedConnection = SyncronizationValues.TRUE;
+	        	}else{
+	        		updatedConnection = SyncronizationValues.FALSE;
+	        	}
+	    	}
+	    	else {
+	    		registeredToDistributedAlgos = SyncronizationValues.FALSE;
+	    		updatedConnection = SyncronizationValues.FALSE;
+	    	}
+	      
+	    	String messageType = resultData.getString(Constants.MESSAGE_TYPE);
 	        if(messageType.equals(Constants.REGISTER)){
 	        	if(resultData.getBoolean(Constants.ITEM_SYNC_VALUE, false)){
 	        		setupSyncronizationInfo(SyncronizationValues.TRUE);
-	        		updatedConnection = SyncronizationValues.TRUE;
 	        	}else{
 	        		setupSyncronizationInfo(SyncronizationValues.FALSE);
 	        	}
@@ -546,14 +601,7 @@ public class CommunicationService extends Service implements
 	        else if (messageType.equals(Constants.UNREGISTER)){
 	        	// Do nothing, but could also set registeredToDistributedAlgos here false...
 	        }
-	        else if (messageType.equals(Constants.UPDATE_CONNECTION)){
-	        	if(resultCode == 200){
-	        		updatedConnection = SyncronizationValues.TRUE;
-	        	}else{
-	        		updatedConnection = SyncronizationValues.FALSE;
-	        	}
-	        }
-	        else{
+	        else if(messageType.equals(Constants.OFFER) || messageType.equals(Constants.UNREGISTER_OFFER)){
 	        	String itemName = resultData.getString(Constants.ITEM_NAME);
 	        	if(resultData.getBoolean(Constants.ITEM_SYNC_VALUE, false)){
 	        		offerSyncronizationInfo.put(itemName, SyncronizationValues.TRUE); // Managed to set requested value.
@@ -561,6 +609,7 @@ public class CommunicationService extends Service implements
 	        		offerSyncronizationInfo.put(itemName, SyncronizationValues.FALSE); // Could not send to server.
 	        	}
 	        }
+	        
 	        if(updateListener!=null){
 	        	updateListener.refreshCollectedDataStates();
 	        }

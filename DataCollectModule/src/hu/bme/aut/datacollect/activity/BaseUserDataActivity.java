@@ -7,13 +7,19 @@ import hu.bme.aut.communication.Constants;
 import hu.bme.aut.communication.NodeCommunicationIntentService;
 import hu.bme.aut.communication.utils.HttpParamsUtils;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Toast;
 
@@ -23,6 +29,7 @@ public abstract class BaseUserDataActivity extends Activity{
 	protected String id;
 	protected String passwd;
 	public static boolean showProgress = false; 
+	private static final int SENDER_WIFI=1;
 
 	protected void sendMessage(String msgType){
 		Intent intent = new Intent(this, NodeCommunicationIntentService.class);
@@ -60,10 +67,53 @@ public abstract class BaseUserDataActivity extends Activity{
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if(progressDialog!=null && !showProgress){
+		if(progressDialog!=null){
 			hideProgress();
 		}
 	}
+	
+	protected boolean isWifiAvaiable() {
+		ConnectivityManager connectivityManager = (ConnectivityManager) this
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo wifi = connectivityManager
+				.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		if (wifi != null ) {
+			if(!wifi.isAvailable()) // Wifi is disabled, notify user and navigate to settings.
+			{
+				setupAlertDialog("Wi-Fi állapot",
+						"Wi-Fi kapcsolat nincs engedélyezve. Kívánja engedélyezni? Enélkül a kommunikációs modul nem tudja feladatát elvégezni.",
+						SENDER_WIFI);
+				return false;
+			}else if (wifi.isAvailable() && wifi.isConnected()){
+				return true;
+			}			
+		}
+		return false;
+		}
+		
+		private void setupAlertDialog(String title, String msg, int senderId){
+			final int sender=senderId;
+			AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
+			alertbox.setTitle(title);
+			alertbox.setMessage(msg);
+			alertbox.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface arg0, int arg1) {
+				switch (sender) {
+				case SENDER_WIFI:
+					startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+					break;
+				default:
+					break;
+				}
+			}
+			});
+			alertbox.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface arg0, int arg1) {
+					 // No
+					}
+				});
+			alertbox.show();
+		}
 
 	protected void success(){
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());

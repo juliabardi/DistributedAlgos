@@ -66,7 +66,7 @@
                 android:checkMark="?android:attr/listChoiceIndicatorMultiple"
                 android:gravity="center_vertical"
                 android:text="DistributedAlgos szerver kapcsolat" />
-
+           
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -89,6 +89,40 @@
                     android:visibility="invisible"
                     android:layout_gravity="center"  />
             </LinearLayout>
+            
+           <CheckedTextView
+                android:id="@+id/checkedDistAlgoIpUpdate"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                android:gravity="center_vertical"
+                android:text="IP frissítés" />
+           
+          <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:onClick="distIpUpdate"
+                    android:text="Újracsatlakozás" />
+
+                <TextView
+                    android:id="@+id/checkedGDistAlgosIpUpdate"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="Csatlakozás folyamatban..."
+                    android:visibility="invisible"
+                    android:layout_gravity="center"  />
+            </LinearLayout>
+           
+            
+            
         </LinearLayout>
 
         <TextView

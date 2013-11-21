@@ -30,24 +30,26 @@ public class RegisterActivity extends BaseUserDataActivity {
 	}
 	
 	public void onRegistration(View v){
-		if((EditText)findViewById(R.id.editTextEMail)== null ||
-			(EditText)findViewById(R.id.editTextPassword)== null ||
-			(EditText)findViewById(R.id.editTextPasswordAgain)== null ||
-			((EditText)findViewById(R.id.editTextEMail)).getText().toString().equals("") ||
-			((EditText)findViewById(R.id.editTextPassword)).getText().toString().trim().equals("") ||
-			((EditText)findViewById(R.id.editTextPasswordAgain)).getText().toString().trim().equals("")){
-			Toast.makeText(this, "Nem adtál meg minden adatot!", Toast.LENGTH_SHORT).show();			
-			return;
-		}else if( ! ((EditText)findViewById(R.id.editTextPassword)).getText().toString().
-				equals(((EditText)findViewById(R.id.editTextPasswordAgain)).getText().toString())){
-			Toast.makeText(this, "A jelszavak nem egyeznek!", Toast.LENGTH_SHORT).show();
-			return;
+		if(isWifiAvaiable()){
+			if((EditText)findViewById(R.id.editTextEMail)== null ||
+				(EditText)findViewById(R.id.editTextPassword)== null ||
+				(EditText)findViewById(R.id.editTextPasswordAgain)== null ||
+				((EditText)findViewById(R.id.editTextEMail)).getText().toString().equals("") ||
+				((EditText)findViewById(R.id.editTextPassword)).getText().toString().trim().equals("") ||
+				((EditText)findViewById(R.id.editTextPasswordAgain)).getText().toString().trim().equals("")){
+				Toast.makeText(this, "Nem adtál meg minden adatot!", Toast.LENGTH_SHORT).show();			
+				return;
+			}else if( ! ((EditText)findViewById(R.id.editTextPassword)).getText().toString().
+					equals(((EditText)findViewById(R.id.editTextPasswordAgain)).getText().toString())){
+				Toast.makeText(this, "A jelszavak nem egyeznek!", Toast.LENGTH_SHORT).show();
+				return;
+			}
+			
+			id =((EditText)findViewById(R.id.editTextEMail)).getText().toString();
+			passwd = ((EditText)findViewById(R.id.editTextPassword)).getText().toString();
+							
+			sendMessage(Constants.REGISTER_USER);
 		}
-		
-		id =((EditText)findViewById(R.id.editTextEMail)).getText().toString();
-		passwd = ((EditText)findViewById(R.id.editTextPassword)).getText().toString();
-						
-		sendMessage(Constants.REGISTER_USER);
 	}
 
 	@Override
