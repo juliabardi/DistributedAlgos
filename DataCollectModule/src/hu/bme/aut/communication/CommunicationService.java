@@ -233,13 +233,25 @@ public class CommunicationService extends Service implements
 	private void unregisterFormDistributedAlgos(){
 		registeredToDistributedAlgos=SyncronizationValues.SENDING_UNREG;
 		StringBuilder builder = new StringBuilder();
-		builder.append(HttpParamsUtils.getFullNodeAddress(this));
+		builder.append(HttpParamsUtils.getFullNodeAddressProtocol(this, Constants.HTTPS));
 		builder.append(Constants.UNREGISTER);
-		builder.append("?" + Constants.ALGTYPE);
-		builder.append("=" + Constants.ALGTYPE_DIST_ALGOS);
+		String userID = settings.getString(DataCollectService.USER_NAME, "");
+		if(userID.equals("")){
+			return;
+		}
+		
+		JSONObject data= new JSONObject();
+		try {
+			data.put(Constants.ALGTYPE, Constants.ALGTYPE_DIST_ALGOS);
+			data.put(Constants.USER_DATA, createUserData(userID));
+		} catch (JSONException e) {
+			Log.e(this.getClass().getName(), "Could not handle peer unregistration, JSON parse exception.");
+			e.printStackTrace();
+			return;
+		}
 		
 		String url = builder.toString();
-		sendJobToNodeService(Constants.UNREGISTER,Constants.UNREGISTER,url, null);
+		sendJobToNodeService(Constants.UNREGISTER,Constants.UNREGISTER,url, data.toString());
 	}
 	
 	private void setupSyncronizationInfo(SyncronizationValues syncValue){
@@ -365,6 +377,7 @@ public class CommunicationService extends Service implements
 
 		} catch (JSONException e) {
 			Log.e(this.getClass().getName(), "Could not register peer, JSON parse exception.");
+			setupSyncronizationInfo(SyncronizationValues.FALSE);
 			e.printStackTrace();
 		}
 		
@@ -404,7 +417,9 @@ public class CommunicationService extends Service implements
 				data.put(Constants.USER_DATA, createUserData(userID));
 			} catch (JSONException e) {
 				Log.e(this.getClass().getName(), "Could not handle peer offer, JSON parse exception.");
+				offerSyncronizationInfo.put(key,SyncronizationValues.FALSE);
 				e.printStackTrace();
+				return;
 			}
 			
 			StringBuilder builder = new StringBuilder();
@@ -467,7 +482,8 @@ public class CommunicationService extends Service implements
 		if (DataCollectService.sharedPrefKeys.contains(key)){
 			handleOffer(key, sharedPrefs.getBoolean(key, false));
 		}else if(DataCollectService.DEVICE_IP_WIFI.equals(key)){ // We got a new IP address, must notify the server...
-			updateConnData();
+			updatedConnection = SyncronizationValues.FALSE;
+			checkSyncValues(false);
 		}else if(key.equals(DataCollectService.DEC_NODE_IP)){ // IP reset
 			registerPeer();
 		}else if(key.equals(DataCollectService.DEC_ADMIN_IP)){ // IP reset
@@ -525,13 +541,40 @@ public class CommunicationService extends Service implements
 				
 				if(GCMRegistrar.isRegisteredOnServer(CommunicationService.this))registeredToGCM = SyncronizationValues.TRUE;
 				else registeredToGCM = SyncronizationValues.FALSE;
+			}else if(newMessage.equals(getString(R.string.gcm_message))){
+				checkSyncValues(true);
 			}
-			
 			if(updateListener!=null){
 	        	updateListener.refreshGCMConnData();
 	        }
 		}
 	};
+	
+	/**
+	 * Check if we must sync sg...
+	 * @param fromGCM If it is a GCM msg update GCM is registered...
+	 */
+	private void checkSyncValues(boolean fromGCM){
+		// Since we got MSG GCM is connected, we must check other data
+		if(!fromGCM){
+			if(!isSynced(getRegisteredtoGCMServer())){
+				registerGCM();
+			}
+		}
+		
+		if(!isSynced(registeredToDistributedAlgos)){ // Also sends IP update in body...
+			registerPeer();
+		}
+		else if(!isSynced(updatedConnection)){ 
+			updateConnData();
+		}
+	}
+	
+	private boolean isSynced(SyncronizationValues data){
+		if(data==SyncronizationValues.FALSE)
+			return false;
+		else return true;
+	}
 
 	/**
 	 * Listen to Wifi connection state.

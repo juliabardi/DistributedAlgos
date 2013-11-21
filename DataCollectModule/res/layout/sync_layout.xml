@@ -44,8 +44,6 @@
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginTop="10dp"
                     android:onClick="connectToGCMServer"
                     android:text="Újracsatlakozás" />
 
@@ -75,8 +73,6 @@
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginTop="10dp"
                     android:onClick="connectToDistAlgoServer"
                     android:text="Újracsatlakozás" />
 
@@ -106,8 +102,6 @@
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginTop="10dp"
                     android:onClick="distIpUpdate"
                     android:text="Újracsatlakozás" />
 
@@ -135,10 +129,11 @@
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             android:onClick="navigateToRequests"
+            android:layout_margin="5dp"
             android:text="Beérkezett kérések megtekintése" />
 
         <TextView
-            android:text="Kiajánlott adatok"
+            android:text="Kiajánlott/ Visszavont adatok"
             style="@style/title.insideView" />
 
         <Button
@@ -146,13 +141,15 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
+            android:layout_margin="5dp"
             android:onClick="syncCollectedDataStates"
             android:text="Adatok szinkronizálása" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:layout_margin="5dp" >
 
             <TextView
                 android:layout_width="match_parent"
