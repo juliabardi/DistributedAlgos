@@ -80,7 +80,13 @@ public final class ServerUtilities {
             try {
                 displayMessage(context, context.getString(
                         R.string.server_registering, i, MAX_ATTEMPTS));
+                if(serverUrl.startsWith(hu.bme.aut.communication.Constants.HTTPS)){
+                	Log.i(ServerUtilities.class.getName(), "Secure connection.");
+                	postSecure(serverUrl + "register", params);
+                }else{
+                	Log.i(ServerUtilities.class.getName(), "Simple connection.");
                 	post(serverUrl + "register", params);
+                }
                 GCMRegistrar.setRegisteredOnServer(context, true);
                 String message = context.getString(R.string.server_registered);
                 CommonUtilities.displayMessage(context, message);
@@ -122,7 +128,13 @@ public final class ServerUtilities {
         params.put("regId", regId);
         try {
             GCMRegistrar.setRegisteredOnServer(context, false); // Asked by dec_admin server side to always retry connecting at communication module startup.
+            if(serverUrl.startsWith(hu.bme.aut.communication.Constants.HTTPS)){
+            	Log.i(ServerUtilities.class.getName(), "Secure connection.");
+            	postSecure(serverUrl + "unregister", params);
+        	}else{
+        		Log.i(ServerUtilities.class.getName(), "Simple connection.");
         		post(serverUrl + "unregister", params);
+        	}
             String message = context.getString(R.string.server_unregistered);
             CommonUtilities.displayMessage(context, message);
         } catch (IOException e) {
