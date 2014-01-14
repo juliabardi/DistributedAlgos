@@ -18,7 +18,7 @@ public class HttpParamsUtils {
 		if(!port.trim().equals("")){
 			builder.append(":");
 			builder.append(port);}
-		//builder.append("/DistributedEnvironmentCoordination");
+		builder.append(Constants.GCMServerPath);
 		builder.append("/");
 		return builder.toString();
 	}

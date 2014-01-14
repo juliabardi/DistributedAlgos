@@ -51,19 +51,19 @@
     <string name="welcome_long">Az alábbiakban megadhatod a szerverek címét, majd a regisztrációt követően elnavigálunk a főoldalra. Ezután a Beállításokban engedélyezhetsz adatgyűjtéseket.\n
         Érzékeny adatokat a beállításoktól függetlenül minden esetben titkosított csatornán küldünk ki!</string>
     <string name="node_szerver_settings">Node szerver beállítások</string>
-    <string name="default_dec_node_ip">node-dec.rhcloud.com</string>
-    <string name="default_dec_node_port">3000</string>
-    <string name="default_dec_node_port_https">3002</string>
+    <string name="default_dec_node_ip">babcomaut.aut.bme.hu</string>
+    <string name="default_dec_node_port">1338</string>
+    <string name="default_dec_node_port_https">1339</string>
     <string name="default_dec_node_protocol">http</string>
     <string name="gcm_szerver_settings">GCM szerver beállítások</string>
-    <string name="default_dec_admin_ip">admin-dec.rhcloud.com</string>
-    <string name="default_dec_admin_port">8080</string>
+    <string name="default_dec_admin_ip">babcomaut.aut.bme.hu</string>
+    <string name="default_dec_admin_port">10080</string>
     <string name="default_dec_admin_port_https">8443</string>
     <string name="data_collector_szerver_settings">DataCollector szerver beállítások</string>
-    <string name="default_data_collector_ip">datacollector-distributedalgos.rhcloud.com</string>
+    <string name="default_data_collector_ip">babcomaut.aut.bme.hu</string>
     <string name="default_data_collector_protocol">https</string>
-    <string name="default_data_collector_port">3001</string>
-    <string name="default_data_collector_port_https">3003</string>
+    <string name="default_data_collector_port">1340</string>
+    <string name="default_data_collector_port_https">1341</string>
     <string name="save_start">Mentés</string>
     <string name="settings">Beállítások</string>
     <string name="take_picture">Képkészítés</string>

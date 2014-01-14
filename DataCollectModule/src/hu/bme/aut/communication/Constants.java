@@ -53,9 +53,9 @@ public class Constants {
 	
 	
 	// Server specific
-	public static final String NodeServerIP = "node-dec.rhcloud.com";
-	public static final String GCMServerIP = "admin-dec.rhcloud.com";
-	public static final String DataCollectorServerIP = "datacollector-distributedalgos.rhcloud.com";
+	public static final String NodeServerIP = "babcomaut.aut.bme.hu";
+	public static final String GCMServerIP = "babcomaut.aut.bme.hu";
+	public static final String DataCollectorServerIP = "babcomaut.aut.bme.hu";
 	public static final String NodeServerPort = "";
 	public static final String NodeServerPortHttps = "";
 	public static final String DataCollectorServerPort = "";
@@ -65,6 +65,7 @@ public class Constants {
 	public static final String GCMServerProtocol = "http";
 	public static final String NodeServerProtocol = "http";
 	public static final String DataCollectorServerProtocol = "https";
+	public static final String GCMServerPath="/DistributedEnvironmentCoordination";
 	
 	public static String getDeviceIP(Context context){
     	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
